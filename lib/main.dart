@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -32,7 +33,9 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-  } catch (e) {}
+  } catch (e) {
+    log('$e', name: 'first error');
+  }
   runApp(RpApp());
 }
 
@@ -57,10 +60,10 @@ class RpApp extends StatelessWidget {
       SystemUiOverlay.bottom
     ]);
     _portraitModeOnly();
-    return NeumorphicApp(
+    return BlocProvider(create: (context) => AuthBloc(), child: NeumorphicApp(
       debugShowCheckedModeBanner: false,
       title: 'Roleplaying app',
-      home: BlocProvider(create: (context) => AuthBloc(), child: const Landing()),
+      home: const Landing(),
       routes: appRoutes,
       theme: const NeumorphicThemeData(
         baseColor: lightPrimary,
@@ -70,37 +73,37 @@ class RpApp extends StatelessWidget {
         lightSource: LightSource.top,
       ),
       darkTheme: const NeumorphicThemeData(
-        baseColor: darkPrimary,
-        accentColor: Color(0xffa0a0a0),
-        variantColor: Color(0xffffffff),
-        shadowDarkColor: Color(0xFF000000),
-        shadowLightColor: Color(0xFF424242),
-        defaultTextColor: Colors.white
+          baseColor: darkPrimary,
+          accentColor: Color(0xffa0a0a0),
+          variantColor: Color(0xffffffff),
+          shadowDarkColor: Color(0xFF000000),
+          shadowLightColor: Color(0xFF424242),
+          defaultTextColor: Colors.white
       ),
       materialTheme: ThemeData(
-        scaffoldBackgroundColor: lightPrimary,
-        backgroundColor: lightPrimary,
-        primaryColor: const Color(0xFF2F69FF),
-        accentColor: const Color(0xffc2c2c2),
-        textTheme: const TextTheme(
+          scaffoldBackgroundColor: lightPrimary,
+          backgroundColor: lightPrimary,
+          primaryColor: const Color(0xFF2F69FF),
+          accentColor: const Color(0xffc2c2c2),
+          textTheme: const TextTheme(
             headline1: TextStyle(color: Colors.white, fontSize: 24),
             headline2: TextStyle(color: Colors.black, fontSize: 24),
             bodyText1: TextStyle(color: Colors.black, fontSize: 20),
             bodyText2: TextStyle(color: Colors.white, fontSize: 20),
             subtitle1: TextStyle(color: Color(0xff000000), fontSize: 18),
             subtitle2: TextStyle(color: Color(0xff525252), fontSize: 14),
-        )
+          )
       ),
       materialDarkTheme: ThemeData(
-        scaffoldBackgroundColor: darkPrimary,
-        backgroundColor: darkPrimary,
-        primaryColor: Colors.black,
-        accentColor: const Color(0xff9e9e9e),
-        canvasColor: Colors.white,
-        brightness: Brightness.dark,
-        cardTheme: const CardTheme(
-          shadowColor: Colors.white,
-        ),
+          scaffoldBackgroundColor: darkPrimary,
+          backgroundColor: darkPrimary,
+          primaryColor: Colors.black,
+          accentColor: const Color(0xff9e9e9e),
+          canvasColor: Colors.white,
+          brightness: Brightness.dark,
+          cardTheme: const CardTheme(
+            shadowColor: Colors.white,
+          ),
           textTheme: const TextTheme(
             headline1: TextStyle(color: Colors.white, fontSize: 24),
             headline2: TextStyle(color: Colors.white, fontSize: 24),
@@ -110,6 +113,6 @@ class RpApp extends StatelessWidget {
             subtitle2: TextStyle(color: Color(0xffe3e3e3), fontSize: 14),
           )
       ),
-    );
+    ));
   }
 }

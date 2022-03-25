@@ -13,19 +13,24 @@ import 'package:roleplaying_app/src/ui/Utils.dart';
 
 import '../services/auth_service.dart';
 
-class FormScreen extends StatefulWidget {
+class FormScreen extends StatelessWidget {
+  final AuthService authService = AuthService();
 
   FormScreen({Key? key}) : super(key: key);
 
-  @override
-  State<FormScreen> createState() => _FormView();
-
   Widget build(BuildContext context) {
-    return _FormView().build(context);
+    return FormView();
   }
 }
 
-class _FormView extends State<FormScreen> {
+class FormView extends StatefulWidget {
+  FormView({Key? key}) : super(key: key);
+
+  @override
+  State<FormView> createState() => _FormView();
+}
+
+class _FormView extends State<FormView> {
   late TextEditingController _titleController;
   late TextEditingController _textController;
 
@@ -43,212 +48,214 @@ class _FormView extends State<FormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final AuthBloc authBloc = BlocProvider.of<AuthBloc>(context);
+    final AuthBloc authBloc = context.read<AuthBloc>();
     final _user = authBloc.state.getUser()!.id;
 
-    developer.log(authBloc.state.getUser().toString(), name: "Current user on form screen");
-    developer.log(authBloc.state.toString(), name: "Current state on form screen");
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, state) {
+        developer.log(state.getUser().toString(), name: "Current user on form screen");
+        developer.log(state.toString(), name: "Current state on form screen");
+        if (state is AuthStateAuthetificated) {
+          return Scaffold(
+            body: Stack(
+              children: [
+                Positioned(top: 15, left: 15, child: Utils.GenerateBackButton(context)),
+                Positioned(
+                    top: 15,
+                    right: 15,
+                    child: Neumorphic(
+                      style: NeumorphicStyle(
+                        shape: NeumorphicShape.flat,
+                        depth: 5.0,
+                        color: Theme.of(context).primaryColor,
+                        boxShape: NeumorphicBoxShape.circle(),
+                      ),
+                      child: IconButton(
+                        icon: Icon(Icons.check),
+                        color: Colors.white,
+                        iconSize: sqrt(MediaQuery.of(context).size.height + MediaQuery.of(context).size.width),
+                        onPressed: () async {
+                          _title = _titleController.text;
+                          _text = _textController.text;
 
-    return Scaffold(
-      body: Stack(
-        children: [
-          Positioned(
-              top: 15,
-              left: 15,
-              child: Utils.GenerateBackButton(context)
-          ),
-          Positioned(
-            top: 15,
-            right: 15,
-            child: Neumorphic(
-              style: NeumorphicStyle(
-                shape: NeumorphicShape.flat,
-                depth: 5.0,
-                color: Theme.of(context).primaryColor,
-                boxShape: NeumorphicBoxShape.circle(),
-              ),
-              child: IconButton(
-                icon: Icon(Icons.check),
-                color: Colors.white,
-                iconSize: sqrt(MediaQuery.of(context).size.height + MediaQuery.of(context).size.width),
-                onPressed: () async {
-                  _title = _titleController.text;
-                  _text = _textController.text;
+                          Profile _form = Profile(_user, _title, _text);
 
-                  Profile _form = Profile(_user, _title, _text);
+                          print(_form.toString());
 
-                  print(_form.toString());
+                          _formService.addOrUpdateProfile(_form);
 
-                  _formService.addOrUpdateProfile(_form);
-
-                  Navigator.pop(context);
-                },
-              ),
-            )
-          ),
-          Center(
-            child: Padding(
-              padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 10),
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width / 1.1,
-                height: MediaQuery.of(context).size.height / 1.15,
-                child: Neumorphic(
-                  style: NeumorphicStyle(
-                    shape: NeumorphicShape.flat,
-                    boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(5)),
-                    depth: 2.0,
-                    color: Theme.of(context).cardColor,
-                  ),
-                  child: Center(
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(top: 30),
-                          child: SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.5,
-                            height: MediaQuery.of(context).size.height / 22,
-                            child: Neumorphic(
-                                style: NeumorphicStyle(
-                                    shape: NeumorphicShape.convex,
-                                    boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(10)),
-                                    depth: 5.0,
-                                    color: Theme.of(context).cardColor
-                                ),
-                                child: Padding(
-                                  padding: EdgeInsets.only(left: MediaQuery.of(context).size.width / 10),
-                                  child: TextField(
-                                    decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                      hintText: "Название анкеты",
-                                    ),
-                                    controller: _titleController,
-                                  ),
-                                )
-                            ),
-                          ),
+                          Navigator.pop(context);
+                        },
+                      ),
+                    )),
+                Center(
+                  child: Padding(
+                    padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 10),
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width / 1.1,
+                      height: MediaQuery.of(context).size.height / 1.15,
+                      child: Neumorphic(
+                        style: NeumorphicStyle(
+                          shape: NeumorphicShape.flat,
+                          boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(5)),
+                          depth: 2.0,
+                          color: Theme.of(context).cardColor,
                         ),
-                        Padding(
-                            padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 80),
-                            child: SizedBox(
-                                width: MediaQuery.of(context).size.width / 1.38,
-                                height: MediaQuery.of(context).size.height / 3.07,
-                                child: NeumorphicButton(
-                                  style: NeumorphicStyle(
-                                    shape: NeumorphicShape.flat,
-                                    boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(5)),
-                                    depth: 5.0,
-                                    color: Theme.of(context).accentColor,
-                                  ),
-                                  child: Center(
-                                    child: Icon(Icons.image_outlined,
-                                      size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width)*60),
-                                    ),
-                                  ),
-                                  onPressed: () => Navigator.pushNamed(context, ''),
-                                )
-                            )
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 60),
-                          child: SizedBox(
-                            width: MediaQuery.of(context).size.width / 1.27,
-                            height: MediaQuery.of(context).size.height / 9,
-                            child: Neumorphic(
-                              style: NeumorphicStyle(
-                                shape: NeumorphicShape.flat,
-                                boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(5)),
-                                depth: 2.0,
-                                color: Theme.of(context).accentColor,
-                              ),
-                              child: Center(
-                                child: Padding(
-                                  padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 50, left: MediaQuery.of(context).size.width / 30),
-                                  child: Column(
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Text("Текст:",
-                                            style: Theme.of(context).textTheme.bodyText2,
+                        child: Center(
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(top: 30),
+                                child: SizedBox(
+                                  width: MediaQuery.of(context).size.width * 0.5,
+                                  height: MediaQuery.of(context).size.height / 22,
+                                  child: Neumorphic(
+                                      style: NeumorphicStyle(
+                                          shape: NeumorphicShape.convex,
+                                          boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(10)),
+                                          depth: 5.0,
+                                          color: Theme.of(context).cardColor),
+                                      child: Padding(
+                                        padding: EdgeInsets.only(left: MediaQuery.of(context).size.width / 10),
+                                        child: TextField(
+                                          decoration: InputDecoration(
+                                            border: InputBorder.none,
+                                            hintText: "Название анкеты",
                                           ),
-                                          Padding(
-                                            padding: EdgeInsets.only(left: MediaQuery.of(context).size.width / 15),
-                                            child: SizedBox(
-                                              width:  MediaQuery.of(context).size.width / 2,
-                                              height: MediaQuery.of(context).size.height / 28,
-                                              child: Neumorphic(
-                                                style: NeumorphicStyle(
-                                                  shape: NeumorphicShape.flat,
-                                                  boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(5)),
-                                                  depth: 2.0,
-                                                  color: Theme.of(context).accentColor,
-                                                ),
-                                                child: TextField(
-                                                  decoration: InputDecoration(
-                                                      border: InputBorder.none,
-                                                      hintText: "Текст",
-                                                      hintStyle: TextStyle(
-                                                        color: Theme.of(context).textTheme.bodyText1?.color,
-                                                      )
-                                                  ),
-                                                  controller: _textController,
-                                                ),
-                                              ),
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 80),
-                                        child: SizedBox(
-                                          width: MediaQuery.of(context).size.width / 1.5,
-                                          height: MediaQuery.of(context).size.height / 30,
-                                          child: NeumorphicButton(
-                                            style: NeumorphicStyle(
-                                              shape: NeumorphicShape.flat,
-                                              boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(5)),
-                                              depth: 2.0,
-                                              color: Theme.of(context).cardColor,
-                                            ),
-                                            child: Center(
-                                              child: Icon(Icons.add,
-                                                size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width) / 3),
-                                              ),
-                                            ),
-                                            onPressed: () => { }
+                                          controller: _titleController,
+                                        ),
+                                      )),
+                                ),
+                              ),
+                              Padding(
+                                  padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 80),
+                                  child: SizedBox(
+                                      width: MediaQuery.of(context).size.width / 1.38,
+                                      height: MediaQuery.of(context).size.height / 3.07,
+                                      child: NeumorphicButton(
+                                        style: NeumorphicStyle(
+                                          shape: NeumorphicShape.flat,
+                                          boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(5)),
+                                          depth: 5.0,
+                                          color: Theme.of(context).accentColor,
+                                        ),
+                                        child: Center(
+                                          child: Icon(
+                                            Icons.image_outlined,
+                                            size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width) * 60),
                                           ),
                                         ),
-                                      )
-                                    ],
+                                        onPressed: () => Navigator.pushNamed(context, ''),
+                                      ))),
+                              Padding(
+                                padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 60),
+                                child: SizedBox(
+                                  width: MediaQuery.of(context).size.width / 1.27,
+                                  height: MediaQuery.of(context).size.height / 9,
+                                  child: Neumorphic(
+                                    style: NeumorphicStyle(
+                                      shape: NeumorphicShape.flat,
+                                      boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(5)),
+                                      depth: 2.0,
+                                      color: Theme.of(context).accentColor,
+                                    ),
+                                    child: Center(
+                                      child: Padding(
+                                        padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 50, left: MediaQuery.of(context).size.width / 30),
+                                        child: Column(
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  "Текст:",
+                                                  style: Theme.of(context).textTheme.bodyText2,
+                                                ),
+                                                Padding(
+                                                  padding: EdgeInsets.only(left: MediaQuery.of(context).size.width / 15),
+                                                  child: SizedBox(
+                                                    width: MediaQuery.of(context).size.width / 2,
+                                                    height: MediaQuery.of(context).size.height / 28,
+                                                    child: Neumorphic(
+                                                      style: NeumorphicStyle(
+                                                        shape: NeumorphicShape.flat,
+                                                        boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(5)),
+                                                        depth: 2.0,
+                                                        color: Theme.of(context).accentColor,
+                                                      ),
+                                                      child: TextField(
+                                                        decoration: InputDecoration(
+                                                            border: InputBorder.none,
+                                                            hintText: "Текст",
+                                                            hintStyle: TextStyle(
+                                                              color: Theme.of(context).textTheme.bodyText1?.color,
+                                                            )),
+                                                        controller: _textController,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                            Padding(
+                                              padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 80),
+                                              child: SizedBox(
+                                                width: MediaQuery.of(context).size.width / 1.5,
+                                                height: MediaQuery.of(context).size.height / 30,
+                                                child: NeumorphicButton(
+                                                    style: NeumorphicStyle(
+                                                      shape: NeumorphicShape.flat,
+                                                      boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(5)),
+                                                      depth: 2.0,
+                                                      color: Theme.of(context).cardColor,
+                                                    ),
+                                                    child: Center(
+                                                      child: Icon(
+                                                        Icons.add,
+                                                        size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width) / 3),
+                                                      ),
+                                                    ),
+                                                    onPressed: () => {}),
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
+                              Padding(
+                                padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 80),
+                                child: SizedBox(
+                                  width: MediaQuery.of(context).size.width / 1.3,
+                                  height: MediaQuery.of(context).size.height / 3.4,
+                                  child: Neumorphic(
+                                    style: NeumorphicStyle(
+                                      shape: NeumorphicShape.flat,
+                                      boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(5)),
+                                      depth: 2.0,
+                                      color: Theme.of(context).accentColor,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            ],
                           ),
                         ),
-                        Padding(
-                          padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 80),
-                          child: SizedBox(
-                            width: MediaQuery.of(context).size.width / 1.3,
-                            height: MediaQuery.of(context).size.height / 3.4,
-                            child: Neumorphic(
-                              style: NeumorphicStyle(
-                                shape: NeumorphicShape.flat,
-                                boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(5)),
-                                depth: 2.0,
-                                color: Theme.of(context).accentColor,
-                              ),
-                            ),
-                          ),
-                        )
-                      ],
+                      ),
                     ),
                   ),
-                ),
-              ),
+                )
+              ],
             ),
-          )
-        ],
-      ),
+          );
+        }
+        return const Scaffold(
+          body: Center(
+            child: CircularProgressIndicator(),
+          ),
+        );
+      },
     );
   }
 
