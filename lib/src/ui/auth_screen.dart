@@ -4,6 +4,7 @@ import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
 import 'package:roleplaying_app/src/services/auth_service.dart';
+import 'package:roleplaying_app/src/ui/form_screen.dart';
 
 import 'dart:developer' as developer;
 
@@ -223,7 +224,10 @@ class _AuthView extends State<AuthView> {
                           developer.log(context
                               .read<AuthBloc>()
                               .state.toString(), name: "Current state");
-                          Navigator.pushNamed(context, '/form_screen');
+                          BlocProvider(
+                            create: (BuildContext context) => AuthBloc(),
+                            child: FormScreen().build(context)
+                          );
                         }
                       },
                       child: Container(),

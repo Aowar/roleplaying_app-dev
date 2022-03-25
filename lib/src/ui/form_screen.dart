@@ -13,27 +13,19 @@ import 'package:roleplaying_app/src/ui/Utils.dart';
 
 import '../services/auth_service.dart';
 
-class FormScreen extends StatelessWidget {
-
-  final AuthService authService = AuthService();
+class FormScreen extends StatefulWidget {
 
   FormScreen({Key? key}) : super(key: key);
+
+  @override
+  State<FormScreen> createState() => _FormView();
+
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => AuthBloc(),
-      child: FormView(),
-    );
+    return _FormView().build(context);
   }
 }
 
-class FormView extends StatefulWidget {
-  FormView({Key? key}) : super(key: key);
-
-  @override
-  State<FormView> createState() => _FormView();
-}
-
-class _FormView extends State<FormView> {
+class _FormView extends State<FormScreen> {
   late TextEditingController _titleController;
   late TextEditingController _textController;
 
