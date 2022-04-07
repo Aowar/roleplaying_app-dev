@@ -9,4 +9,12 @@ class Profile extends Equatable {
 
   @override
   List<Object?> get props => [userId, title, text];
+
+  Map<String, dynamic> toMap() {
+    return {
+      "userId": userId,
+      "title": title,
+      "text": text
+    };
+  }
 }

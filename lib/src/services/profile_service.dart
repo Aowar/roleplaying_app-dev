@@ -5,6 +5,6 @@ class FormService {
   final CollectionReference _profileCollection = FirebaseFirestore.instance.collection("profiles");
 
   Future addOrUpdateProfile(Profile form) async {
-    return await _profileCollection.doc(form.userId).set(form);
+    return await _profileCollection.doc().set(form.toMap());
   }
 }
