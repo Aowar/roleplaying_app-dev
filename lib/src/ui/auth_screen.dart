@@ -27,6 +27,7 @@ class AuthView extends StatefulWidget {
 }
 
 class _AuthView extends State<AuthView> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late TextEditingController _passwordController;
   late TextEditingController _emailController;
 
@@ -39,6 +40,35 @@ class _AuthView extends State<AuthView> {
     super.initState();
     _passwordController = TextEditingController();
     _emailController = TextEditingController();
+  }
+
+  ///Creating login fields func
+  Widget generateFormTextField(Icon icon, String hintText, TextEditingController controller, bool obscureText, String failedValidatorText) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * 0.5,
+      child: Neumorphic(
+        style: NeumorphicStyle(
+            shape: NeumorphicShape.convex,
+            boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(10)),
+            depth: 5.0,
+            color: Theme.of(context).cardColor),
+        child: TextFormField(
+          decoration: InputDecoration(
+            border: InputBorder.none,
+            icon: icon,
+            hintText: hintText,
+          ),
+          obscureText: obscureText,
+          controller: controller,
+          validator: (String? value) {
+            if (value == null || value.isEmpty) {
+              return failedValidatorText;
+            }
+            return null;
+          },
+        ),
+      ),
+    );
   }
 
   @override
@@ -64,74 +94,47 @@ class _AuthView extends State<AuthView> {
                           child: Text("Ролевые игры", style: Theme.of(context).textTheme.headline1),
                         ))),
               ),
+              ///Auth form
               Center(
-                child: Padding(
-                  padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 2.4),
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.5,
-                        height: MediaQuery.of(context).size.height / 22,
-                        child: Neumorphic(
-                          style: NeumorphicStyle(
-                              shape: NeumorphicShape.convex,
-                              boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(10)),
-                              depth: 5.0,
-                              color: Theme.of(context).cardColor),
-                          child: TextField(
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              icon: Icon(Icons.login),
-                              hintText: "Введите email",
-                            ),
-                            controller: _emailController,
+                child: Form(
+                  key: _formKey,
+                    child: Padding(
+                      padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 2.4),
+                      child: Column(
+                        children: [
+                          ///Login field
+                          generateFormTextField(const Icon(Icons.login), "Введите email", _emailController, false, 'Пожалуйста введите email'),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 30),
+                            ///Password field
+                            child: generateFormTextField(const Icon(Icons.password), "Введите пароль", _passwordController, true, "Пожалуйста введите пароль")
                           ),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 30),
-                        child: SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.5,
-                          height: MediaQuery.of(context).size.height / 22,
-                          child: Neumorphic(
-                            style: NeumorphicStyle(
-                                shape: NeumorphicShape.convex,
-                                boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(10)),
-                                depth: 5.0,
-                                color: Theme.of(context).cardColor),
-                            child: TextField(
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                                icon: Icon(Icons.password),
-                                hintText: "Введите пароль",
+                          Padding(
+                            padding: const EdgeInsets.only(top: 20),
+                            ///Login button
+                            child: SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.5,
+                              child: NeumorphicButton(
+                                style: NeumorphicStyle(
+                                    shape: NeumorphicShape.flat,
+                                    boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(20)),
+                                    depth: 15.0,
+                                    color: Theme.of(context).primaryColor),
+                                child: Center(
+                                  child: Text("Войти", style: Theme.of(context).textTheme.bodyText1),
+                                ),
+                                onPressed: () {
+                                  if (_formKey.currentState!.validate()) {
+                                    auth(authBloc);
+                                  }
+                                },
                               ),
-                              onSubmitted: (text) {auth(authBloc);},
-                              controller: _passwordController,
                             ),
-                          ),
-                        ),
+                          )
+                        ],
                       ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 20),
-                        child: SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.5,
-                          height: MediaQuery.of(context).size.height / 16,
-                          child: NeumorphicButton(
-                            style: NeumorphicStyle(
-                                shape: NeumorphicShape.flat,
-                                boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(20)),
-                                depth: 15.0,
-                                color: Theme.of(context).primaryColor),
-                            child: Center(
-                              child: Text("Войти", style: Theme.of(context).textTheme.bodyText1),
-                            ),
-                            onPressed: () {auth(authBloc);},
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
+                    ),
+                )
               ),
               BlocListener<AuthBloc, AuthState>(
                 listener: (context, state) {
