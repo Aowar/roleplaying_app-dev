@@ -130,6 +130,33 @@ class _AuthView extends State<AuthView> {
                                 },
                               ),
                             ),
+                          ),
+                          Padding(
+                              padding: const EdgeInsets.only(top: 10),
+                            child: TextButton(
+                                onPressed: () {
+                                  setState(() {
+                                    Stack(
+                                      children: [
+                                        Positioned(
+                                          top: 100,
+                                          left: 100,
+                                          child: SizedBox(
+                                            width: 200,
+                                            height: 200,
+                                            child: Container(
+                                              color: Colors.red,
+                                            ),
+                                          )
+                                        )
+                                      ],
+                                    );
+                                  });
+                                },
+                                child: Text("Ещё не зарегистрированы? Создать аккаунт",
+                                  style: Theme.of(context).textTheme.subtitle2
+                                )
+                            ),
                           )
                         ],
                       ),
@@ -141,7 +168,7 @@ class _AuthView extends State<AuthView> {
                   if (state is AuthStateAuthetificated) {
                     developer.log(context.read<AuthBloc>().state.getUser().toString(), name: "Current user");
                     developer.log(context.read<AuthBloc>().state.toString(), name: "Current state");
-                    Navigator.pushNamed(context, '/form_screen');
+                    Navigator.pushNamed(context, '/menu_screen');
                   }
                 },
                 child: Container(),

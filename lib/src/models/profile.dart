@@ -1,11 +1,17 @@
 import 'package:equatable/equatable.dart';
 
 class Profile extends Equatable {
-  final String userId;
-  String title;
-  String text;
+  late String userId;
+  late String title;
+  late String text;
 
   Profile(this.userId,this.title, this.text);
+
+  Profile.fromJson(Map<String, dynamic> data) {
+    userId = data['userId'];
+    title = data['title'];
+    text = data['text'];
+  }
 
   @override
   List<Object?> get props => [userId, title, text];
