@@ -8,23 +8,29 @@ import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
 import 'package:roleplaying_app/src/models/profile.dart';
 import 'package:roleplaying_app/src/models/user.dart';
-import 'package:roleplaying_app/src/services/profile_service.dart';
+import 'package:roleplaying_app/src/services/form_service.dart';
 import 'package:roleplaying_app/src/ui/Utils.dart';
 
 import '../services/auth_service.dart';
 
+late String _profileId;
+
 class FormScreen extends StatelessWidget {
   final AuthService authService = AuthService();
+  final String profileId;
 
-  FormScreen({Key? key}) : super(key: key);
+  FormScreen({Key? key, required this.profileId}) : super(key: key);
 
   Widget build(BuildContext context) {
-    return FormView();
+    return FormView(profileId: profileId);
   }
 }
 
 class FormView extends StatefulWidget {
-  FormView({Key? key}) : super(key: key);
+  final String profileId;
+  FormView({Key? key, required this.profileId}) : super(key: key) {
+    _profileId = profileId;
+  }
 
   @override
   State<FormView> createState() => _FormView();
@@ -120,7 +126,7 @@ class _FormView extends State<FormView> {
                                         child: TextField(
                                           decoration: InputDecoration(
                                             border: InputBorder.none,
-                                            hintText: "Название анкеты",
+                                            hintText: _profileId,
                                           ),
                                           controller: _titleController,
                                         ),

@@ -23,7 +23,6 @@ final appRoutes = <String, WidgetBuilder>{
   '/menu_screen': (BuildContext context) => MenuScreen(),
   '/profile_screen' : (BuildContext context) => ProfileScreen(),
   '/chat_screen' : (BuildContext context) => ChatScreen(),
-  '/form_screen' : (BuildContext context) => FormScreen(),
   '/chat_edit_screen' : (BuildContext context) => ChatEditScreen(),
 };
 
