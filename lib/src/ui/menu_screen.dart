@@ -9,7 +9,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
 import 'package:roleplaying_app/src/models/profile.dart';
-import 'package:roleplaying_app/src/services/profile_service.dart';
+import 'package:roleplaying_app/src/services/form_service.dart';
+import 'package:roleplaying_app/src/ui/form_screen.dart';
 
 import 'Utils.dart';
 
@@ -81,10 +82,27 @@ class _MenuScreenState extends State<MenuScreen> {
 
   Stream<List<Profile>> _readProfiles() => FirebaseFirestore.instance.collection("profiles").snapshots().map((snapshot) => snapshot.docs.map((doc) => Profile.fromJson(doc.data())).toList());
 
-  Widget buildProfile(Profile profile) => ListTile(
-    leading: CircleAvatar(child:  Text('${profile.userId}')),
-    title: Text(profile.title),
-    subtitle: Text(profile.text),
+  Widget buildProfile(Profile profile) => SizedBox(
+    height: 100,
+    child: Column(
+          children: [
+            NeumorphicButton(
+              style: NeumorphicStyle(
+                shape: NeumorphicShape.flat,
+                boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(5)),
+                depth: 5.0,
+                color: Theme.of(context).accentColor,
+              ),
+              child:
+              Icon(Icons.image_outlined,
+                size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width)*3),
+              ),
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => FormScreen(profileId: profile.id))),
+            ),
+            Text(profile.title,
+                style: Theme.of(context).textTheme.subtitle2),
+          ],
+        )
   );
 
   itemOfProfilesList() {
@@ -92,20 +110,25 @@ class _MenuScreenState extends State<MenuScreen> {
       stream: _readProfiles(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return Text("Something went wrong");
+          return Text("Something went wrong", style: Theme.of(context).textTheme.subtitle2);
         }
 
         if (snapshot.hasData) {
           final profiles = snapshot.data!;
 
-          return Expanded(
-              child: ListView(
-                scrollDirection: Axis.vertical,
-                children: profiles.map(buildProfile).toList(),
-              )
+          return Flexible(
+            fit: FlexFit.loose,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: profiles.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return buildProfile(profiles[index]);
+                },
+                separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 10),
+              ),
           );
         }
-        return Text("loading");
+        return Text("loading", style: Theme.of(context).textTheme.subtitle2);
       },
     );
   }
@@ -130,26 +153,51 @@ class _MenuScreenState extends State<MenuScreen> {
                   ),
                   Padding(
                       padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 4.5),
-                      child: itemOfProfilesList()
-                      // child: Center(
-                      //   child: Column(
-                      //     children: [
-                      //       generateMenuBlock(_containersNames[0], '/chat_screen'),
-                      //       Padding(
-                      //         padding: const EdgeInsets.only(top: 30),
-                      //         child: generateMenuBlock(_containersNames[1], '/form_screen', true, '/form_screen', Icons.add),
-                      //       ),
-                      //       Padding(
-                      //         padding: const EdgeInsets.only(top: 30),
-                      //         child: generateMenuBlock(_containersNames[2], '/chat_screen', true, '/chat_edit_screen', Icons.add),
-                      //       ),
-                      //       Padding(
-                      //           padding: const EdgeInsets.only(top: 30),
-                      //           child: itemOfProfilesList()
-                      //       ),
-                      //     ],
-                      //   ),
-                      // )
+                      child: Center(
+                        child: Column(
+                          children: [
+                            generateMenuBlock(_containersNames[0], '/chat_screen'),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 30),
+                              child:  SizedBox(
+                                width: MediaQuery.of(context).size.width / 1.1,
+                                height: MediaQuery.of(context).size.height / 5.2,
+                                child: Neumorphic(
+                                  style: NeumorphicStyle(
+                                    shape: NeumorphicShape.flat,
+                                    boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(20)),
+                                    depth: 2.0,
+                                    color: Theme.of(context).cardColor,
+                                  ),
+                                  child: Stack(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(left: 10, top: 2),
+                                        child: Text("Мои анкеты",
+                                          style: Theme.of(context).textTheme.headline2,
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(left: 20, top: 35),
+                                        child: itemOfProfilesList()
+                                      ),
+                                        Positioned(
+                                            right: 15,
+                                            top: 15,
+                                            child: Utils.GenerateButton('/form_screen', Icons.add, context)
+                                        )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 30),
+                              child: generateMenuBlock(_containersNames[2], '/chat_screen', true, '/chat_edit_screen', Icons.add),
+                            ),
+                          ],
+                        ),
+                      )
                   )
                 ],
               ),

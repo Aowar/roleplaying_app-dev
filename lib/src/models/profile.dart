@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 class Profile extends Equatable {
+  late String id;
   late String userId;
   late String title;
   late String text;
@@ -8,6 +9,7 @@ class Profile extends Equatable {
   Profile(this.userId,this.title, this.text);
 
   Profile.fromJson(Map<String, dynamic> data) {
+    id = data['id'];
     userId = data['userId'];
     title = data['title'];
     text = data['text'];
