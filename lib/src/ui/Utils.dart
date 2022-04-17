@@ -21,6 +21,23 @@ class Utils{
     );
   }
 
+  static GenerateButton2(IconData icon, BuildContext context, MaterialPageRoute materialPageRoute){
+    return Neumorphic(
+      style: NeumorphicStyle(
+        shape: NeumorphicShape.flat,
+        depth: 5.0,
+        color: Theme.of(context).primaryColor,
+        boxShape: NeumorphicBoxShape.circle(),
+      ),
+      child: IconButton(
+        icon: Icon(icon),
+        color: Colors.white,
+        iconSize: sqrt(MediaQuery.of(context).size.height + MediaQuery.of(context).size.width),
+        onPressed: () => Navigator.push(context, materialPageRoute),
+      ),
+    );
+  }
+
   static GenerateBackButton(BuildContext context){
     return Neumorphic(
       style: NeumorphicStyle(

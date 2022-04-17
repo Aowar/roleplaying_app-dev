@@ -9,8 +9,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
 import 'package:roleplaying_app/src/models/profile.dart';
-import 'package:roleplaying_app/src/services/form_service.dart';
-import 'package:roleplaying_app/src/ui/form_screen.dart';
+import 'package:roleplaying_app/src/services/profile_service.dart';
+import 'package:roleplaying_app/src/ui/auth_screen.dart';
+import 'package:roleplaying_app/src/ui/profile_edit_screen.dart';
+import 'package:roleplaying_app/src/ui/profile_screen.dart';
 
 import 'Utils.dart';
 
@@ -26,7 +28,7 @@ class _MenuScreenState extends State<MenuScreen> {
 
   final List<String> _containersNames = ["Открытые чаты", "Мои анкеты", "Мои чаты"];
 
-  generateMenuBlock(String _containersName, String route, [bool? _buttonFlag, String? _route, IconData? icon]){ //Как сделать дефолтные значения?
+  generateMenuBlock(String _containersName, String route, [bool? _buttonFlag, String? _route, IconData? icon]){
     return SizedBox(
       width: MediaQuery.of(context).size.width / 1.1,
       height: MediaQuery.of(context).size.height / 5.2,
@@ -80,8 +82,12 @@ class _MenuScreenState extends State<MenuScreen> {
     );
   }
 
-  Stream<List<Profile>> _readProfiles() => FirebaseFirestore.instance.collection("profiles").snapshots().map((snapshot) => snapshot.docs.map((doc) => Profile.fromJson(doc.data())).toList());
+  ///Getting list stream of profiles where id of current user = user id in profile
+  Stream<List<Profile>> _readProfiles(AuthState state) => FirebaseFirestore.instance.collection("profiles").where("userId", isEqualTo:  state.getUser()!.id).snapshots().map(
+          (snapshot) => snapshot.docs.map((doc) => Profile.fromJson(doc.data())).toList()
+  );
 
+  ///Building profile block
   Widget buildProfile(Profile profile) => SizedBox(
     height: 100,
     child: Column(
@@ -97,7 +103,7 @@ class _MenuScreenState extends State<MenuScreen> {
               Icon(Icons.image_outlined,
                 size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width)*3),
               ),
-              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => FormScreen(profileId: profile.id))),
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileEditScreen.edit(profile: profile))),
             ),
             Text(profile.title,
                 style: Theme.of(context).textTheme.subtitle2),
@@ -105,30 +111,37 @@ class _MenuScreenState extends State<MenuScreen> {
         )
   );
 
-  itemOfProfilesList() {
+  ///Getting profiles from DB
+  itemOfProfilesList(AuthState state) {
     return StreamBuilder<List<Profile>>(
-      stream: _readProfiles(),
+      stream: _readProfiles(state),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return Text("Something went wrong", style: Theme.of(context).textTheme.subtitle2);
+          return Text("Ошибка получения данных", style: Theme.of(context).textTheme.subtitle2);
         }
-
         if (snapshot.hasData) {
           final profiles = snapshot.data!;
-
-          return Flexible(
-            fit: FlexFit.loose,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: profiles.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return buildProfile(profiles[index]);
-                },
-                separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 10),
-              ),
+          return Padding(
+              padding: EdgeInsets.only(right: 25),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Flexible(
+                    fit: FlexFit.loose,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: profiles.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return buildProfile(profiles[index]);
+                      },
+                      separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 10),
+                    ),
+                  )
+                ],
+              )
           );
         }
-        return Text("loading", style: Theme.of(context).textTheme.subtitle2);
+        return const CircularProgressIndicator();
       },
     );
   }
@@ -161,7 +174,7 @@ class _MenuScreenState extends State<MenuScreen> {
                               padding: const EdgeInsets.only(top: 30),
                               child:  SizedBox(
                                 width: MediaQuery.of(context).size.width / 1.1,
-                                height: MediaQuery.of(context).size.height / 5.2,
+                                height: MediaQuery.of(context).size.height / 4.8,
                                 child: Neumorphic(
                                   style: NeumorphicStyle(
                                     shape: NeumorphicShape.flat,
@@ -179,12 +192,12 @@ class _MenuScreenState extends State<MenuScreen> {
                                       ),
                                       Padding(
                                         padding: const EdgeInsets.only(left: 20, top: 35),
-                                        child: itemOfProfilesList()
+                                        child: itemOfProfilesList(state)
                                       ),
                                         Positioned(
-                                            right: 15,
-                                            top: 15,
-                                            child: Utils.GenerateButton('/form_screen', Icons.add, context)
+                                            right: 5,
+                                            top: 5,
+                                            child: Utils.GenerateButton2(Icons.add, context, MaterialPageRoute(builder: (context) => ProfileEditScreen.create()))
                                         )
                                     ],
                                   ),
@@ -203,11 +216,7 @@ class _MenuScreenState extends State<MenuScreen> {
               ),
             );
           }
-          return const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
-          );
+          return AuthScreen();
         }
     );
   }

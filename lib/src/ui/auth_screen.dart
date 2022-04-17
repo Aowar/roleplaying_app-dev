@@ -51,7 +51,8 @@ class _AuthView extends State<AuthView> {
             shape: NeumorphicShape.convex,
             boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(10)),
             depth: 5.0,
-            color: Theme.of(context).cardColor),
+            color: Theme.of(context).cardColor
+        ),
         child: TextFormField(
           decoration: InputDecoration(
             border: InputBorder.none,
@@ -76,105 +77,113 @@ class _AuthView extends State<AuthView> {
     final AuthBloc authBloc = BlocProvider.of<AuthBloc>(context);
     return BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
       return Scaffold(
-          resizeToAvoidBottomInset: true,
-          body: Stack(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 5, top: 5),
-                child: SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.5,
-                    height: MediaQuery.of(context).size.height / 16,
-                    child: Neumorphic(
-                        style: NeumorphicStyle(
-                            shape: NeumorphicShape.flat,
-                            boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(20)),
-                            depth: 2.0,
-                            color: Theme.of(context).primaryColor),
-                        child: Center(
-                          child: Text("Ролевые игры", style: Theme.of(context).textTheme.headline1),
-                        ))),
-              ),
-              ///Auth form
-              Center(
-                child: Form(
-                  key: _formKey,
-                    child: Padding(
-                      padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 2.4),
-                      child: Column(
-                        children: [
-                          ///Login field
-                          generateFormTextField(const Icon(Icons.login), "Введите email", _emailController, false, 'Пожалуйста введите email'),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 30),
-                            ///Password field
-                            child: generateFormTextField(const Icon(Icons.password), "Введите пароль", _passwordController, true, "Пожалуйста введите пароль")
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 20),
-                            ///Login button
-                            child: SizedBox(
-                              width: MediaQuery.of(context).size.width * 0.5,
-                              child: NeumorphicButton(
-                                style: NeumorphicStyle(
-                                    shape: NeumorphicShape.flat,
-                                    boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(20)),
-                                    depth: 15.0,
-                                    color: Theme.of(context).primaryColor),
-                                child: Center(
-                                  child: Text("Войти", style: Theme.of(context).textTheme.bodyText1),
-                                ),
-                                onPressed: () {
-                                  if (_formKey.currentState!.validate()) {
-                                    auth(authBloc);
-                                  }
-                                },
-                              ),
-                            ),
-                          ),
-                          Padding(
-                              padding: const EdgeInsets.only(top: 10),
-                            child: TextButton(
-                                onPressed: () {
-                                  setState(() {
-                                    Stack(
-                                      children: [
-                                        Positioned(
-                                          top: 100,
-                                          left: 100,
-                                          child: SizedBox(
-                                            width: 200,
-                                            height: 200,
-                                            child: Container(
-                                              color: Colors.red,
-                                            ),
-                                          )
-                                        )
-                                      ],
-                                    );
-                                  });
-                                },
-                                child: Text("Ещё не зарегистрированы? Создать аккаунт",
-                                  style: Theme.of(context).textTheme.subtitle2
-                                )
-                            ),
-                          )
-                        ],
-                      ),
+          resizeToAvoidBottomInset: false,
+          body: SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height),
+              child: Container(
+                child: Stack(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 5, top: 5),
+                      child: SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.5,
+                          height: MediaQuery.of(context).size.height / 16,
+                          child: Neumorphic(
+                              style: NeumorphicStyle(
+                                  shape: NeumorphicShape.flat,
+                                  boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(20)),
+                                  depth: 2.0,
+                                  color: Theme.of(context).primaryColor),
+                              child: Center(
+                                child: Text("Ролевые игры", style: Theme.of(context).textTheme.headline1),
+                              ))),
                     ),
+                    ///Auth form
+                    Center(
+                        child: Form(
+                          key: _formKey,
+                          child: Padding(
+                            padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 2.4),
+                            child: Column(
+                              children: [
+                                ///Login field
+                                generateFormTextField(const Icon(Icons.login), "Введите email", _emailController, false, 'Пожалуйста введите email'),
+                                Padding(
+                                    padding: const EdgeInsets.only(top: 30),
+                                    ///Password field
+                                    child: generateFormTextField(const Icon(Icons.password), "Введите пароль", _passwordController, true, "Пожалуйста введите пароль")
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 20),
+                                  ///Login button
+                                  child: SizedBox(
+                                    width: MediaQuery.of(context).size.width * 0.5,
+                                    child: NeumorphicButton(
+                                      style: NeumorphicStyle(
+                                          shape: NeumorphicShape.flat,
+                                          boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(20)),
+                                          depth: 15.0,
+                                          color: Theme.of(context).primaryColor),
+                                      child: Center(
+                                        child: Text("Войти", style: Theme.of(context).textTheme.bodyText1),
+                                      ),
+                                      onPressed: () {
+                                        if (_formKey.currentState!.validate()) {
+                                          auth(authBloc);
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 10),
+                                  child: TextButton(
+                                      onPressed: () {
+                                        // return Overlay.of(context)!.insert(
+                                        //   OverlayEntry(builder: (context) {
+                                        //     return Stack(
+                                        //       children: [
+                                        //         Positioned(
+                                        //             top: 100,
+                                        //             left: 100,
+                                        //             child: SizedBox(
+                                        //               width: 200,
+                                        //               height: 200,
+                                        //               child: Container(
+                                        //                 color: Colors.red,
+                                        //               ),
+                                        //             )
+                                        //         )
+                                        //       ],
+                                        //     );
+                                        //   })
+                                        // );
+                                      },
+                                      child: Text("Ещё не зарегистрированы? Создать аккаунт",
+                                          style: Theme.of(context).textTheme.subtitle2
+                                      )
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        )
+                    ),
+                    BlocListener<AuthBloc, AuthState>(
+                      listener: (context, state) {
+                        if (state is AuthStateAuthetificated) {
+                          Navigator.pushNamed(context, '/menu_screen');
+                        }
+                      },
+                      child: Container(),
+                    )
+                  ],
                 )
-              ),
-              BlocListener<AuthBloc, AuthState>(
-                listener: (context, state) {
-                  if (state is AuthStateAuthetificated) {
-                    developer.log(context.read<AuthBloc>().state.getUser().toString(), name: "Current user");
-                    developer.log(context.read<AuthBloc>().state.toString(), name: "Current state");
-                    Navigator.pushNamed(context, '/menu_screen');
-                  }
-                },
-                child: Container(),
               )
-            ],
-          ));
+            ),
+          )
+      );
     });
   }
 

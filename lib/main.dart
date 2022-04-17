@@ -11,17 +11,16 @@ import 'package:roleplaying_app/src/services/auth_service.dart';
 import 'package:roleplaying_app/src/ui/auth_screen.dart';
 import 'package:roleplaying_app/src/ui/chat_description_screen.dart';
 import 'package:roleplaying_app/src/ui/chat_screen.dart';
-import 'package:roleplaying_app/src/ui/form_screen.dart';
+import 'package:roleplaying_app/src/ui/profile_screen.dart';
 import 'package:roleplaying_app/src/ui/landing.dart';
 import 'package:roleplaying_app/src/ui/menu_screen.dart';
-import 'package:roleplaying_app/src/ui/profile_screen.dart';
+import 'package:roleplaying_app/src/ui/user_profile_screen.dart';
 import 'firebase_options.dart';
 
 final appRoutes = <String, WidgetBuilder>{
   '/start_screen': (BuildContext context) => Landing(),
   '/auth_screen': (BuildContext context) => AuthScreen(),
   '/menu_screen': (BuildContext context) => MenuScreen(),
-  '/profile_screen' : (BuildContext context) => ProfileScreen(),
   '/chat_screen' : (BuildContext context) => ChatScreen(),
   '/chat_edit_screen' : (BuildContext context) => ChatEditScreen(),
 };
@@ -107,7 +106,7 @@ class RpApp extends StatelessWidget {
             headline1: TextStyle(color: Colors.white, fontSize: 24),
             headline2: TextStyle(color: Colors.white, fontSize: 24),
             bodyText1: TextStyle(color: Colors.white, fontSize: 20),
-            bodyText2: TextStyle(color: Color(0x7E000000), fontSize: 20),
+            bodyText2: TextStyle(color: Color(0xD2FFFFFF), fontSize: 20),
             subtitle1: TextStyle(color: Color(0xff000000), fontSize: 18),
             subtitle2: TextStyle(color: Color(0xffe3e3e3), fontSize: 14),
           )
