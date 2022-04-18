@@ -1,50 +1,52 @@
 import 'dart:math';
-import 'dart:developer' as developer;
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
 import 'package:roleplaying_app/src/models/chat.dart';
-import 'package:roleplaying_app/src/models/profile.dart';
 import 'package:roleplaying_app/src/services/chat_service.dart';
-import 'package:roleplaying_app/src/ui/Utils.dart';
 import 'package:roleplaying_app/src/ui/auth_screen.dart';
-import 'package:roleplaying_app/src/ui/chat_edit_screen.dart';
+import 'package:roleplaying_app/src/ui/chat_screen.dart';
 import 'package:roleplaying_app/src/ui/menu_screen.dart';
 
-import '../services/auth_service.dart';
+import 'Utils.dart';
 
+late bool _chatCreateFlag;
 late Chat _chat;
 
-class ChatDescriptionScreen extends StatelessWidget {
-  final AuthService authService = AuthService();
+class ChatEditScreen extends StatelessWidget {
   Chat? chat;
+  ChatEditScreen.create({Key? key}) : super(key: key) {
+    _chatCreateFlag = true;
+  }
 
-  ChatDescriptionScreen({Key? key, required this.chat}) : super(key: key) {
+  ChatEditScreen.update({Key? key, required this.chat}) : super(key: key) {
+    _chatCreateFlag = false;
     _chat = chat!;
   }
 
+  @override
   Widget build(BuildContext context) {
-    return const ChatDescriptionView();
+    return const ChatEditView();
   }
 }
 
-class ChatDescriptionView extends StatefulWidget {
-  const ChatDescriptionView({Key? key}) : super(key: key);
+class ChatEditView extends StatefulWidget {
+  const ChatEditView({Key? key}) : super(key: key);
 
   @override
-  State<ChatDescriptionView> createState() => _ChatDescriptionView();
+  State<ChatEditView> createState() => _ChatEditView();
 }
 
-class _ChatDescriptionView extends State<ChatDescriptionView> {
+class _ChatEditView extends State<ChatEditView> {
+  final ChatService _chatService = ChatService();
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
 
   late String title;
-  late String text;
+  late String description;
 
   @override
   void initState() {
@@ -56,22 +58,50 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
   @override
   Widget build(BuildContext context) {
     final AuthBloc authBloc = context.read<AuthBloc>();
-
+    final user = authBloc.state.getUser()!.id;
     return BlocBuilder <AuthBloc, AuthState> (
         builder: (context, state) {
           if (state is AuthStateAuthetificated) {
             return Scaffold(
               body: Stack(
                 children: [
+                  ///Back button
                   Positioned(
                       top: 15,
                       left: 15,
-                      child: Utils.GenerateBackButton(context),
+                      child: Utils.GenerateBackButton(context)
                   ),
+                  ///Apply button
                   Positioned(
-                    top: 15,
-                    right: 15,
-                    child: Utils.GenerateButton2(Icons.menu, context, MaterialPageRoute(builder: (context) => ChatEditScreen.update(chat: _chat))),
+                      top: 15,
+                      right: 15,
+                      child: Neumorphic(
+                        style: NeumorphicStyle(
+                          shape: NeumorphicShape.flat,
+                          depth: 5.0,
+                          color: Theme.of(context).primaryColor,
+                          boxShape: const NeumorphicBoxShape.circle(),
+                        ),
+                        child: IconButton(
+                          icon: const Icon(Icons.check),
+                          color: Colors.white,
+                          iconSize: sqrt(MediaQuery.of(context).size.height + MediaQuery.of(context).size.width),
+                          onPressed: () async {
+                            title = _titleController.text;
+                            description = _descriptionController.text;
+                            List usersList = [];
+                            if (_chatCreateFlag) {
+                              usersList = [user];
+                            } else {
+                              _chat.title = title;
+                              _chat.description = description;
+                            }
+                            Chat chat = Chat(usersList, state.getUser()!.id, title, description);
+                            !_chatCreateFlag ? _chatService.updateProfile(_chat) : _chatService.addChat(chat);
+                            !_chatCreateFlag ? Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(chat: _chat))) : Navigator.push(context, MaterialPageRoute(builder: (context) => MenuScreen()));
+                          },
+                        ),
+                      )
                   ),
                   Center(
                     child: Padding(
@@ -93,7 +123,7 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
                                     children: [
                                       ///Title block
                                       Padding(
-                                        padding: const EdgeInsets.only(top: 15),
+                                        padding: const EdgeInsets.only(top: 30),
                                         child: SizedBox(
                                             width: MediaQuery.of(context).size.width * 0.5,
                                             height: MediaQuery.of(context).size.height / 22,
@@ -105,14 +135,13 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
                                                   color: Theme.of(context).accentColor
                                               ),
                                               child: TextField(
-                                                readOnly: true,
                                                 textAlignVertical: TextAlignVertical.center,
                                                 textAlign: TextAlign.center,
                                                 decoration: const InputDecoration(
                                                   border: InputBorder.none,
                                                   hintText: "Название чата",
                                                 ),
-                                                controller: _titleController..text = _chat.title,
+                                                controller: !_chatCreateFlag ? (_titleController..text = _chat.title) : _titleController,
                                               ),
                                             )
                                         ),
@@ -143,7 +172,7 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
                                     Padding(
                                       padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 60),
                                       child: Container(
-                                        constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height / 3.4,),
+                                        constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height / 4),
                                         child: SizedBox(
                                           width: MediaQuery.of(context).size.width / 1.3,
                                           child: Neumorphic(
@@ -154,7 +183,6 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
                                                 color: Theme.of(context).accentColor,
                                               ),
                                               child: TextField(
-                                                readOnly: true,
                                                 keyboardType: TextInputType.multiline,
                                                 maxLines: null,
                                                 decoration: InputDecoration(
@@ -164,71 +192,12 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
                                                       color: Theme.of(context).textTheme.bodyText1?.color,
                                                     )
                                                 ),
-                                                controller: _descriptionController..text = _chat.description,
+                                                controller: !_chatCreateFlag ? (_descriptionController..text = _chat.description) : _descriptionController,
                                               )
                                           ),
                                         ),
                                       ),
                                     ),
-                                    ///Users container
-                                    Padding(
-                                      padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 80, bottom: 20),
-                                      child: Container(
-                                        constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height / 8, maxHeight: MediaQuery.of(context).size.height / 7.5),
-                                        child: SizedBox(
-                                          width: MediaQuery.of(context).size.width / 1.3,
-                                          child: Neumorphic(
-                                              style: NeumorphicStyle(
-                                                shape: NeumorphicShape.flat,
-                                                boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(5)),
-                                                depth: 2.0,
-                                                color: Theme.of(context).accentColor,
-                                              ),
-                                              ///User
-                                              child: Padding(
-                                                  padding: const EdgeInsets.only(top: 10),
-                                                  child: Row(
-                                                    children: [
-                                                      SizedBox(
-                                                        width: MediaQuery.of(context).size.width / 1.3,
-                                                        child: ListView.separated(
-                                                          itemCount: _chat.usersId.length,
-                                                          itemBuilder: (BuildContext context, int index) {
-                                                            return Column(
-                                                              children: [
-                                                                NeumorphicButton(
-                                                                  style: NeumorphicStyle(
-                                                                    shape: NeumorphicShape.flat,
-                                                                    boxShape: const NeumorphicBoxShape.circle(),
-                                                                    depth: 5.0,
-                                                                    color: Theme.of(context).accentColor,
-                                                                  ),
-                                                                  child:
-                                                                  Icon(Icons.image_outlined,
-                                                                    size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width)*2),
-                                                                  ),
-                                                                  onPressed: () => {},
-                                                                  // onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen(profile: profile))),
-                                                                ),
-                                                                Padding(
-                                                                    padding: const EdgeInsets.only(top: 10),
-                                                                    child: Text(_chat.usersId[index],
-                                                                        style: Theme.of(context).textTheme.subtitle2
-                                                                    )
-                                                                )
-                                                              ],
-                                                            );
-                                                          },
-                                                          separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 10),
-                                                        ),
-                                                      )
-                                                    ],
-                                                  )
-                                              )
-                                          ),
-                                        ),
-                                      ),
-                                    )
                                   ],
                                 )
                               ],

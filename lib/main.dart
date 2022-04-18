@@ -21,8 +21,6 @@ final appRoutes = <String, WidgetBuilder>{
   '/start_screen': (BuildContext context) => Landing(),
   '/auth_screen': (BuildContext context) => AuthScreen(),
   '/menu_screen': (BuildContext context) => MenuScreen(),
-  '/chat_screen' : (BuildContext context) => ChatScreen(),
-  '/chat_edit_screen' : (BuildContext context) => ChatEditScreen(),
 };
 
 void main() async {

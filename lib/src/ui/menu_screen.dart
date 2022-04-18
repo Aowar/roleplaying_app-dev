@@ -8,9 +8,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
+import 'package:roleplaying_app/src/models/chat.dart';
 import 'package:roleplaying_app/src/models/profile.dart';
 import 'package:roleplaying_app/src/services/profile_service.dart';
 import 'package:roleplaying_app/src/ui/auth_screen.dart';
+import 'package:roleplaying_app/src/ui/chat_edit_screen.dart';
+import 'package:roleplaying_app/src/ui/chat_screen.dart';
 import 'package:roleplaying_app/src/ui/profile_edit_screen.dart';
 import 'package:roleplaying_app/src/ui/profile_screen.dart';
 
@@ -87,6 +90,11 @@ class _MenuScreenState extends State<MenuScreen> {
           (snapshot) => snapshot.docs.map((doc) => Profile.fromJson(doc.data())).toList()
   );
 
+  ///Getting list stream of chats
+  Stream<List<Chat>> _readChats() => FirebaseFirestore.instance.collection("chats").snapshots().map(
+          (snapshot) => snapshot.docs.map((doc) => Chat.fromJson(doc.data())).toList()
+  );
+
   ///Building profile block
   Widget buildProfile(Profile profile) => SizedBox(
     height: 100,
@@ -103,12 +111,38 @@ class _MenuScreenState extends State<MenuScreen> {
               Icon(Icons.image_outlined,
                 size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width)*3),
               ),
-              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileEditScreen.edit(profile: profile))),
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen(profile: profile))),
             ),
             Text(profile.title,
-                style: Theme.of(context).textTheme.subtitle2),
+                style: Theme.of(context).textTheme.subtitle2
+            ),
           ],
         )
+  );
+
+  ///Building chat block
+  Widget buildChat(Chat chat) => SizedBox(
+      height: 100,
+      child: Column(
+        children: [
+          NeumorphicButton(
+            style: NeumorphicStyle(
+              shape: NeumorphicShape.flat,
+              boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(5)),
+              depth: 5.0,
+              color: Theme.of(context).accentColor,
+            ),
+            child:
+            Icon(Icons.image_outlined,
+              size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width)*3),
+            ),
+            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(chat: chat))),
+          ),
+          Text(chat.title,
+              style: Theme.of(context).textTheme.subtitle2
+          ),
+        ],
+      )
   );
 
   ///Getting profiles from DB
@@ -146,6 +180,41 @@ class _MenuScreenState extends State<MenuScreen> {
     );
   }
 
+  ///Getting profiles from DB
+  itemOfChatsList() {
+    return StreamBuilder<List<Chat>>(
+      stream: _readChats(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Text("Ошибка получения данных", style: Theme.of(context).textTheme.subtitle2);
+        }
+        if (snapshot.hasData) {
+          final chats = snapshot.data!;
+          return Padding(
+              padding: EdgeInsets.only(right: 25),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Flexible(
+                    fit: FlexFit.loose,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: chats.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return buildChat(chats[index]);
+                      },
+                      separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 10),
+                    ),
+                  )
+                ],
+              )
+          );
+        }
+        return const CircularProgressIndicator();
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc, AuthState>(
@@ -169,12 +238,11 @@ class _MenuScreenState extends State<MenuScreen> {
                       child: Center(
                         child: Column(
                           children: [
-                            generateMenuBlock(_containersNames[0], '/chat_screen'),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 30),
-                              child:  SizedBox(
+                            ///Chats block
+                            Container (
+                              constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height / 7, maxHeight: MediaQuery.of(context).size.height / 6),
+                              child: SizedBox(
                                 width: MediaQuery.of(context).size.width / 1.1,
-                                height: MediaQuery.of(context).size.height / 4.8,
                                 child: Neumorphic(
                                   style: NeumorphicStyle(
                                     shape: NeumorphicShape.flat,
@@ -186,20 +254,57 @@ class _MenuScreenState extends State<MenuScreen> {
                                     children: [
                                       Padding(
                                         padding: const EdgeInsets.only(left: 10, top: 2),
-                                        child: Text("Мои анкеты",
+                                        child: Text("Чаты",
                                           style: Theme.of(context).textTheme.headline2,
                                         ),
                                       ),
                                       Padding(
-                                        padding: const EdgeInsets.only(left: 20, top: 35),
-                                        child: itemOfProfilesList(state)
+                                          padding: const EdgeInsets.only(left: 20, top: 35),
+                                          child: itemOfChatsList()
                                       ),
+                                      Positioned(
+                                          right: 5,
+                                          top: 5,
+                                          child: Utils.GenerateButton2(Icons.add, context, MaterialPageRoute(builder: (context) => ChatEditScreen.create()))
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            ///Profiles block
+                            Padding(
+                              padding: const EdgeInsets.only(top: 30),
+                              child: Container (
+                                constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height / 7, maxHeight: MediaQuery.of(context).size.height / 6),
+                                child: SizedBox(
+                                  width: MediaQuery.of(context).size.width / 1.1,
+                                  child: Neumorphic(
+                                    style: NeumorphicStyle(
+                                      shape: NeumorphicShape.flat,
+                                      boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(20)),
+                                      depth: 2.0,
+                                      color: Theme.of(context).cardColor,
+                                    ),
+                                    child: Stack(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.only(left: 10, top: 2),
+                                          child: Text("Мои анкеты",
+                                            style: Theme.of(context).textTheme.headline2,
+                                          ),
+                                        ),
+                                        Padding(
+                                            padding: const EdgeInsets.only(left: 20, top: 35),
+                                            child: itemOfProfilesList(state)
+                                        ),
                                         Positioned(
                                             right: 5,
                                             top: 5,
                                             child: Utils.GenerateButton2(Icons.add, context, MaterialPageRoute(builder: (context) => ProfileEditScreen.create()))
                                         )
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),

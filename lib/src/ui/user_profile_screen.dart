@@ -5,15 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:roleplaying_app/src/ui/Utils.dart';
 
-class ProfileScreen extends StatefulWidget{
+class UserProfileScreen extends StatefulWidget{
 
-  ProfileScreen({Key? key}) : super(key: key);
+  UserProfileScreen({Key? key}) : super(key: key);
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  State<UserProfileScreen> createState() => _UserProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _UserProfileScreenState extends State<UserProfileScreen> {
 
   @override
   Widget build(BuildContext context) {

@@ -15,16 +15,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   void _onStarted(UserInit event, Emitter<AuthState> emit) {
     emit(const AutStateInit(UserModel.empty));
-    print("Starting log in");
   }
 
   void _onLoggedIn(UserLoggedIn event, Emitter<AuthState> emit) {
     emit(AuthStateAuthetificated(event.user));
-    print("Logged in" + event.user.toString());
   }
 
   void _onLoggedOut(UserLoggedOut event, Emitter<AuthState> emit) {
     emit(AuthStateNotAuthentificated());
-    print("Logged out");
   }
 }

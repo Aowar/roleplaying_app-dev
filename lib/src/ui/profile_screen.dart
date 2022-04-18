@@ -10,24 +10,29 @@ import 'package:roleplaying_app/src/models/profile.dart';
 import 'package:roleplaying_app/src/models/user.dart';
 import 'package:roleplaying_app/src/services/profile_service.dart';
 import 'package:roleplaying_app/src/ui/Utils.dart';
+import 'package:roleplaying_app/src/ui/menu_screen.dart';
+import 'package:roleplaying_app/src/ui/profile_edit_screen.dart';
 
 import '../services/auth_service.dart';
 import 'auth_screen.dart';
 
+late Profile _profile;
+
 class ProfileScreen extends StatelessWidget {
   final AuthService authService = AuthService();
-  final String profileId;
+  final Profile profile;
 
-  ProfileScreen({Key? key, required this.profileId}) : super(key: key);
+  ProfileScreen({Key? key, required this.profile}) : super(key: key) {
+    _profile = profile;
+  }
 
   Widget build(BuildContext context) {
-    return ProfileView(profileId: profileId);
+    return ProfileView();
   }
 }
 
 class ProfileView extends StatefulWidget {
-  final String profileId;
-  ProfileView({Key? key, required this.profileId}) : super(key: key) {
+  ProfileView({Key? key}) : super(key: key) {
   }
 
   @override
@@ -40,8 +45,8 @@ class _ProfileView extends State<ProfileView> {
 
   ProfileService _profileService = ProfileService();
 
-  late String title;
-  late String text;
+  late String title = _profile.title;
+  late String text = _profile.text;
 
   @override
   void initState() {
@@ -52,9 +57,6 @@ class _ProfileView extends State<ProfileView> {
 
   @override
   Widget build(BuildContext context) {
-    final AuthBloc authBloc = context.read<AuthBloc>();
-    final user = authBloc.state.getUser()!.id;
-
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
         if (state is AuthStateAuthetificated) {
@@ -62,31 +64,16 @@ class _ProfileView extends State<ProfileView> {
             body: Stack(
               children: [
                 ///Building back button
-                Positioned(top: 15, left: 15, child: Utils.GenerateBackButton(context)),
+                Positioned(
+                    top: 15,
+                    left: 15,
+                    child: Utils.GenerateButton2(Icons.arrow_back_ios, context, MaterialPageRoute(builder: (context) => MenuScreen())),
+                ),
                 ///Building apply button
                 Positioned(
                     top: 15,
                     right: 15,
-                    child: Neumorphic(
-                      style: NeumorphicStyle(
-                        shape: NeumorphicShape.flat,
-                        depth: 5.0,
-                        color: Theme.of(context).primaryColor,
-                        boxShape: const NeumorphicBoxShape.circle(),
-                      ),
-                      child: IconButton(
-                        icon: const Icon(Icons.check),
-                        color: Colors.white,
-                        iconSize: sqrt(MediaQuery.of(context).size.height + MediaQuery.of(context).size.width),
-                        onPressed: () async {
-                          title = _titleController.text;
-                          text = _textController.text;
-                          Profile _form = Profile(user, title, text);
-                          _profileService.addProfile(_form);
-                          Navigator.pop(context);
-                        },
-                      ),
-                    )
+                    child: Utils.GenerateButton2(Icons.edit, context, MaterialPageRoute(builder: (context) => ProfileEditScreen.edit(profile: _profile))),
                 ),
                 Center(
                   child: Padding(
@@ -109,7 +96,6 @@ class _ProfileView extends State<ProfileView> {
                                 padding: const EdgeInsets.only(top: 30),
                                 child: SizedBox(
                                   width: MediaQuery.of(context).size.width * 0.8,
-                                  height: MediaQuery.of(context).size.height / 22,
                                   child: Neumorphic(
                                       style: NeumorphicStyle(
                                           shape: NeumorphicShape.convex,
@@ -120,12 +106,13 @@ class _ProfileView extends State<ProfileView> {
                                       child: TextField(
                                         textAlignVertical: TextAlignVertical.center,
                                         textAlign: TextAlign.center,
+                                        readOnly: true,
                                         style: Theme.of(context).textTheme.headline1,
                                         decoration: const InputDecoration(
                                           border: InputBorder.none,
                                           hintText: "Название",
                                         ),
-                                        controller: _titleController,
+                                        controller: _titleController..text = title,
                                       )
                                   ),
                                 ),
@@ -228,30 +215,34 @@ class _ProfileView extends State<ProfileView> {
                               ),
                               Padding(
                                 padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 80),
-                                child: SizedBox(
-                                  width: MediaQuery.of(context).size.width / 1.3,
-                                  height: MediaQuery.of(context).size.height / 3.4,
-                                  child: Neumorphic(
-                                      style: NeumorphicStyle(
-                                        shape: NeumorphicShape.flat,
-                                        boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(5)),
-                                        depth: 2.0,
-                                        color: Theme.of(context).accentColor,
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(left: 10),
-                                        child: TextField(
-                                          keyboardType: TextInputType.multiline,
-                                          maxLines: null,
-                                          decoration: InputDecoration(
-                                              border: InputBorder.none,
-                                              hintText: "Текст",
-                                              hintStyle: TextStyle(
-                                                color: Theme.of(context).textTheme.bodyText1?.color,
-                                              )
-                                          ),
+                                child: Container(
+                                  constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height / 3.4),
+                                  child: SizedBox(
+                                    width: MediaQuery.of(context).size.width / 1.3,
+                                    child: Neumorphic(
+                                        style: NeumorphicStyle(
+                                          shape: NeumorphicShape.flat,
+                                          boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(5)),
+                                          depth: 2.0,
+                                          color: Theme.of(context).accentColor,
                                         ),
-                                      )
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(left: 10),
+                                          child: TextField(
+                                            keyboardType: TextInputType.multiline,
+                                            maxLines: null,
+                                            readOnly: true,
+                                            decoration: InputDecoration(
+                                                border: InputBorder.none,
+                                                hintText: "Текст",
+                                                hintStyle: TextStyle(
+                                                  color: Theme.of(context).textTheme.bodyText1?.color,
+                                                )
+                                            ),
+                                            controller: _textController..text = text,
+                                          ),
+                                        )
+                                    ),
                                   ),
                                 ),
                               )

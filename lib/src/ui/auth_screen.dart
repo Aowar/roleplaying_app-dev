@@ -190,20 +190,21 @@ class _AuthView extends State<AuthView> {
   auth(authBloc) async {
     _email = _emailController.text;
     _password = _passwordController.text;
-
-    UserModel user = await _authService.signIn(_email.trim(), _password.trim());
-    if (user.id.isNotEmpty) {
-      authBloc.add(UserLoggedIn(user: user));
-    }
-    if (user.isEmpty) {
-      Fluttertoast.showToast(
+    if ((await _authService.signIn(_email.trim(), _password.trim())) == null) {
+      return Fluttertoast.showToast(
           msg: "Ошибка авторизации",
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.CENTER,
-          timeInSecForIosWeb: 1,
+          timeInSecForIosWeb: 2,
           backgroundColor: Colors.red,
           textColor: Colors.white,
-          fontSize: 16.0);
-    } else {}
+          fontSize: 16.0
+      );
+    } else {
+      UserModel user = await _authService.signIn(_email.trim(), _password.trim());
+      if (user.id.isNotEmpty) {
+        authBloc.add(UserLoggedIn(user: user));
+      } else {}
+    }
   }
 }
