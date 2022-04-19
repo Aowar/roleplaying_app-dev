@@ -31,7 +31,7 @@ class _AuthView extends State<AuthView> {
   late TextEditingController _passwordController;
   late TextEditingController _emailController;
 
-  AuthService _authService = AuthService();
+  final AuthService _authService = AuthService();
   late String _email;
   late String _password;
 

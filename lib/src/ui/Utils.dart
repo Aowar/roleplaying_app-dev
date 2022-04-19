@@ -2,6 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
+import 'package:roleplaying_app/src/services/auth_service.dart';
 
 class Utils{
   static GenerateButton(String _route, IconData icon, BuildContext context){
@@ -10,7 +12,7 @@ class Utils{
         shape: NeumorphicShape.flat,
         depth: 5.0,
         color: Theme.of(context).primaryColor,
-        boxShape: NeumorphicBoxShape.circle(),
+        boxShape: const NeumorphicBoxShape.circle(),
       ),
       child: IconButton(
         icon: Icon(icon),
@@ -21,13 +23,34 @@ class Utils{
     );
   }
 
+  static GenerateLogOutButton(String _route, AuthService authService, IconData icon, BuildContext context, AuthBloc authBloc){
+    return Neumorphic(
+      style: NeumorphicStyle(
+        shape: NeumorphicShape.flat,
+        depth: 5.0,
+        color: Theme.of(context).primaryColor,
+        boxShape: const NeumorphicBoxShape.circle(),
+      ),
+      child: IconButton(
+        icon: Icon(icon),
+        color: Colors.white,
+        iconSize: sqrt(MediaQuery.of(context).size.height + MediaQuery.of(context).size.width),
+        onPressed: () {
+          authService.logOut();
+          authBloc.add(const UserLoggedOut());
+          Navigator.pushNamed(context, _route);
+        },
+      ),
+    );
+  }
+
   static GenerateButton2(IconData icon, BuildContext context, MaterialPageRoute materialPageRoute){
     return Neumorphic(
       style: NeumorphicStyle(
         shape: NeumorphicShape.flat,
         depth: 5.0,
         color: Theme.of(context).primaryColor,
-        boxShape: NeumorphicBoxShape.circle(),
+        boxShape: const NeumorphicBoxShape.circle(),
       ),
       child: IconButton(
         icon: Icon(icon),
@@ -44,10 +67,10 @@ class Utils{
         shape: NeumorphicShape.flat,
         depth: 5.0,
         color: Theme.of(context).primaryColor,
-        boxShape: NeumorphicBoxShape.circle(),
+        boxShape: const NeumorphicBoxShape.circle(),
       ),
       child: IconButton(
-        icon: Icon(Icons.arrow_back_ios_rounded),
+        icon: const Icon(Icons.arrow_back_ios_rounded),
         color: Colors.white,
         iconSize: sqrt(MediaQuery.of(context).size.height + MediaQuery.of(context).size.width),
         onPressed: () => Navigator.pop(context),

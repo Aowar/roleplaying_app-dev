@@ -10,6 +10,7 @@ import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
 import 'package:roleplaying_app/src/models/chat.dart';
 import 'package:roleplaying_app/src/models/profile.dart';
+import 'package:roleplaying_app/src/services/auth_service.dart';
 import 'package:roleplaying_app/src/services/profile_service.dart';
 import 'package:roleplaying_app/src/ui/auth_screen.dart';
 import 'package:roleplaying_app/src/ui/chat_edit_screen.dart';
@@ -28,6 +29,8 @@ class MenuScreen extends StatefulWidget{
 }
 
 class _MenuScreenState extends State<MenuScreen> {
+
+  final AuthService _authService = AuthService();
 
   final List<String> _containersNames = ["Открытые чаты", "Мои анкеты", "Мои чаты"];
 
@@ -156,7 +159,7 @@ class _MenuScreenState extends State<MenuScreen> {
         if (snapshot.hasData) {
           final profiles = snapshot.data!;
           return Padding(
-              padding: EdgeInsets.only(right: 25),
+              padding: const EdgeInsets.only(right: 25),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
@@ -180,7 +183,7 @@ class _MenuScreenState extends State<MenuScreen> {
     );
   }
 
-  ///Getting profiles from DB
+  ///Getting chats from DB
   itemOfChatsList() {
     return StreamBuilder<List<Chat>>(
       stream: _readChats(),
@@ -191,7 +194,7 @@ class _MenuScreenState extends State<MenuScreen> {
         if (snapshot.hasData) {
           final chats = snapshot.data!;
           return Padding(
-              padding: EdgeInsets.only(right: 25),
+              padding: const EdgeInsets.only(right: 25),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
@@ -217,6 +220,7 @@ class _MenuScreenState extends State<MenuScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final AuthBloc authBloc = BlocProvider.of<AuthBloc>(context);
     return BlocBuilder<AuthBloc, AuthState>(
         builder: (context, state) {
           if (state is AuthStateAuthetificated) {
@@ -231,7 +235,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   Positioned(
                       right: 15,
                       top: 15,
-                      child: Utils.GenerateButton('/auth_screen', Icons.logout, context)
+                      child: Utils.GenerateLogOutButton('/auth_screen', _authService, Icons.logout, context, authBloc)
                   ),
                   Padding(
                       padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 4.5),
@@ -240,7 +244,7 @@ class _MenuScreenState extends State<MenuScreen> {
                           children: [
                             ///Chats block
                             Container (
-                              constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height / 7, maxHeight: MediaQuery.of(context).size.height / 6),
+                              constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height / 7, maxHeight: MediaQuery.of(context).size.height / 4.7),
                               child: SizedBox(
                                 width: MediaQuery.of(context).size.width / 1.1,
                                 child: Neumorphic(
@@ -276,7 +280,7 @@ class _MenuScreenState extends State<MenuScreen> {
                             Padding(
                               padding: const EdgeInsets.only(top: 30),
                               child: Container (
-                                constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height / 7, maxHeight: MediaQuery.of(context).size.height / 6),
+                                constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height / 7, maxHeight: MediaQuery.of(context).size.height / 4.7),
                                 child: SizedBox(
                                   width: MediaQuery.of(context).size.width / 1.1,
                                   child: Neumorphic(
