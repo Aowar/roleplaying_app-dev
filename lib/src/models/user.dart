@@ -15,18 +15,10 @@ class UserModel extends Equatable {
   /// The current user's id.
   final String id;
 
-  /// The current user's name (display name).
-  final String? name;
-
-  /// Url for the current user's photo.
-  final String? photo;
-
   /// {@macro user}
   const UserModel({
     required this.id,
     this.email,
-    this.name,
-    this.photo,
   });
 
   /// Empty user which represents an unauthenticated user.
@@ -39,5 +31,5 @@ class UserModel extends Equatable {
   bool get isNotEmpty => this != UserModel.empty;
 
   @override
-  List<Object?> get props => [email, id, name, photo];
+  List<Object?> get props => [email, id];
 }

@@ -97,7 +97,7 @@ class _ChatEditView extends State<ChatEditView> {
                               _chat.description = description;
                             }
                             Chat chat = Chat(usersList, state.getUser()!.id, title, description);
-                            !_chatCreateFlag ? _chatService.updateProfile(_chat) : _chatService.addChat(chat);
+                            !_chatCreateFlag ? _chatService.updateChat(_chat) : _chatService.addChat(chat);
                             !_chatCreateFlag ? Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(chat: _chat))) : Navigator.push(context, MaterialPageRoute(builder: (context) => MenuScreen()));
                           },
                         ),

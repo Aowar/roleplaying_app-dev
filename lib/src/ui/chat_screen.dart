@@ -10,7 +10,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
 import 'package:roleplaying_app/src/models/chat.dart';
+import 'package:roleplaying_app/src/models/customUserModel.dart';
 import 'package:roleplaying_app/src/models/message.dart';
+import 'package:roleplaying_app/src/services/customUserService.dart';
 import 'package:roleplaying_app/src/services/message_service.dart';
 import 'package:roleplaying_app/src/ui/Utils.dart';
 import 'package:roleplaying_app/src/ui/auth_screen.dart';
@@ -32,6 +34,7 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   late TextEditingController _textController;
   final MessageService _messageService = MessageService(_chat!);
+  final CustomUserService _customUserService  = CustomUserService();
 
   @override
   void initState() {
@@ -40,86 +43,100 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Widget _getMessageList() {
-    return Neumorphic(
-        style: NeumorphicStyle(
-          shape: NeumorphicShape.flat,
-          boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(5)),
-          depth: 2.0,
-          color: Theme
-              .of(context)
-              .cardColor,
-        ),
-        child: SizedBox(
-          width: MediaQuery
-              .of(context)
-              .size
-              .width / 1.2,
-          height: MediaQuery
-              .of(context)
-              .size
-              .height / 6,
-          child: FirebaseAnimatedList(
-            query: _messageService.messageCollection,
-            itemBuilder: (context, snapshot, animation, index) {
-              final json = snapshot.value as Map<String, dynamic>;
-              final message = Message.fromJson(json);
-              return messageBox(message.text);
-            },
-          ),
-        )
+    return SizedBox(
+      width: MediaQuery.of(context).size.width / 1.2,
+      height: MediaQuery.of(context).size.height / 6,
+      child: Stack(
+        children: [
+          Positioned(
+              child: FirebaseAnimatedList(
+                  query: _messageService.messageCollection,
+                  itemBuilder: (context, snapshot, animation, index) {
+                    return Container(child: messageBox(snapshot.children.elementAt(2).value.toString(), snapshot.children.elementAt(0).value.toString()));
+                  }),
+          )
+        ],
+      )
     );
   }
 
-  getMessageList() {
-    return _messageService.messageCollection.onValue.listen((event) {
-      event.snapshot.children.forEach((element) {
-        ListView(
-          children: [
-            messageBox(element.children.elementAt(2).value.toString())
-          ],
-        );
-      });
-    });
+  Stream<List<CustomUserModel>> _readUser(String userId) => FirebaseFirestore.instance.collection("users").where("userId", isEqualTo:  userId).snapshots().map(
+          (snapshot) => snapshot.docs.map((doc) => CustomUserModel.fromJson(doc.data())).toList()
+  );
+
+  ///Getting message author
+  authorOfMessage(String userId) {
+    return StreamBuilder<List<CustomUserModel>>(
+      stream: _readUser(userId),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Text("Ошибка получения данных", style: Theme.of(context).textTheme.subtitle2);
+        }
+        if (snapshot.hasData) {
+          final user = snapshot.data!;
+          return Padding(
+              padding: const EdgeInsets.only(right: 25),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Flexible(
+                    fit: FlexFit.loose,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: user.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return Text(user[index].nickName.toString(), style: Theme.of(context).textTheme.subtitle1);
+                      },
+                      separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 10),
+                    ),
+                  )
+                ],
+              )
+          );
+        }
+        return const CircularProgressIndicator();
+      },
+    );
   }
 
   ///Message box
-  Widget messageBox(String text) => Stack(
-    children: [
-      Container(
-        constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 6),
-        child: Neumorphic(
-          style: NeumorphicStyle(
-            shape: NeumorphicShape.flat,
-            boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(5)),
-            depth: 2.0,
-            color: Theme.of(context).accentColor,
-          ),
-          child: Stack(
-            children: [
-              Positioned(
-                left: 10,
-                top: 10,
-                child: Utils.GenerateButton('/profile_screen', Icons.account_circle_sharp, context),
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 100, left: MediaQuery.of(context).size.width / 5.5),
-                child: Text('Пользователь 2',
-                    style: Theme.of(context).textTheme.subtitle1
+  Widget messageBox(String text, String userId) => Padding(
+    padding: const EdgeInsets.only(bottom: 10),
+    child: Stack(
+      children: [
+        Container(
+          constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 6, maxWidth: MediaQuery.of(context).size.width / 1.2),
+          child: Neumorphic(
+            style: NeumorphicStyle(
+              shape: NeumorphicShape.flat,
+              boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(5)),
+              depth: 2.0,
+              color: Theme.of(context).accentColor,
+            ),
+            child: Stack(
+              children: [
+                Positioned(
+                  left: 10,
+                  top: 10,
+                  child: Utils.GenerateButton('/profile_screen', Icons.account_circle_sharp, context),
                 ),
-              ),
-              Padding(
-                  padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 12, left: MediaQuery.of(context).size.width / 5),
-                  child: Text(text,
-                    textAlign: TextAlign.left,
-                    style: Theme.of(context).textTheme.bodyText1,
-                  )
-              )
-            ],
+                Padding(
+                  padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 100, left: MediaQuery.of(context).size.width / 8),
+                  child: authorOfMessage(userId)
+                ),
+                Padding(
+                    padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 20, left: MediaQuery.of(context).size.width / 8, right: 5, bottom: 10),
+                    child: Text(text,
+                      textAlign: TextAlign.left,
+                      style: Theme.of(context).textTheme.bodyText1,
+                    )
+                )
+              ],
+            ),
           ),
         ),
-      ),
-      const Padding(padding: EdgeInsets.only(bottom: 5))
-    ],
+      ],
+    )
   );
 
   @override

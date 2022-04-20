@@ -17,7 +17,8 @@ class ChatService {
     });
   }
 
-  Future updateProfile(Chat chat) async {
+  Future updateChat(Chat chat) async {
     _chatCollection.doc(chat.id).update(chat.toMap());
   }
+
 }

@@ -10,7 +10,7 @@ class AuthService {
     try {
       UserCredential result = await _firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
       User? user = result.user;
-      return UserModel(id: user!.uid, email: user.email, name: user.displayName, photo: user.photoURL);
+      return UserModel(id: user!.uid, email: user.email);
     }
     catch (e) {
       return null;
@@ -21,7 +21,7 @@ class AuthService {
     try {
       UserCredential result = await _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
       User? user = result.user;
-      return UserModel(id: user!.uid, email: user.email, name: user.displayName, photo: user.photoURL);
+      return UserModel(id: user!.uid, email: user.email);
     }
     catch (e) {
       return null;
@@ -38,6 +38,6 @@ class AuthService {
   }
 
   Future<UserModel> getUserFromFirebase() async {
-    return UserModel(id: _firebaseAuth.currentUser!.uid, email: _firebaseAuth.currentUser!.email, name: _firebaseAuth.currentUser?.displayName, photo: _firebaseAuth.currentUser?.photoURL);
+    return UserModel(id: _firebaseAuth.currentUser!.uid, email: _firebaseAuth.currentUser!.email);
   }
 }
