@@ -122,11 +122,11 @@ class _ChatScreenState extends State<ChatScreen> {
                   child: Utils.GenerateButton2(Icons.account_circle_sharp, context, MaterialPageRoute(builder: (context) => UserProfileScreen(userId: userId))),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 100, left: MediaQuery.of(context).size.width / 8),
+                  padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 100, left: MediaQuery.of(context).size.width / 5),
                   child: authorOfMessage(userId)
                 ),
                 Padding(
-                    padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 20, left: MediaQuery.of(context).size.width / 8, right: 5, bottom: 10),
+                    padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 20, left: MediaQuery.of(context).size.width / 5, right: 5, bottom: 10),
                     child: Text(text,
                       textAlign: TextAlign.left,
                       style: Theme.of(context).textTheme.bodyText1,
