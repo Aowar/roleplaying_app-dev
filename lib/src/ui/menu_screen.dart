@@ -17,6 +17,7 @@ import 'package:roleplaying_app/src/ui/chat_edit_screen.dart';
 import 'package:roleplaying_app/src/ui/chat_screen.dart';
 import 'package:roleplaying_app/src/ui/profile_edit_screen.dart';
 import 'package:roleplaying_app/src/ui/profile_screen.dart';
+import 'package:roleplaying_app/src/ui/user_profile_screen.dart';
 
 import 'Utils.dart';
 
@@ -230,7 +231,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   Positioned(
                     left: 15,
                     top: 15,
-                    child: Utils.GenerateButton('/profile_screen', Icons.account_circle_sharp, context),
+                    child: Utils.GenerateButton2(Icons.account_circle_sharp, context, MaterialPageRoute(builder: (context) => UserProfileScreen(userId: state.getUser()!.id))),
                   ),
                   Positioned(
                       right: 15,

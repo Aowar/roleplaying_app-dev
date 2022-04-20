@@ -18,6 +18,7 @@ import 'package:roleplaying_app/src/ui/Utils.dart';
 import 'package:roleplaying_app/src/ui/auth_screen.dart';
 import 'package:roleplaying_app/src/ui/chat_description_screen.dart';
 import 'package:roleplaying_app/src/ui/chat_edit_screen.dart';
+import 'package:roleplaying_app/src/ui/user_profile_screen.dart';
 
 late Chat? _chat;
 
@@ -118,7 +119,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 Positioned(
                   left: 10,
                   top: 10,
-                  child: Utils.GenerateButton('/profile_screen', Icons.account_circle_sharp, context),
+                  child: Utils.GenerateButton2(Icons.account_circle_sharp, context, MaterialPageRoute(builder: (context) => UserProfileScreen(userId: userId))),
                 ),
                 Padding(
                   padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 100, left: MediaQuery.of(context).size.width / 8),
