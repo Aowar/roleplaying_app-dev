@@ -44,10 +44,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   Flexible(
                     fit: FlexFit.loose,
                     child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
                       itemCount: user.length,
                       itemBuilder: (BuildContext context, int index) {
                          return Text(user[index].nickName.toString(),
+                            textAlign: TextAlign.center,
                             style: Theme.of(context).textTheme.headline2
                         );
                       },
@@ -94,8 +94,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 40),
                       child: Center(
                         child: SizedBox(
-                          height: MediaQuery.of(context).size.height / 40,
-                          width: MediaQuery.of(context).size.height / 5,
+                          height: MediaQuery.of(context).size.height / 10,
+                          width: MediaQuery.of(context).size.width / 2,
                           child: Container(
                             child: userNickName(_userId),
                           )
