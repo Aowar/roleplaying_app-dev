@@ -28,19 +28,12 @@ class AuthView extends StatefulWidget {
 
 class _AuthView extends State<AuthView> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  late TextEditingController _passwordController;
-  late TextEditingController _emailController;
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
 
   final AuthService _authService = AuthService();
   late String _email;
   late String _password;
-
-  @override
-  void initState() {
-    super.initState();
-    _passwordController = TextEditingController();
-    _emailController = TextEditingController();
-  }
 
   ///Creating login fields func
   Widget generateFormTextField(Icon icon, String hintText, TextEditingController controller, bool obscureText, String failedValidatorText) {

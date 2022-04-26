@@ -26,34 +26,27 @@ class ProfileScreen extends StatelessWidget {
     _profile = profile;
   }
 
+  @override
   Widget build(BuildContext context) {
-    return ProfileView();
+    return const ProfileView();
   }
 }
 
 class ProfileView extends StatefulWidget {
-  ProfileView({Key? key}) : super(key: key) {
-  }
+  const ProfileView({Key? key}) : super(key: key);
 
   @override
   State<ProfileView> createState() => _ProfileView();
 }
 
 class _ProfileView extends State<ProfileView> {
-  late TextEditingController _titleController;
-  late TextEditingController _textController;
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _textController = TextEditingController();
 
-  ProfileService _profileService = ProfileService();
+  final ProfileService _profileService = ProfileService();
 
   late String title = _profile.title;
   late String text = _profile.text;
-
-  @override
-  void initState() {
-    super.initState();
-    _titleController = TextEditingController();
-    _textController = TextEditingController();
-  }
 
   @override
   Widget build(BuildContext context) {

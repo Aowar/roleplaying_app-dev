@@ -42,18 +42,11 @@ class ChatEditView extends StatefulWidget {
 
 class _ChatEditView extends State<ChatEditView> {
   final ChatService _chatService = ChatService();
-  late TextEditingController _titleController;
-  late TextEditingController _descriptionController;
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
 
   late String title;
   late String description;
-
-  @override
-  void initState() {
-    super.initState();
-    _titleController = TextEditingController();
-    _descriptionController = TextEditingController();
-  }
 
   @override
   Widget build(BuildContext context) {

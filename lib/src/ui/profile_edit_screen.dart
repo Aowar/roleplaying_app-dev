@@ -33,6 +33,7 @@ class ProfileEditScreen extends StatelessWidget {
     _profileCreateFlag = true;
   }
 
+  @override
   Widget build(BuildContext context) {
     return const ProfileEditView();
   }
@@ -46,20 +47,13 @@ class ProfileEditView extends StatefulWidget {
 }
 
 class _ProfileEditView extends State<ProfileEditView> {
-  late TextEditingController _titleController;
-  late TextEditingController _textController;
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _textController = TextEditingController();
 
   final ProfileService _profileService = ProfileService();
 
   late String title;
   late String text;
-
-  @override
-  void initState() {
-    super.initState();
-    _titleController = TextEditingController();
-    _textController = TextEditingController();
-  }
 
   @override
   Widget build(BuildContext context) {

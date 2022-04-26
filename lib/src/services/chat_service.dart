@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:roleplaying_app/src/models/chat.dart';
 
@@ -12,7 +10,7 @@ class ChatService {
       'title': chat.title,
       'description': chat.description,
       'usersId': chat.usersId,
-      'organizatorId': chat.organizatorId,
+      'organizerId': chat.organizatorId,
       'id': docRef.id
     });
   }
@@ -21,4 +19,7 @@ class ChatService {
     _chatCollection.doc(chat.id).update(chat.toMap());
   }
 
+  CollectionReference getCollection() {
+    return _chatCollection;
+  }
 }

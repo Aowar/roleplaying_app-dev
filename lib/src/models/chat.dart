@@ -12,7 +12,7 @@ class Chat extends Equatable {
   Chat.fromJson(Map<String, dynamic> data) {
     id = data['id'];
     usersId = data['usersId'];
-    organizatorId = data['organizatorId'];
+    organizatorId = data['organizerId'];
     title = data['title'];
     description = data['description'];
   }
@@ -23,7 +23,7 @@ class Chat extends Equatable {
   Map<String, dynamic> toMap() {
     return {
       "usersId": usersId,
-      "organizatorId": organizatorId,
+      "organizerId": organizatorId,
       "title": title,
       "description": description
     };

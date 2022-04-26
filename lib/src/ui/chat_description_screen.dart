@@ -40,18 +40,11 @@ class ChatDescriptionView extends StatefulWidget {
 }
 
 class _ChatDescriptionView extends State<ChatDescriptionView> {
-  late TextEditingController _titleController;
-  late TextEditingController _descriptionController;
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
 
   late String title;
   late String text;
-
-  @override
-  void initState() {
-    super.initState();
-    _titleController = TextEditingController();
-    _descriptionController = TextEditingController();
-  }
 
   @override
   Widget build(BuildContext context) {
