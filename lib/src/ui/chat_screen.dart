@@ -12,6 +12,7 @@ import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
 import 'package:roleplaying_app/src/models/chat.dart';
 import 'package:roleplaying_app/src/models/customUserModel.dart';
 import 'package:roleplaying_app/src/models/message.dart';
+import 'package:roleplaying_app/src/services/chat_service.dart';
 import 'package:roleplaying_app/src/services/customUserService.dart';
 import 'package:roleplaying_app/src/services/message_service.dart';
 import 'package:roleplaying_app/src/ui/Utils.dart';
@@ -33,31 +34,57 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  late TextEditingController _textController;
+  final TextEditingController _textController = TextEditingController();
   final MessageService _messageService = MessageService(_chat!);
   final CustomUserService _customUserService  = CustomUserService();
 
-  @override
-  void initState() {
-    super.initState();
-    _textController = TextEditingController();
+  ///Getting list stream of messages
+  Stream<List<Message>> _readMessages() {
+    return FirebaseFirestore.instance.collection("chats").doc(_chat!.id).collection("messages").orderBy('creationDate', descending: false).snapshots().map(
+            (snapshot) =>
+            snapshot.docs.map((doc) => Message.fromJson(doc.data())).toList()
+    );
   }
 
-  Widget _getMessageList() {
-    return SizedBox(
-      width: MediaQuery.of(context).size.width / 1.2,
-      height: MediaQuery.of(context).size.height / 6,
-      child: Stack(
-        children: [
-          Positioned(
-              child: FirebaseAnimatedList(
-                  query: _messageService.messageCollection,
-                  itemBuilder: (context, snapshot, animation, index) {
-                    return Container(child: messageBox(snapshot.children.elementAt(2).value.toString(), snapshot.children.elementAt(0).value.toString()));
-                  }),
-          )
-        ],
-      )
+  ///Getting messages from DB
+  itemOfMessagesList(AuthState state) {
+    return StreamBuilder<List<Message>>(
+      stream: _readMessages(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Text("Ошибка получения данных", style: Theme.of(context).textTheme.subtitle2);
+        }
+        if (snapshot.hasData) {
+          final messages = snapshot.data!;
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Flexible(
+                fit: FlexFit.loose,
+                child: ListView.separated(
+                  scrollDirection: Axis.vertical,
+                  itemCount: messages.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    if (state.getUser()!.id == messages[index].authorId) {
+                      return Padding(
+                        padding: const EdgeInsets.only(left: 25),
+                        child: curUserMessageBox(messages[index].text, messages[index].authorId),
+                      );
+                    } else {
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 15),
+                        child: messageBox(messages[index].text, messages[index].authorId),
+                      );
+                    }
+                  },
+                  separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 10),
+                ),
+              )
+            ],
+          );
+        }
+        return const CircularProgressIndicator();
+      },
     );
   }
 
@@ -83,7 +110,6 @@ class _ChatScreenState extends State<ChatScreen> {
                   Flexible(
                     fit: FlexFit.loose,
                     child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
                       itemCount: user.length,
                       itemBuilder: (BuildContext context, int index) {
                         return Text(user[index].nickName.toString(), style: Theme.of(context).textTheme.subtitle1);
@@ -140,6 +166,46 @@ class _ChatScreenState extends State<ChatScreen> {
     )
   );
 
+  ///Generate message box where current logged user id = message author id
+  Widget curUserMessageBox(String text, String userId) => Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Stack(
+        children: [
+          Container(
+            constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 6, maxWidth: MediaQuery.of(context).size.width / 1.2),
+            child: Neumorphic(
+              style: NeumorphicStyle(
+                shape: NeumorphicShape.flat,
+                boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(5)),
+                depth: 2.0,
+                color: Theme.of(context).accentColor,
+              ),
+              child: Stack(
+                children: [
+                  Positioned(
+                    right: 10,
+                    top: 10,
+                    child: Utils.GenerateButton2(Icons.account_circle_sharp, context, MaterialPageRoute(builder: (context) => UserProfileScreen(userId: userId))),
+                  ),
+                  Padding(
+                      padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 100, right: MediaQuery.of(context).size.width / 5),
+                      child: authorOfMessage(userId)
+                  ),
+                  Padding(
+                      padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 20, left: 5, right: MediaQuery.of(context).size.width / 5, bottom: 10),
+                      child: Text(text,
+                        textAlign: TextAlign.left,
+                        style: Theme.of(context).textTheme.bodyText1,
+                      )
+                  )
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+  );
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc, AuthState> (
@@ -183,9 +249,13 @@ class _ChatScreenState extends State<ChatScreen> {
                                           Column(
                                             children: [
                                               SizedBox(
-                                                width: MediaQuery.of(context).size.width / 1.1 - 20,
+                                                width: MediaQuery.of(context).size.width / 1.1 - 15,
                                                 height: MediaQuery.of(context).size.height / 1.6,
-                                                child: _getMessageList()
+                                                child: Stack(
+                                                  children: [
+                                                    itemOfMessagesList(state)
+                                                  ],
+                                                )
                                               )
                                             ],
                                           ),

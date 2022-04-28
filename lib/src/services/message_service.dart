@@ -7,15 +7,16 @@ class MessageService {
   final Chat chat;
   late CollectionReference messageCollection;
   MessageService(this.chat) {
-    messageCollection = FirebaseFirestore.instance.collection("chats" + chat.id + "messages");
+    messageCollection = FirebaseFirestore.instance.collection("chats");
   }
 
   Future addMessage(Message message) async {
-    DocumentReference docRef = messageCollection.doc();
+    DocumentReference docRef = messageCollection.doc(chat.id).collection("messages").doc();
     return await docRef.set({
       'authorId': message.authorId,
       'text': message.text,
-      'id': docRef.id
+      'id': docRef.id,
+      'creationDate': message.creationDate
     });
   }
 
