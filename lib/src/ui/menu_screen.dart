@@ -140,7 +140,10 @@ class _MenuScreenState extends State<MenuScreen> {
             Icon(Icons.image_outlined,
               size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width)*3),
             ),
-            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(chat: chat))),
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(
+                  builder: (context) => ChatScreen(chat: chat)));
+            },
           ),
           Text(chat.title,
               style: Theme.of(context).textTheme.subtitle2
@@ -224,7 +227,7 @@ class _MenuScreenState extends State<MenuScreen> {
     final AuthBloc authBloc = BlocProvider.of<AuthBloc>(context);
     return BlocBuilder<AuthBloc, AuthState>(
         builder: (context, state) {
-          if (state is AuthStateAuthetificated) {
+          if (state is AuthStateAuthenticated) {
             return Scaffold(
               body: Stack(
                 children: [

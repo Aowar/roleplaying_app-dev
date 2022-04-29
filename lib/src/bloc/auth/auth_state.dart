@@ -17,16 +17,15 @@ class AutStateInit extends AuthState {
   const AutStateInit(UserModel user) : super(user);
 }
 
-class AuthStateAuthetificated extends AuthState {
-  AuthStateAuthetificated(UserModel user) : super(user){
-  }
+class AuthStateAuthenticated extends AuthState {
+  const AuthStateAuthenticated(UserModel user) : super(user);
 
   @override
   String toString() => 'UserSignedIn {User: $_user}';
 }
 
-class AuthStateNotAuthentificated extends AuthState {
-  AuthStateNotAuthentificated() : super(UserModel.empty);
+class AuthStateNotAuthenticated extends AuthState {
+  const AuthStateNotAuthenticated() : super(UserModel.empty);
 
   @override
   String toString() => 'User not signed in';

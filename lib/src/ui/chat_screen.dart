@@ -210,7 +210,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc, AuthState> (
         builder: (context, state) {
-          if (state is AuthStateAuthetificated) {
+          if (state is AuthStateAuthenticated && _chat!.usersId.contains(state.getUser()!.id)) {
             return Scaffold(
               body: Stack(
                 children: [
@@ -331,6 +331,64 @@ class _ChatScreenState extends State<ChatScreen> {
                               )
                             ],
                           ),
+                        ),
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            );
+          }
+          else if (state is AuthStateAuthenticated && !_chat!.usersId.contains(state.getUser()!.id)) {
+            return Scaffold(
+              body: Stack(
+                children: [
+                  Positioned(
+                    left: 15,
+                    top: 15,
+                    child: Utils.GenerateBackButton(context),
+                  ),
+                  Center(
+                    child: Container(
+                      child: Neumorphic(
+                        style: NeumorphicStyle(
+                          shape: NeumorphicShape.flat,
+                          boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(5)),
+                          depth: 2.0,
+                          color: Theme.of(context).cardColor,
+                        ),
+                        child: Padding(
+                            padding: const EdgeInsets.only(left: 5, right: 5, top: 5),
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Text("Вы ещё не вступили в чат",
+                                  style: Theme.of(context).textTheme.bodyText1,
+                                ),
+                                Neumorphic(
+                                    style: NeumorphicStyle(
+                                      shape: NeumorphicShape.flat,
+                                      depth: 5.0,
+                                      color: Theme.of(context).primaryColor,
+                                      boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(5)),
+                                    ),
+                                    child: TextButton(
+                                      child: Text("Вступить",
+                                          style: Theme.of(context).textTheme.bodyText1
+                                      ),
+                                      onPressed: () async {
+                                        await ChatService().addNewUserInChat(_chat!, state.getUser()!.id);
+                                        _chat!.usersId.add(state.getUser()!.id);
+                                        setState(() {
+                                          ChatScreen(chat: _chat);
+                                        });
+                                      },
+                                    )
+                                )
+                              ],
+                            ),
+                          )
                         ),
                       ),
                     ),

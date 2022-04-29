@@ -168,7 +168,7 @@ class _RegisterView extends State<RegisterView> {
               ),
               BlocListener<AuthBloc, AuthState>(
                 listener: (context, state) {
-                  if (state is AuthStateAuthetificated) {
+                  if (state is AuthStateAuthenticated) {
                     Navigator.pushNamed(context, '/menu_screen');
                   }
                 },

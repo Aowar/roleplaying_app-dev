@@ -16,7 +16,14 @@ class ChatService {
   }
 
   Future updateChat(Chat chat) async {
-    _chatCollection.doc(chat.id).update(chat.toMap());
+    await _chatCollection.doc(chat.id).update(chat.toMap());
+  }
+
+  Future addNewUserInChat(Chat chat, String userId) async {
+    if (!chat.usersId.contains(userId)) {
+      chat.usersId.add(userId);
+    }
+    await _chatCollection.doc(chat.id).update(chat.toMap());
   }
 
   CollectionReference getCollection() {

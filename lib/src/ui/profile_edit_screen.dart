@@ -62,7 +62,7 @@ class _ProfileEditView extends State<ProfileEditView> {
 
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
-        if (state is AuthStateAuthetificated) {
+        if (state is AuthStateAuthenticated) {
           return Scaffold(
             body: Stack(
               children: [

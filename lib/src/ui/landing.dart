@@ -13,7 +13,7 @@ class Landing extends StatelessWidget {
     return BlocBuilder<AuthBloc, AuthState>(
       buildWhen: (prev, state) => prev.runtimeType != state.runtimeType,
       builder: (context, state) {
-        if (state is AuthStateAuthetificated)
+        if (state is AuthStateAuthenticated)
           return MenuScreen();
         else
           return AuthScreen();

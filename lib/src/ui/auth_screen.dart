@@ -165,7 +165,7 @@ class _AuthView extends State<AuthView> {
                     ),
                     BlocListener<AuthBloc, AuthState>(
                       listener: (context, state) {
-                        if (state is AuthStateAuthetificated) {
+                        if (state is AuthStateAuthenticated) {
                           Navigator.pushNamed(context, '/menu_screen');
                         }
                       },

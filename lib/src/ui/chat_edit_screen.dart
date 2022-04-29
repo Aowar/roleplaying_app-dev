@@ -54,7 +54,7 @@ class _ChatEditView extends State<ChatEditView> {
     final user = authBloc.state.getUser()!.id;
     return BlocBuilder <AuthBloc, AuthState> (
         builder: (context, state) {
-          if (state is AuthStateAuthetificated) {
+          if (state is AuthStateAuthenticated) {
             return Scaffold(
               body: Stack(
                 children: [
