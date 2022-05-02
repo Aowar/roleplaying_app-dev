@@ -11,7 +11,7 @@ import 'package:roleplaying_app/src/ui/auth_screen.dart';
 import 'package:roleplaying_app/src/ui/chat_screen.dart';
 import 'package:roleplaying_app/src/ui/menu_screen.dart';
 
-import 'Utils.dart';
+import 'utils/Utils.dart';
 
 late bool _chatCreateFlag;
 late Chat _chat;

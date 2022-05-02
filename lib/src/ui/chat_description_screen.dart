@@ -10,7 +10,7 @@ import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
 import 'package:roleplaying_app/src/models/chat.dart';
 import 'package:roleplaying_app/src/models/profile.dart';
 import 'package:roleplaying_app/src/services/chat_service.dart';
-import 'package:roleplaying_app/src/ui/Utils.dart';
+import 'package:roleplaying_app/src/ui/utils/Utils.dart';
 import 'package:roleplaying_app/src/ui/auth_screen.dart';
 import 'package:roleplaying_app/src/ui/chat_edit_screen.dart';
 import 'package:roleplaying_app/src/ui/menu_screen.dart';

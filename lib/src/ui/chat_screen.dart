@@ -15,7 +15,7 @@ import 'package:roleplaying_app/src/models/message.dart';
 import 'package:roleplaying_app/src/services/chat_service.dart';
 import 'package:roleplaying_app/src/services/customUserService.dart';
 import 'package:roleplaying_app/src/services/message_service.dart';
-import 'package:roleplaying_app/src/ui/Utils.dart';
+import 'package:roleplaying_app/src/ui/utils/Utils.dart';
 import 'package:roleplaying_app/src/ui/auth_screen.dart';
 import 'package:roleplaying_app/src/ui/chat_description_screen.dart';
 import 'package:roleplaying_app/src/ui/chat_edit_screen.dart';
@@ -38,18 +38,10 @@ class _ChatScreenState extends State<ChatScreen> {
   final MessageService _messageService = MessageService(_chat!);
   final CustomUserService _customUserService  = CustomUserService();
 
-  ///Getting list stream of messages
-  Stream<List<Message>> _readMessages() {
-    return FirebaseFirestore.instance.collection("chats").doc(_chat!.id).collection("messages").orderBy('creationDate', descending: false).snapshots().map(
-            (snapshot) =>
-            snapshot.docs.map((doc) => Message.fromJson(doc.data())).toList()
-    );
-  }
-
   ///Getting messages from DB
   itemOfMessagesList(AuthState state) {
     return StreamBuilder<List<Message>>(
-      stream: _readMessages(),
+      stream: _messageService.readMessages(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return Text("Ошибка получения данных", style: Theme.of(context).textTheme.subtitle2);

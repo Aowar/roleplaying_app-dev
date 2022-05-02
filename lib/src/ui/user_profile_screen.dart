@@ -5,7 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:roleplaying_app/src/models/customUserModel.dart';
-import 'package:roleplaying_app/src/ui/Utils.dart';
+import 'package:roleplaying_app/src/ui/utils/Utils.dart';
 
 late String _userId;
 
