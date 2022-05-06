@@ -21,9 +21,9 @@ class ProfileService {
   Future updateProfile(Profile profile) async {
     _profileCollection.doc(profile.id).update(profile.toMap());
   }
-}
 
-///Getting list stream of profiles where id of current user = user id in profile
-Stream<List<Profile>> readProfiles(AuthState state) => FirebaseFirestore.instance.collection("profiles").where("userId", isEqualTo:  state.getUser()!.id).snapshots().map(
-        (snapshot) => snapshot.docs.map((doc) => Profile.fromJson(doc.data())).toList()
-);
+  ///Getting list stream of profiles where id of current user = user id in profile
+  static Stream<List<Profile>> readProfiles(AuthState state) => FirebaseFirestore.instance.collection("profiles").where("userId", isEqualTo:  state.getUser()!.id).snapshots().map(
+          (snapshot) => snapshot.docs.map((doc) => Profile.fromJson(doc.data())).toList()
+  );
+}

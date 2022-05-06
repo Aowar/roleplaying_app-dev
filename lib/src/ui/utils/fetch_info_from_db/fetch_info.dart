@@ -13,7 +13,7 @@ class FetchInfoFromDb {
   ///Getting profiles from DB
   static itemOfProfilesList(AuthState state) {
     return StreamBuilder<List<Profile>>(
-      stream: readProfiles(state),
+      stream: ProfileService.readProfiles(state),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return Text("Ошибка получения данных", style: Theme.of(context).textTheme.subtitle2);

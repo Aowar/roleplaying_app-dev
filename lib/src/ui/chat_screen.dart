@@ -36,7 +36,6 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _textController = TextEditingController();
   final MessageService _messageService = MessageService(_chat!);
-  final CustomUserService _customUserService  = CustomUserService();
 
   ///Getting messages from DB
   itemOfMessagesList(AuthState state) {
@@ -214,7 +213,12 @@ class _ChatScreenState extends State<ChatScreen> {
                   Positioned(
                     right: 15,
                     top: 15,
-                    child: Utils.GenerateButton2(Icons.menu, context, MaterialPageRoute(builder: (context) => ChatDescriptionScreen(chat: _chat))),
+                    child: FutureBuilder<Chat>(
+                        future: ChatService().getChat(_chat!),
+                        builder: (context, snapshot) {
+                          return Utils.GenerateButton2(Icons.menu, context, MaterialPageRoute(builder: (context) => ChatDescriptionScreen(chat: snapshot.data)));
+                        }
+                    ),
                   ),
                   Center(
                     child: Padding(

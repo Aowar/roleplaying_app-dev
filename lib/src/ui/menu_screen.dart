@@ -210,7 +210,7 @@ class _MenuScreenState extends State<MenuScreen> {
                                         Positioned(
                                             right: 5,
                                             top: 5,
-                                            child: Utils.GenerateButton2(Icons.add, context, MaterialPageRoute(builder: (context) => ProfileEditScreen.create()))
+                                            child: Utils.GenerateButton2(Icons.add, context, MaterialPageRoute(builder: (context) => ChatEditScreen.create()))
                                         )
                                       ],
                                     ),

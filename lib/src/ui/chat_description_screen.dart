@@ -8,8 +8,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
 import 'package:roleplaying_app/src/models/chat.dart';
+import 'package:roleplaying_app/src/models/customUserModel.dart';
 import 'package:roleplaying_app/src/models/profile.dart';
 import 'package:roleplaying_app/src/services/chat_service.dart';
+import 'package:roleplaying_app/src/services/customUserService.dart';
+import 'package:roleplaying_app/src/ui/profile_screen.dart';
+import 'package:roleplaying_app/src/ui/user_profile_screen.dart';
 import 'package:roleplaying_app/src/ui/utils/Utils.dart';
 import 'package:roleplaying_app/src/ui/auth_screen.dart';
 import 'package:roleplaying_app/src/ui/chat_edit_screen.dart';
@@ -46,6 +50,32 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
   late String title;
   late String text;
 
+  Widget buildExitButton(bool deleteFlag, String userId) {
+    if (deleteFlag) {
+      return ElevatedButton(
+        child: Text("Удалить чат", style: Theme.of(context).textTheme.bodyText1),
+        style: ElevatedButton.styleFrom(
+            primary: Theme.of(context).cardColor
+        ),
+        onPressed: () {
+          ChatService().deleteChat(_chat);
+          Navigator.push(context, MaterialPageRoute(builder: (context) => MenuScreen()));
+        },
+      );
+    } else {
+      return ElevatedButton(
+        child: Text("Выйти", style: Theme.of(context).textTheme.bodyText1),
+        style: ElevatedButton.styleFrom(
+            primary: Theme.of(context).cardColor
+        ),
+        onPressed: () {
+          ChatService().deleteUserFromChat(_chat, userId);
+          Navigator.push(context, MaterialPageRoute(builder: (context) => MenuScreen()));
+        },
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final AuthBloc authBloc = context.read<AuthBloc>();
@@ -71,7 +101,7 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
                       padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 10),
                       child: SizedBox(
                         width: MediaQuery.of(context).size.width / 1.1,
-                        height: MediaQuery.of(context).size.height / 1.15,
+                        height: MediaQuery.of(context).size.height / 1.1,
                         child: Neumorphic(
                           style: NeumorphicStyle(
                             shape: NeumorphicShape.flat,
@@ -165,9 +195,9 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
                                     ),
                                     ///Users container
                                     Padding(
-                                      padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 80, bottom: 20),
+                                      padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 80, bottom: 10),
                                       child: Container(
-                                        constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height / 8, maxHeight: MediaQuery.of(context).size.height / 7.5),
+                                        constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height / 8, maxHeight: MediaQuery.of(context).size.height / 6.5),
                                         child: SizedBox(
                                           width: MediaQuery.of(context).size.width / 1.3,
                                           child: Neumorphic(
@@ -177,31 +207,28 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
                                                 depth: 2.0,
                                                 color: Theme.of(context).accentColor,
                                               ),
-                                              ///User
                                               child: Padding(
                                                   padding: const EdgeInsets.only(top: 10),
+                                                  ///User
                                                   child: Row(
                                                     children: [
                                                       SizedBox(
                                                         width: MediaQuery.of(context).size.width / 1.3,
                                                         child: ListView.separated(
+                                                          scrollDirection: Axis.horizontal,
                                                           itemCount: _chat.usersId.length,
                                                           itemBuilder: (BuildContext context, int index) {
                                                             return Column(
                                                               children: [
-                                                                NeumorphicButton(
-                                                                  style: NeumorphicStyle(
-                                                                    shape: NeumorphicShape.flat,
-                                                                    boxShape: const NeumorphicBoxShape.circle(),
-                                                                    depth: 5.0,
-                                                                    color: Theme.of(context).accentColor,
-                                                                  ),
-                                                                  child:
-                                                                  Icon(Icons.image_outlined,
-                                                                    size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width)*2),
-                                                                  ),
-                                                                  onPressed: () => {},
-                                                                  // onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen(profile: profile))),
+                                                                ElevatedButton(
+                                                                    onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => UserProfileScreen(userId: _chat.usersId[index]))),
+                                                                    child: Icon(Icons.account_circle_sharp,
+                                                                      size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width)*2),
+                                                                    ),
+                                                                  style: ElevatedButton.styleFrom(
+                                                                    shape: const CircleBorder(),
+                                                                    primary: Theme.of(context).cardColor
+                                                                  )
                                                                 ),
                                                                 Padding(
                                                                     padding: const EdgeInsets.only(top: 10),
@@ -221,6 +248,10 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
                                           ),
                                         ),
                                       ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 10, bottom: 10),
+                                      child: state.getUser()!.id != _chat.organizerId ? buildExitButton(false, state.getUser()!.id) : buildExitButton(true, state.getUser()!.id)
                                     )
                                   ],
                                 )

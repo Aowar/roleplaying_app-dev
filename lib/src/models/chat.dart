@@ -3,27 +3,27 @@ import 'package:equatable/equatable.dart';
 class Chat extends Equatable {
   late String id;
   late List usersId;
-  late String organizatorId;
+  late String organizerId;
   late String title;
   late String description;
 
-  Chat(this.usersId, this.organizatorId, this.title, this.description);
+  Chat(this.usersId, this.organizerId, this.title, this.description);
 
   Chat.fromJson(Map<String, dynamic> data) {
     id = data['id'];
     usersId = data['usersId'];
-    organizatorId = data['organizerId'];
+    organizerId = data['organizerId'];
     title = data['title'];
     description = data['description'];
   }
 
   @override
-  List<Object?> get props => [usersId, organizatorId, title, description];
+  List<Object?> get props => [usersId, organizerId, title, description];
 
   Map<String, dynamic> toMap() {
     return {
       "usersId": usersId,
-      "organizerId": organizatorId,
+      "organizerId": organizerId,
       "title": title,
       "description": description
     };

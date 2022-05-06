@@ -11,7 +11,7 @@ class ChatService {
       'title': chat.title,
       'description': chat.description,
       'usersId': chat.usersId,
-      'organizerId': chat.organizatorId,
+      'organizerId': chat.organizerId,
       'id': docRef.id
     });
   }
@@ -21,10 +21,40 @@ class ChatService {
   }
 
   Future addNewUserInChat(Chat chat, String userId) async {
+    DocumentReference docRef = _chatCollection.doc(chat.id);
     if (!chat.usersId.contains(userId)) {
       chat.usersId.add(userId);
     }
-    await _chatCollection.doc(chat.id).update(chat.toMap());
+    await docRef.update(chat.toMap());
+  }
+
+  Future deleteUserFromChat(Chat chat, String userId) async {
+    List listOfUsers = List.from(chat.usersId);
+    listOfUsers.removeWhere((element) => element == userId);
+    chat.usersId = listOfUsers;
+    await updateChat(chat);
+  }
+
+  Future deleteChat(Chat chat) async {
+    DocumentReference docRef = _chatCollection.doc(chat.id);
+    await docRef.collection("messages").get().then((QuerySnapshot querySnapshot) {
+      for (var doc in querySnapshot.docs) {
+        doc.reference.delete();
+      }
+    });
+    return await docRef.delete();
+  }
+
+  Future<Chat> getChat(Chat chat) async {
+    DocumentReference docRef =  _chatCollection.doc(chat.id);
+    return await docRef.get().then((value) {
+      if (value.exists) {
+        return Chat(value.get("usersId"), value.get("organizerId"), value.get("title"), value.get("description"));
+      }
+      else {
+        return chat;
+      }
+    });
   }
 
   ///Getting list stream of chats
