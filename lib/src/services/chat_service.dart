@@ -35,8 +35,8 @@ class ChatService {
     await updateChat(chat);
   }
 
-  Future deleteChat(Chat chat) async {
-    DocumentReference docRef = _chatCollection.doc(chat.id);
+  Future deleteChat(String chatId) async {
+    DocumentReference docRef = _chatCollection.doc(chatId);
     await docRef.collection("messages").get().then((QuerySnapshot querySnapshot) {
       for (var doc in querySnapshot.docs) {
         doc.reference.delete();
@@ -45,15 +45,10 @@ class ChatService {
     return await docRef.delete();
   }
 
-  Future<Chat> getChat(Chat chat) async {
-    DocumentReference docRef =  _chatCollection.doc(chat.id);
+  Future<Chat> getChat(String chatId) async {
+    DocumentReference docRef =  _chatCollection.doc(chatId);
     return await docRef.get().then((value) {
-      if (value.exists) {
-        return Chat(value.get("usersId"), value.get("organizerId"), value.get("title"), value.get("description"));
-      }
-      else {
-        return chat;
-      }
+      return Chat(value.get("usersId"), value.get("organizerId"), value.get("title"), value.get("description"));
     });
   }
 

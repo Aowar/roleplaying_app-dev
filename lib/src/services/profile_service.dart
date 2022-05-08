@@ -23,7 +23,8 @@ class ProfileService {
   }
 
   ///Getting list stream of profiles where id of current user = user id in profile
-  static Stream<List<Profile>> readProfiles(AuthState state) => FirebaseFirestore.instance.collection("profiles").where("userId", isEqualTo:  state.getUser()!.id).snapshots().map(
+  static Stream<List<Profile>> readProfiles(String userId) =>
+      FirebaseFirestore.instance.collection("profiles").where("userId", isEqualTo: userId).snapshots().map(
           (snapshot) => snapshot.docs.map((doc) => Profile.fromJson(doc.data())).toList()
   );
 }

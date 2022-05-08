@@ -58,7 +58,7 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
             primary: Theme.of(context).cardColor
         ),
         onPressed: () {
-          ChatService().deleteChat(_chat);
+          ChatService().deleteChat(_chat.id);
           Navigator.push(context, MaterialPageRoute(builder: (context) => MenuScreen()));
         },
       );

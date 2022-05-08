@@ -59,12 +59,12 @@ class _ChatScreenState extends State<ChatScreen> {
                     if (state.getUser()!.id == messages[index].authorId) {
                       return Padding(
                         padding: const EdgeInsets.only(left: 25),
-                        child: curUserMessageBox(messages[index].text, messages[index].authorId),
+                        child: curUserMessageBox(messages[index].text, messages[index].authorId, state.getUser()!.id),
                       );
                     } else {
                       return Padding(
                         padding: const EdgeInsets.only(right: 15),
-                        child: messageBox(messages[index].text, messages[index].authorId),
+                        child: messageBox(messages[index].text, messages[index].authorId, state.getUser()!.id),
                       );
                     }
                   },
@@ -84,7 +84,7 @@ class _ChatScreenState extends State<ChatScreen> {
   );
 
   ///Getting message author
-  authorOfMessage(String userId) {
+  authorOfMessage(String userId, String currentUserId) {
     return StreamBuilder<List<CustomUserModel>>(
       stream: _readUser(userId),
       builder: (context, snapshot) {
@@ -103,7 +103,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     child: ListView.separated(
                       itemCount: user.length,
                       itemBuilder: (BuildContext context, int index) {
-                        return Text(user[index].nickName.toString(), style: Theme.of(context).textTheme.subtitle1);
+                        return Text(user[index].nickName.toString(), style: Theme.of(context).textTheme.subtitle1, textAlign: userId == currentUserId ? TextAlign.right : TextAlign.left);
                       },
                       separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 10),
                     ),
@@ -118,39 +118,35 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   ///Message box
-  Widget messageBox(String text, String userId) => Padding(
+  Widget messageBox(String text, String userId, String currentUserId) => Padding(
     padding: const EdgeInsets.only(bottom: 10),
     child: Stack(
       children: [
         Container(
           constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 6, maxWidth: MediaQuery.of(context).size.width / 1.2),
-          child: Neumorphic(
-            style: NeumorphicStyle(
-              shape: NeumorphicShape.flat,
-              boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(5)),
-              depth: 2.0,
-              color: Theme.of(context).accentColor,
-            ),
-            child: Stack(
-              children: [
-                Positioned(
-                  left: 10,
-                  top: 10,
-                  child: Utils.GenerateButton2(Icons.account_circle_sharp, context, MaterialPageRoute(builder: (context) => UserProfileScreen(userId: userId))),
-                ),
-                Padding(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(5),
+            color: Theme.of(context).accentColor,
+          ),
+          child: Stack(
+            children: [
+              Positioned(
+                left: 10,
+                top: 10,
+                child: Utils.GenerateButton2(Icons.account_circle_sharp, context, MaterialPageRoute(builder: (context) => UserProfileScreen(userId: userId))),
+              ),
+              Padding(
                   padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 100, left: MediaQuery.of(context).size.width / 5),
-                  child: authorOfMessage(userId)
-                ),
-                Padding(
-                    padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 20, left: MediaQuery.of(context).size.width / 5, right: 5, bottom: 10),
-                    child: Text(text,
-                      textAlign: TextAlign.left,
-                      style: Theme.of(context).textTheme.bodyText1,
-                    )
-                )
-              ],
-            ),
+                  child: authorOfMessage(userId, currentUserId)
+              ),
+              Padding(
+                  padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 20, left: MediaQuery.of(context).size.width / 5, right: 5, bottom: 10),
+                  child: Text(text,
+                    textAlign: TextAlign.left,
+                    style: Theme.of(context).textTheme.bodyText1,
+                  )
+              )
+            ],
           ),
         ),
       ],
@@ -158,12 +154,12 @@ class _ChatScreenState extends State<ChatScreen> {
   );
 
   ///Generate message box where current logged user id = message author id
-  Widget curUserMessageBox(String text, String userId) => Padding(
+  Widget curUserMessageBox(String text, String userId, String currentUserId) => Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Stack(
         children: [
           Container(
-            constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 6, maxWidth: MediaQuery.of(context).size.width / 1.2),
+            constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 6, maxWidth: MediaQuery.of(context).size.width / 1.2, minWidth: MediaQuery.of(context).size.width / 2),
             child: Neumorphic(
               style: NeumorphicStyle(
                 shape: NeumorphicShape.flat,
@@ -180,12 +176,12 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                   Padding(
                       padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 100, right: MediaQuery.of(context).size.width / 5),
-                      child: authorOfMessage(userId)
+                      child: authorOfMessage(userId, currentUserId)
                   ),
                   Padding(
                       padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 20, left: 5, right: MediaQuery.of(context).size.width / 5, bottom: 10),
                       child: Text(text,
-                        textAlign: TextAlign.left,
+                        textAlign: TextAlign.right,
                         style: Theme.of(context).textTheme.bodyText1,
                       )
                   )
@@ -214,7 +210,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     right: 15,
                     top: 15,
                     child: FutureBuilder<Chat>(
-                        future: ChatService().getChat(_chat!),
+                        future: ChatService().getChat(_chat!.id),
                         builder: (context, snapshot) {
                           return Utils.GenerateButton2(Icons.menu, context, MaterialPageRoute(builder: (context) => ChatDescriptionScreen(chat: snapshot.data)));
                         }

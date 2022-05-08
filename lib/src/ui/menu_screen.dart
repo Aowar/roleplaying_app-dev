@@ -168,7 +168,7 @@ class _MenuScreenState extends State<MenuScreen> {
                                         ),
                                         Padding(
                                             padding: const EdgeInsets.only(left: 20, top: 35),
-                                            child: FetchInfoFromDb.itemOfProfilesList(state)
+                                            child: FetchInfoFromDb.itemOfProfilesList(state.getUser()!.id)
                                         ),
                                         Positioned(
                                             right: 5,

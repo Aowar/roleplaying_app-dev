@@ -11,9 +11,9 @@ import '../../../services/profile_service.dart';
 class FetchInfoFromDb {
 
   ///Getting profiles from DB
-  static itemOfProfilesList(AuthState state) {
+  static itemOfProfilesList(String userId) {
     return StreamBuilder<List<Profile>>(
-      stream: ProfileService.readProfiles(state),
+      stream: ProfileService.readProfiles(userId),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return Text("Ошибка получения данных", style: Theme.of(context).textTheme.subtitle2);
