@@ -1,8 +1,6 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:roleplaying_app/src/models/chat.dart';
 import 'package:roleplaying_app/src/models/customUserModel.dart';
 
 class CustomUserService {

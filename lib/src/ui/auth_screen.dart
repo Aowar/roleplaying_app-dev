@@ -4,6 +4,7 @@ import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
 import 'package:roleplaying_app/src/services/auth_service.dart';
+import 'package:roleplaying_app/src/services/customUserService.dart';
 
 import 'dart:developer' as developer;
 
