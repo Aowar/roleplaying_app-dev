@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
 import 'package:roleplaying_app/src/services/auth_service.dart';
@@ -46,12 +46,20 @@ class _RegisterView extends State<RegisterView> {
   Widget generateFormTextField(Icon icon, String hintText, TextEditingController controller, bool obscureText, String failedValidatorText) {
     return SizedBox(
       width: MediaQuery.of(context).size.width * 0.5,
-      child: Neumorphic(
-        style: NeumorphicStyle(
-            shape: NeumorphicShape.convex,
-            boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(10)),
-            depth: 5.0,
-            color: Theme.of(context).cardColor
+      child: Container(
+        decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: const BorderRadius.all(
+              Radius.circular(10.0),
+            ),
+            boxShadow: [
+              BoxShadow(
+                  color: Theme.of(context).cardColor.withOpacity(0.2),
+                  spreadRadius: 5,
+                  offset: const Offset(5, 5),
+                  blurRadius: 10
+              )
+            ]
         ),
         child: TextFormField(
           decoration: InputDecoration(
@@ -85,12 +93,21 @@ class _RegisterView extends State<RegisterView> {
                 child: SizedBox(
                     width: MediaQuery.of(context).size.width * 0.5,
                     height: MediaQuery.of(context).size.height / 16,
-                    child: Neumorphic(
-                        style: NeumorphicStyle(
-                            shape: NeumorphicShape.flat,
-                            boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(20)),
-                            depth: 2.0,
-                            color: Theme.of(context).primaryColor),
+                    child: Container(
+                        decoration: BoxDecoration(
+                            color: Theme.of(context).primaryColor,
+                            borderRadius: const BorderRadius.all(
+                              Radius.circular(20.0),
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Theme.of(context).primaryColor.withOpacity(0.2),
+                                  spreadRadius: 2,
+                                  offset: const Offset(5, 5),
+                                  blurRadius: 10
+                              )
+                            ]
+                        ),
                         child: Center(
                           child: Text("Ролевые игры", style: Theme.of(context).textTheme.headline1),
                         ))),
@@ -115,16 +132,27 @@ class _RegisterView extends State<RegisterView> {
                             ///Login button
                             child: SizedBox(
                               width: MediaQuery.of(context).size.width * 0.5,
-                              child: NeumorphicButton(
-                                style: NeumorphicStyle(
-                                    shape: NeumorphicShape.flat,
-                                    boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(20)),
-                                    depth: 15.0,
-                                    color: Theme.of(context).primaryColor),
-                                child: Center(
-                                  child: Text("Войти", style: Theme.of(context).textTheme.bodyText1),
+                              child: GestureDetector(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      color: Theme.of(context).primaryColor,
+                                      borderRadius: const BorderRadius.all(
+                                        Radius.circular(20.0),
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                            color: Theme.of(context).primaryColor.withOpacity(0.2),
+                                            spreadRadius: 15,
+                                            offset: const Offset(5, 5),
+                                            blurRadius: 10
+                                        )
+                                      ]
+                                  ),
+                                  child: Center(
+                                    child: Text("Войти", style: Theme.of(context).textTheme.bodyText1),
+                                  ),
                                 ),
-                                onPressed: () {
+                                onTap: () {
                                   if (_formKey.currentState!.validate()) {
                                     auth(authBloc);
                                   }

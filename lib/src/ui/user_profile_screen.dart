@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
 import 'package:roleplaying_app/src/models/customUserModel.dart';
 import 'package:roleplaying_app/src/ui/auth_screen.dart';
@@ -86,12 +85,18 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                          padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 10),
                          child: Column(
                            children: [
-                             Neumorphic(
-                               style: NeumorphicStyle(
-                                 shape: NeumorphicShape.flat,
-                                 depth: 3.5,
-                                 color: Theme.of(context).primaryColor,
-                                 boxShape: const NeumorphicBoxShape.circle(),
+                             Container(
+                               decoration: BoxDecoration(
+                                   color: Theme.of(context).primaryColor,
+                                   shape: BoxShape.circle,
+                                   boxShadow: [
+                                     BoxShadow(
+                                         color: Theme.of(context).primaryColor.withOpacity(0.2),
+                                         spreadRadius: 3,
+                                         offset: const Offset(5, 5),
+                                         blurRadius: 10
+                                     )
+                                   ]
                                ),
                                child: Icon(Icons.account_circle_sharp,
                                  size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width)*20),
@@ -116,12 +121,20 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                  constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height / 7, maxHeight: MediaQuery.of(context).size.height / 4.7),
                                  child: SizedBox(
                                    width: MediaQuery.of(context).size.width / 1.1,
-                                   child: Neumorphic(
-                                     style: NeumorphicStyle(
-                                       shape: NeumorphicShape.flat,
-                                       boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(20)),
-                                       depth: 2.0,
-                                       color: Theme.of(context).cardColor,
+                                   child: Container(
+                                     decoration: BoxDecoration(
+                                         color: Theme.of(context).cardColor,
+                                         borderRadius: const BorderRadius.all(
+                                           Radius.circular(20.0),
+                                         ),
+                                         boxShadow: [
+                                           BoxShadow(
+                                               color: Theme.of(context).cardColor.withOpacity(0.2),
+                                               spreadRadius: 2,
+                                               offset: const Offset(5, 5),
+                                               blurRadius: 10
+                                           )
+                                         ]
                                      ),
                                      child: Stack(
                                        children: [

@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
 import 'package:roleplaying_app/src/services/auth_service.dart';
@@ -29,24 +29,127 @@ class AuthView extends StatefulWidget {
 
 class _AuthView extends State<AuthView> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordLoginController = TextEditingController();
+  final TextEditingController _emailLoginController = TextEditingController();
+  final TextEditingController _emailRegisterController = TextEditingController();
+  final TextEditingController _passwordRegisterController = TextEditingController();
+  late bool isOpen = false;
+  late OverlayEntry _overlayEntry;
 
   final AuthService _authService = AuthService();
   late String _email;
   late String _password;
 
-  ///Creating login fields func
+  void openRegisterForm() {
+    isOpen = true;
+    _overlayEntry = _createRegisterOverlay();
+    Overlay.of(context)!.insert(_overlayEntry);
+  }
+
+  void closeRegisterForm() {
+    isOpen = false;
+    _overlayEntry.remove();
+  }
+
+  OverlayEntry _createRegisterOverlay() {
+    return OverlayEntry(builder: (context) {
+      return GestureDetector(
+        onTap: closeRegisterForm,
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          child: Container(
+              color: const Color(0x41000000),
+              child: Center(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width / 1.8,
+                  child: GestureDetector(
+                      onTap: () { },
+                      child: Container(
+                        constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 2),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: Theme.of(context).accentColor,
+                        ),
+                          ///Register form
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              ///Login field
+                              Material(
+                                  child: generateFormTextField(const Icon(Icons.login), "Введите email", _emailRegisterController, false, 'Пожалуйста введите email'),
+                                  color: Theme.of(context).accentColor
+                              ),
+                              ///Password field
+                              Material(
+                                child: generateFormTextField(const Icon(Icons.password), "Введите пароль", _passwordRegisterController, true, "Пожалуйста введите пароль"),
+                                color: Theme.of(context).accentColor,
+                              ),
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.5,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(20.0),
+                                      boxShadow: [
+                                        BoxShadow(
+                                            color: Theme.of(context).primaryColor.withOpacity(0.2),
+                                            spreadRadius: 5,
+                                            offset: const Offset(0, 3),
+                                            blurRadius: 10
+                                        )
+                                      ]
+                                  ),
+                                  child: ElevatedButton(
+                                    style: ButtonStyle(
+                                        backgroundColor: MaterialStateProperty.all<Color>(Theme.of(context).primaryColor),
+                                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                            RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(20.0)
+                                            )
+                                        )
+                                    ),
+                                    onPressed: () {  },
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Center(
+                                        child: Text("Войти", style: Theme.of(context).textTheme.bodyText1),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      )
+                  ),
+                ),
+              )
+          ),
+        ),
+      );
+    });
+  }
+
   Widget generateFormTextField(Icon icon, String hintText, TextEditingController controller, bool obscureText, String failedValidatorText) {
     return SizedBox(
       width: MediaQuery.of(context).size.width * 0.5,
-      child: Neumorphic(
-        style: NeumorphicStyle(
-            shape: NeumorphicShape.convex,
-            boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(10)),
-            depth: 5.0,
-            color: Theme.of(context).cardColor
-        ),
+      child: Container(
+              decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  borderRadius: const BorderRadius.all(
+                    Radius.circular(10.0),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                        color: Theme.of(context).cardColor.withOpacity(0.2),
+                        spreadRadius: 5,
+                        offset: const Offset(5, 5),
+                        blurRadius: 10
+                    )
+                  ]
+              ),
         child: TextFormField(
           decoration: InputDecoration(
             border: InputBorder.none,
@@ -83,12 +186,21 @@ class _AuthView extends State<AuthView> {
                       child: SizedBox(
                           width: MediaQuery.of(context).size.width * 0.5,
                           height: MediaQuery.of(context).size.height / 16,
-                          child: Neumorphic(
-                              style: NeumorphicStyle(
-                                  shape: NeumorphicShape.flat,
-                                  boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(20)),
-                                  depth: 2.0,
-                                  color: Theme.of(context).primaryColor),
+                          child: Container(
+                              decoration: BoxDecoration(
+                                  color: Theme.of(context).primaryColor,
+                                  borderRadius: const BorderRadius.all(
+                                    Radius.circular(20.0),
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                        color: Theme.of(context).primaryColor.withOpacity(0.2),
+                                        spreadRadius: 2,
+                                        offset: const Offset(5, 5),
+                                        blurRadius: 10
+                                    )
+                                  ]
+                              ),
                               child: Center(
                                 child: Text("Ролевые игры", style: Theme.of(context).textTheme.headline1),
                               ))),
@@ -102,31 +214,50 @@ class _AuthView extends State<AuthView> {
                             child: Column(
                               children: [
                                 ///Login field
-                                generateFormTextField(const Icon(Icons.login), "Введите email", _emailController, false, 'Пожалуйста введите email'),
+                                generateFormTextField(const Icon(Icons.login), "Введите email", _emailLoginController, false, 'Пожалуйста введите email'),
                                 Padding(
                                     padding: const EdgeInsets.only(top: 30),
                                     ///Password field
-                                    child: generateFormTextField(const Icon(Icons.password), "Введите пароль", _passwordController, true, "Пожалуйста введите пароль")
+                                      child: generateFormTextField(const Icon(Icons.password), "Введите пароль", _passwordLoginController, true, "Пожалуйста введите пароль")
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.only(top: 20),
                                   ///Login button
                                   child: SizedBox(
                                     width: MediaQuery.of(context).size.width * 0.5,
-                                    child: NeumorphicButton(
-                                      style: NeumorphicStyle(
-                                          shape: NeumorphicShape.flat,
-                                          boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(20)),
-                                          depth: 15.0,
-                                          color: Theme.of(context).primaryColor),
-                                      child: Center(
-                                        child: Text("Войти", style: Theme.of(context).textTheme.bodyText1),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(20.0),
+                                          boxShadow: [
+                                            BoxShadow(
+                                                color: Theme.of(context).primaryColor.withOpacity(0.2),
+                                                spreadRadius: 5,
+                                                offset: const Offset(0, 3),
+                                                blurRadius: 10
+                                            )
+                                          ]
                                       ),
-                                      onPressed: () {
-                                        if (_formKey.currentState!.validate()) {
-                                          auth(authBloc);
-                                        }
-                                      },
+                                      child: ElevatedButton(
+                                        style: ButtonStyle(
+                                            backgroundColor: MaterialStateProperty.all<Color>(Theme.of(context).primaryColor),
+                                            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                                RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(20.0)
+                                                )
+                                            )
+                                        ),
+                                        onPressed: () {
+                                          if (_formKey.currentState!.validate()) {
+                                            auth(authBloc);
+                                          }
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Center(
+                                            child: Text("Войти", style: Theme.of(context).textTheme.bodyText1),
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -134,25 +265,7 @@ class _AuthView extends State<AuthView> {
                                   padding: const EdgeInsets.only(top: 10),
                                   child: TextButton(
                                       onPressed: () {
-                                        // return Overlay.of(context)!.insert(
-                                        //   OverlayEntry(builder: (context) {
-                                        //     return Stack(
-                                        //       children: [
-                                        //         Positioned(
-                                        //             top: 100,
-                                        //             left: 100,
-                                        //             child: SizedBox(
-                                        //               width: 200,
-                                        //               height: 200,
-                                        //               child: Container(
-                                        //                 color: Colors.red,
-                                        //               ),
-                                        //             )
-                                        //         )
-                                        //       ],
-                                        //     );
-                                        //   })
-                                        // );
+                                        openRegisterForm();
                                       },
                                       child: Text("Ещё не зарегистрированы? Создать аккаунт",
                                           style: Theme.of(context).textTheme.subtitle2
@@ -182,8 +295,8 @@ class _AuthView extends State<AuthView> {
   }
 
   auth(authBloc) async {
-    _email = _emailController.text;
-    _password = _passwordController.text;
+    _email = _emailLoginController.text;
+    _password = _passwordLoginController.text;
     if ((await _authService.signIn(_email.trim(), _password.trim())) == null) {
       return Fluttertoast.showToast(
           msg: "Ошибка авторизации",

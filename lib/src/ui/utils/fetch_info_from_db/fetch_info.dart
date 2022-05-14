@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:flutter/material.dart';
 import 'package:roleplaying_app/src/ui/utils/fetch_info_from_db/blocks_builder.dart';
 
 import '../../../bloc/auth/auth_bloc.dart';

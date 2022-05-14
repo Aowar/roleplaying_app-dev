@@ -2,10 +2,8 @@ import 'dart:math';
 import 'dart:developer' as developer;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
 import 'package:roleplaying_app/src/models/chat.dart';
 import 'package:roleplaying_app/src/models/customUserModel.dart';
@@ -31,6 +29,7 @@ class ChatDescriptionScreen extends StatelessWidget {
     _chat = chat!;
   }
 
+  @override
   Widget build(BuildContext context) {
     return const ChatDescriptionView();
   }
@@ -78,8 +77,6 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
 
   @override
   Widget build(BuildContext context) {
-    final AuthBloc authBloc = context.read<AuthBloc>();
-
     return BlocBuilder <AuthBloc, AuthState> (
         builder: (context, state) {
           if (state is AuthStateAuthenticated) {
@@ -102,12 +99,20 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
                       child: SizedBox(
                         width: MediaQuery.of(context).size.width / 1.1,
                         height: MediaQuery.of(context).size.height / 1.1,
-                        child: Neumorphic(
-                          style: NeumorphicStyle(
-                            shape: NeumorphicShape.flat,
-                            boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(5)),
-                            depth: 2.0,
-                            color: Theme.of(context).cardColor,
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: Theme.of(context).cardColor,
+                              borderRadius: const BorderRadius.all(
+                                Radius.circular(5.0),
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                    color: Theme.of(context).cardColor.withOpacity(0.2),
+                                    spreadRadius: 2,
+                                    offset: const Offset(5, 5),
+                                    blurRadius: 10
+                                )
+                              ]
                           ),
                           child: Center(
                             child: ListView(
@@ -120,12 +125,20 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
                                         child: SizedBox(
                                             width: MediaQuery.of(context).size.width * 0.5,
                                             height: MediaQuery.of(context).size.height / 22,
-                                            child: Neumorphic(
-                                              style: NeumorphicStyle(
-                                                  shape: NeumorphicShape.convex,
-                                                  boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(10)),
-                                                  depth: 5.0,
-                                                  color: Theme.of(context).accentColor
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                  color: Theme.of(context).accentColor,
+                                                  borderRadius: const BorderRadius.all(
+                                                    Radius.circular(10.0),
+                                                  ),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                        color: Theme.of(context).accentColor.withOpacity(0.2),
+                                                        spreadRadius: 5,
+                                                        offset: const Offset(5, 5),
+                                                        blurRadius: 10
+                                                    )
+                                                  ]
                                               ),
                                               child: TextField(
                                                 readOnly: true,
@@ -144,17 +157,27 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
                                       Padding(
                                           padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 80),
                                           child: SizedBox(
-                                              child: NeumorphicButton(
-                                                style: NeumorphicStyle(
-                                                  shape: NeumorphicShape.flat,
-                                                  boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(5)),
-                                                  depth: 5.0,
-                                                  color: Theme.of(context).accentColor,
+                                              child: GestureDetector(
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                      color: Theme.of(context).accentColor,
+                                                      borderRadius: const BorderRadius.all(
+                                                        Radius.circular(5.0),
+                                                      ),
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                            color: Theme.of(context).accentColor.withOpacity(0.2),
+                                                            spreadRadius: 5,
+                                                            offset: const Offset(5, 5),
+                                                            blurRadius: 10
+                                                        )
+                                                      ]
+                                                  ),
+                                                  child: Icon(Icons.image_outlined,
+                                                    size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width)*45),
+                                                  ),
                                                 ),
-                                                child: Icon(Icons.image_outlined,
-                                                  size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width)*45),
-                                                ),
-                                                onPressed: () => Navigator.pushNamed(context, ''),
+                                                onTap: () => Navigator.pushNamed(context, ''),
                                               )
                                           )
                                       ),
@@ -169,12 +192,20 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
                                         constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height / 3.4,),
                                         child: SizedBox(
                                           width: MediaQuery.of(context).size.width / 1.3,
-                                          child: Neumorphic(
-                                              style: NeumorphicStyle(
-                                                shape: NeumorphicShape.flat,
-                                                boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(5)),
-                                                depth: 2.0,
-                                                color: Theme.of(context).accentColor,
+                                          child: Container(
+                                              decoration: BoxDecoration(
+                                                  color: Theme.of(context).accentColor,
+                                                  borderRadius: const BorderRadius.all(
+                                                    Radius.circular(5.0),
+                                                  ),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                        color: Theme.of(context).accentColor.withOpacity(0.2),
+                                                        spreadRadius: 5,
+                                                        offset: const Offset(5, 5),
+                                                        blurRadius: 10
+                                                    )
+                                                  ]
                                               ),
                                               child: TextField(
                                                 readOnly: true,
@@ -200,12 +231,20 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
                                         constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height / 8, maxHeight: MediaQuery.of(context).size.height / 6.5),
                                         child: SizedBox(
                                           width: MediaQuery.of(context).size.width / 1.3,
-                                          child: Neumorphic(
-                                              style: NeumorphicStyle(
-                                                shape: NeumorphicShape.flat,
-                                                boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(5)),
-                                                depth: 2.0,
-                                                color: Theme.of(context).accentColor,
+                                          child: Container(
+                                              decoration: BoxDecoration(
+                                                  color: Theme.of(context).accentColor,
+                                                  borderRadius: const BorderRadius.all(
+                                                    Radius.circular(5.0),
+                                                  ),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                        color: Theme.of(context).accentColor.withOpacity(0.2),
+                                                        spreadRadius: 2,
+                                                        offset: const Offset(5, 5),
+                                                        blurRadius: 10
+                                                    )
+                                                  ]
                                               ),
                                               child: Padding(
                                                   padding: const EdgeInsets.only(top: 10),

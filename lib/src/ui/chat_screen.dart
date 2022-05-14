@@ -4,10 +4,8 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
 import 'package:roleplaying_app/src/models/chat.dart';
 import 'package:roleplaying_app/src/models/customUserModel.dart';
@@ -160,12 +158,20 @@ class _ChatScreenState extends State<ChatScreen> {
         children: [
           Container(
             constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 6, maxWidth: MediaQuery.of(context).size.width / 1.2, minWidth: MediaQuery.of(context).size.width / 2),
-            child: Neumorphic(
-              style: NeumorphicStyle(
-                shape: NeumorphicShape.flat,
-                boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(5)),
-                depth: 2.0,
-                color: Theme.of(context).accentColor,
+            child: Container(
+              decoration: BoxDecoration(
+                  color: Theme.of(context).accentColor,
+                  borderRadius: const BorderRadius.all(
+                    Radius.circular(5.0),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                        color: Theme.of(context).accentColor.withOpacity(0.2),
+                        spreadRadius: 2,
+                        offset: const Offset(5, 5),
+                        blurRadius: 10
+                    )
+                  ]
               ),
               child: Stack(
                 children: [
@@ -222,12 +228,20 @@ class _ChatScreenState extends State<ChatScreen> {
                       child: SizedBox(
                         width: MediaQuery.of(context).size.width / 1.1,
                         height: MediaQuery.of(context).size.height / 1.24,
-                        child: Neumorphic(
-                          style: NeumorphicStyle(
-                            shape: NeumorphicShape.flat,
-                            boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(5)),
-                            depth: 2.0,
-                            color: Theme.of(context).cardColor,
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: Theme.of(context).cardColor,
+                              borderRadius: const BorderRadius.all(
+                                Radius.circular(5.0),
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                    color: Theme.of(context).cardColor.withOpacity(0.2),
+                                    spreadRadius: 2,
+                                    offset: const Offset(5, 5),
+                                    blurRadius: 10
+                                )
+                              ]
                           ),
                           child: Stack(
                             children: [
@@ -262,12 +276,20 @@ class _ChatScreenState extends State<ChatScreen> {
                                                           width: MediaQuery.of(context).size.width / 1.5,
                                                           child: Container(
                                                             constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 4.5),
-                                                            child: Neumorphic(
-                                                                style: NeumorphicStyle(
-                                                                    shape: NeumorphicShape.convex,
-                                                                    boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(20)),
-                                                                    depth: 5.0,
-                                                                    color: Theme.of(context).accentColor
+                                                            child: Container(
+                                                                decoration: BoxDecoration(
+                                                                    color: Theme.of(context).accentColor,
+                                                                    borderRadius: const BorderRadius.all(
+                                                                      Radius.circular(20.0),
+                                                                    ),
+                                                                    boxShadow: [
+                                                                      BoxShadow(
+                                                                          color: Theme.of(context).accentColor.withOpacity(0.2),
+                                                                          spreadRadius: 5,
+                                                                          offset: const Offset(5, 5),
+                                                                          blurRadius: 10
+                                                                      )
+                                                                    ]
                                                                 ),
                                                                 child: Padding(
                                                                   padding: const EdgeInsets.only(left: 10),
@@ -291,12 +313,18 @@ class _ChatScreenState extends State<ChatScreen> {
                                                     ),
                                                     Padding(
                                                       padding: const EdgeInsets.only(left: 5),
-                                                      child: Neumorphic(
-                                                        style: NeumorphicStyle(
-                                                          shape: NeumorphicShape.flat,
-                                                          depth: 5.0,
-                                                          color: Theme.of(context).primaryColor,
-                                                          boxShape: const NeumorphicBoxShape.circle(),
+                                                      child: Container(
+                                                        decoration: BoxDecoration(
+                                                            color: Theme.of(context).primaryColor,
+                                                            shape: BoxShape.circle,
+                                                            boxShadow: [
+                                                              BoxShadow(
+                                                                  color: Theme.of(context).primaryColor.withOpacity(0.2),
+                                                                  spreadRadius: 5,
+                                                                  offset: const Offset(5, 5),
+                                                                  blurRadius: 10
+                                                              )
+                                                            ]
                                                         ),
                                                         child: IconButton(
                                                           icon: const Icon(Icons.arrow_forward_ios_rounded),
@@ -342,46 +370,60 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                   Center(
                     child: Container(
-                      child: Neumorphic(
-                        style: NeumorphicStyle(
-                          shape: NeumorphicShape.flat,
-                          boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(5)),
-                          depth: 2.0,
+                      decoration: BoxDecoration(
                           color: Theme.of(context).cardColor,
-                        ),
-                        child: Padding(
-                            padding: const EdgeInsets.only(left: 5, right: 5, top: 5),
-                          child: Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Text("Вы ещё не вступили в чат",
-                                  style: Theme.of(context).textTheme.bodyText1,
-                                ),
-                                Neumorphic(
-                                    style: NeumorphicStyle(
-                                      shape: NeumorphicShape.flat,
-                                      depth: 5.0,
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(5.0),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                                color: Theme.of(context).cardColor.withOpacity(0.2),
+                                spreadRadius: 2,
+                                offset: const Offset(5, 5),
+                                blurRadius: 10
+                            )
+                          ]
+                      ),
+                      child: Padding(
+                          padding: const EdgeInsets.only(left: 5, right: 5, top: 5),
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Text("Вы ещё не вступили в чат",
+                                style: Theme.of(context).textTheme.bodyText1,
+                              ),
+                              Container(
+                                  decoration: BoxDecoration(
                                       color: Theme.of(context).primaryColor,
-                                      boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(5)),
-                                    ),
-                                    child: TextButton(
-                                      child: Text("Вступить",
-                                          style: Theme.of(context).textTheme.bodyText1
+                                      borderRadius: const BorderRadius.all(
+                                        Radius.circular(5.0),
                                       ),
-                                      onPressed: () async {
-                                        await ChatService().addNewUserInChat(_chat!, state.getUser()!.id);
-                                        _chat!.usersId.add(state.getUser()!.id);
-                                        setState(() {
-                                          ChatScreen(chat: _chat);
-                                        });
-                                      },
-                                    )
-                                )
-                              ],
-                            ),
-                          )
-                        ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                            color: Theme.of(context).primaryColor.withOpacity(0.2),
+                                            spreadRadius: 5,
+                                            offset: const Offset(5, 5),
+                                            blurRadius: 10
+                                        )
+                                      ]
+                                  ),
+                                  child: TextButton(
+                                    child: Text("Вступить",
+                                        style: Theme.of(context).textTheme.bodyText1
+                                    ),
+                                    onPressed: () async {
+                                      await ChatService().addNewUserInChat(_chat!, state.getUser()!.id);
+                                      _chat!.usersId.add(state.getUser()!.id);
+                                      setState(() {
+                                        ChatScreen(chat: _chat);
+                                      });
+                                    },
+                                  )
+                              )
+                            ],
+                          ),
+                        )
                       ),
                     ),
                   )

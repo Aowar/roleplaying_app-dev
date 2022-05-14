@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:flutter/material.dart';
 
 import '../../../models/chat.dart';
 import '../../../models/profile.dart';
@@ -14,21 +14,27 @@ class BlocksBuilder {
       height: 100,
       child: Column(
         children: [
-          NeumorphicButton(
-            style: NeumorphicStyle(
-              shape: NeumorphicShape.flat,
-              boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(5)),
-              depth: 5.0,
-              color: Theme.of(context).accentColor,
-            ),
-            child:
-            Icon(Icons.image_outlined,
-              size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width)*3),
-            ),
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(
-                  builder: (context) => ChatScreen(chat: chat)));
-            },
+          GestureDetector(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).accentColor,
+                borderRadius: const BorderRadius.all(
+                  Radius.circular(5.0),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Theme.of(context).accentColor.withOpacity(0.2),
+                    spreadRadius: 5,
+                    offset: const Offset(5, 5),
+                    blurRadius: 10
+                  )
+                ]
+              ),
+              child: Icon(Icons.image_outlined,
+                  size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width)*3),
+                ),
+              ),
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(chat: chat))),
           ),
           Text(chat.title,
               style: Theme.of(context).textTheme.subtitle2
@@ -42,18 +48,27 @@ class BlocksBuilder {
       height: 100,
       child: Column(
         children: [
-          NeumorphicButton(
-            style: NeumorphicStyle(
-              shape: NeumorphicShape.flat,
-              boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(5)),
-              depth: 5.0,
-              color: Theme.of(context).accentColor,
-            ),
-            child:
-            Icon(Icons.image_outlined,
-              size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width)*3),
-            ),
-            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen(profile: profile))),
+          GestureDetector(
+            child: Container(
+              decoration: BoxDecoration(
+                  color: Theme.of(context).accentColor,
+                  borderRadius: const BorderRadius.all(
+                    Radius.circular(5.0),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                        color: Theme.of(context).accentColor.withOpacity(0.2),
+                        spreadRadius: 5,
+                        offset: const Offset(5, 5),
+                        blurRadius: 10
+                    )
+                  ]
+              ),
+              child: Icon(Icons.image_outlined,
+                  size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width)*3),
+                ),
+              ),
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen(profile: profile))),
           ),
           Text(profile.title,
               style: Theme.of(context).textTheme.subtitle2
