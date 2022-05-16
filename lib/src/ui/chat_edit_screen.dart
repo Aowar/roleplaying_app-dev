@@ -6,10 +6,8 @@ import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
 import 'package:roleplaying_app/src/models/chat.dart';
 import 'package:roleplaying_app/src/services/chat_service.dart';
 import 'package:roleplaying_app/src/ui/auth_screen.dart';
-import 'package:roleplaying_app/src/ui/chat_screen.dart';
 import 'package:roleplaying_app/src/ui/menu_screen.dart';
-
-import 'utils/Utils.dart';
+import 'package:roleplaying_app/src/ui/utils/Utils.dart' as utils;
 
 late bool _chatCreateFlag;
 late Chat _chat;
@@ -57,10 +55,10 @@ class _ChatEditView extends State<ChatEditView> {
               body: Stack(
                 children: [
                   ///Back button
-                  Positioned(
+                  const Positioned(
                       top: 15,
                       left: 15,
-                      child: Utils.GenerateBackButton(context)
+                      child: utils.BackButton()
                   ),
                   ///Apply button
                   Positioned(
@@ -95,7 +93,7 @@ class _ChatEditView extends State<ChatEditView> {
                             }
                             Chat chat = Chat(usersList, state.getUser()!.id, title, description);
                             !_chatCreateFlag ? _chatService.updateChat(_chat) : _chatService.addChat(chat);
-                            !_chatCreateFlag ? Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(chat: _chat))) : Navigator.push(context, MaterialPageRoute(builder: (context) => MenuScreen()));
+                            Navigator.pop(context);
                           },
                         ),
                       )

@@ -8,7 +8,7 @@ import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
 import 'package:roleplaying_app/src/models/customUserModel.dart';
 import 'package:roleplaying_app/src/ui/auth_screen.dart';
 import 'package:roleplaying_app/src/ui/profile_edit_screen.dart';
-import 'package:roleplaying_app/src/ui/utils/Utils.dart';
+import 'package:roleplaying_app/src/ui/utils/Utils.dart' as utils;
 import 'package:roleplaying_app/src/ui/utils/fetch_info_from_db/fetch_info.dart';
 
 late String _userId;
@@ -75,10 +75,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
              return Scaffold(
                body: Stack(
                  children: [
-                   Positioned(
+                   const Positioned(
                        left: 15,
                        top: 15,
-                       child: Utils.GenerateBackButton(context)
+                       child: utils.BackButton()
                    ),
                    Center(
                      child: Padding(
@@ -151,7 +151,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                          state.getUser()!.id == _userId ? Positioned(
                                              right: 5,
                                              top: 5,
-                                             child: Utils.GenerateButton2(Icons.add, context, MaterialPageRoute(builder: (context) => ProfileEditScreen.create()))
+                                             child: utils.PushButton(icon: Icons.add, route: MaterialPageRoute(builder: (context) => ProfileEditScreen.create()))
                                          ) : Container()
                                        ],
                                      ),

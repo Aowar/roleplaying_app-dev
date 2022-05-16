@@ -6,10 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
 import 'package:roleplaying_app/src/models/profile.dart';
-import 'package:roleplaying_app/src/models/user.dart';
 import 'package:roleplaying_app/src/services/profile_service.dart';
-import 'package:roleplaying_app/src/ui/utils/Utils.dart';
-import 'package:roleplaying_app/src/ui/menu_screen.dart';
+import 'package:roleplaying_app/src/ui/utils/Utils.dart' as utils;
 import 'package:roleplaying_app/src/ui/profile_edit_screen.dart';
 
 import '../services/auth_service.dart';
@@ -56,17 +54,19 @@ class _ProfileView extends State<ProfileView> {
             body: Stack(
               children: [
                 ///Building back button
-                Positioned(
+                const Positioned(
                     top: 15,
                     left: 15,
-                    child: Utils.GenerateButton2(Icons.arrow_back_ios, context, MaterialPageRoute(builder: (context) => MenuScreen())),
+                    child: utils.BackButton()
                 ),
-                ///Building apply button
-                Positioned(
+                ///Building edit button
+                if (state.getUser()!.id == _profile.userId) ...[
+                  Positioned(
                     top: 15,
                     right: 15,
-                    child: Utils.GenerateButton2(Icons.edit, context, MaterialPageRoute(builder: (context) => ProfileEditScreen.edit(profile: _profile))),
-                ),
+                    child: utils.PushButton(icon: Icons.edit, route: MaterialPageRoute(builder: (context) => ProfileEditScreen.edit(profile: _profile))),
+                  ),
+                ],
                 Center(
                   child: Padding(
                     padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 10),
@@ -249,7 +249,8 @@ class _ProfileView extends State<ProfileView> {
                                                             ),
                                                           ),
                                                         ),
-                                                        onTap: () => {}),
+                                                        onTap: () => {}
+                                                    ),
                                                   ),
                                                 )
                                               ],

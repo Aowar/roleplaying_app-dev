@@ -12,6 +12,8 @@ class UserModel extends Equatable {
   /// The current user's email address.
   final String? email;
 
+  final String? nickName;
+
   /// The current user's id.
   final String id;
 
@@ -19,6 +21,7 @@ class UserModel extends Equatable {
   const UserModel({
     required this.id,
     this.email,
+    this.nickName
   });
 
   /// Empty user which represents an unauthenticated user.

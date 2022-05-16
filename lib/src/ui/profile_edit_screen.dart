@@ -1,19 +1,13 @@
 import 'dart:math';
-import 'dart:developer' as developer;
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
 import 'package:roleplaying_app/src/models/profile.dart';
-import 'package:roleplaying_app/src/models/user.dart';
 import 'package:roleplaying_app/src/services/profile_service.dart';
-import 'package:roleplaying_app/src/ui/utils/Utils.dart';
+import 'package:roleplaying_app/src/ui/utils/Utils.dart' as utils;
 import 'package:roleplaying_app/src/ui/auth_screen.dart';
 import 'package:roleplaying_app/src/ui/menu_screen.dart';
-import 'package:roleplaying_app/src/ui/profile_screen.dart';
-import 'package:roleplaying_app/src/ui/user_profile_screen.dart';
 
 import '../services/auth_service.dart';
 
@@ -57,7 +51,6 @@ class _ProfileEditView extends State<ProfileEditView> {
   @override
   Widget build(BuildContext context) {
     final AuthBloc authBloc = context.read<AuthBloc>();
-    final user = authBloc.state.getUser()!.id;
 
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
@@ -66,41 +59,16 @@ class _ProfileEditView extends State<ProfileEditView> {
             body: Stack(
               children: [
                 ///Building back button
-                Positioned(top: 15, left: 15, child: Utils.GenerateBackButton(context)),
+                const Positioned(
+                    top: 15,
+                    left: 15,
+                    child: utils.BackButton()
+                ),
                 ///Building apply button
-                Positioned(
+                const Positioned(
                     top: 15,
                     right: 15,
-                    child: Container(
-                      decoration: BoxDecoration(
-                          color: Theme.of(context).primaryColor,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                                color: Theme.of(context).primaryColor.withOpacity(0.2),
-                                spreadRadius: 5,
-                                offset: const Offset(5, 5),
-                                blurRadius: 10
-                            )
-                          ]
-                      ),
-                      child: IconButton(
-                        icon: const Icon(Icons.check),
-                        color: Colors.white,
-                        iconSize: sqrt(MediaQuery.of(context).size.height + MediaQuery.of(context).size.width),
-                        onPressed: () async {
-                          title = _titleController.text;
-                          text = _textController.text;
-                          Profile profile = Profile(user, title, text);
-                          if (!_profileCreateFlag) {
-                            _profile.text = text;
-                            _profile.title = title;
-                          }
-                          !_profileCreateFlag ? _profileService.updateProfile(_profile) : _profileService.addProfile(profile);
-                          !_profileCreateFlag ? Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen(profile: _profile))) : Navigator.push(context, MaterialPageRoute(builder: (context) => MenuScreen()));
-                        },
-                      ),
-                    )
+                    child: utils.ApplyButton(),
                 ),
                 Center(
                   child: Padding(

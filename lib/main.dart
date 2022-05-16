@@ -6,15 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
 import 'package:roleplaying_app/src/services/auth_service.dart';
 import 'package:roleplaying_app/src/ui/auth_screen.dart';
-import 'package:roleplaying_app/src/ui/landing.dart';
 import 'package:roleplaying_app/src/ui/menu_screen.dart';
 import 'firebase_options.dart';
-
-final appRoutes = <String, WidgetBuilder>{
-  '/start_screen': (BuildContext context) => Landing(),
-  '/auth_screen': (BuildContext context) => AuthScreen(),
-  '/menu_screen': (BuildContext context) => MenuScreen(),
-};
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -53,8 +46,7 @@ class RpApp extends StatelessWidget {
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Roleplaying app',
-          home: const Landing(),
-          routes: appRoutes,
+          home: AuthScreen(),
           darkTheme: ThemeData(
               scaffoldBackgroundColor: darkPrimary,
               backgroundColor: darkPrimary,

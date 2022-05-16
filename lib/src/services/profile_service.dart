@@ -6,7 +6,7 @@ import 'package:roleplaying_app/src/models/profile.dart';
 import '../bloc/auth/auth_bloc.dart';
 
 class ProfileService {
-  final CollectionReference _profileCollection = FirebaseFirestore.instance.collection("profiles");
+  static final CollectionReference _profileCollection = FirebaseFirestore.instance.collection("profiles");
 
   Future addProfile(Profile profile) async {
     DocumentReference docRef = _profileCollection.doc();
@@ -27,4 +27,11 @@ class ProfileService {
       FirebaseFirestore.instance.collection("profiles").where("userId", isEqualTo: userId).snapshots().map(
           (snapshot) => snapshot.docs.map((doc) => Profile.fromJson(doc.data())).toList()
   );
+
+  Future<Profile> getProfile(String profileId) async {
+    DocumentReference docRef =  _profileCollection.doc(profileId);
+    return await docRef.get().then((value) {
+      return Profile(value.get("userId"), value.get("title"), value.get("text"));
+    });
+  }
 }

@@ -4,13 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
+import 'package:roleplaying_app/src/models/customUserModel.dart';
 import 'package:roleplaying_app/src/services/auth_service.dart';
 import 'package:roleplaying_app/src/services/customUserService.dart';
+import 'package:roleplaying_app/src/ui/menu_screen.dart';
 
 import 'dart:developer' as developer;
 
 import '../models/user.dart';
-import 'landing.dart';
 
 class AuthScreen extends StatelessWidget {
   final AuthService authService = AuthService();
@@ -84,17 +85,17 @@ class _AuthView extends State<AuthView> {
                               children: [
                                 ///Login field
                                 Material(
-                                    child: generateFormEmailField(const Icon(Icons.login), "Введите email", _emailRegisterController, false),
+                                    child: generateFormEmailField(const Icon(Icons.login), "Введите email", _emailRegisterController),
                                     color: Theme.of(context).accentColor
                                 ),
                                 ///User nickname field
                                 Material(
-                                  child: generateFormTextField(const Icon(Icons.password), "Введите желаемый никнейм", _userNicknameController, true, "Пожалуйста введите никнейм"),
+                                  child: generateNicknameTextField(const Icon(Icons.text_fields_outlined), "Введите желаемый никнейм", _userNicknameController),
                                   color: Theme.of(context).accentColor,
                                 ),
                                 ///Password field
                                 Material(
-                                  child: generateFormPasswordField(const Icon(Icons.password), "Введите пароль", _passwordRegisterController, true),
+                                  child: generateFormPasswordField(const Icon(Icons.password), "Введите пароль", _passwordRegisterController),
                                   color: Theme.of(context).accentColor,
                                 ),
                                 SizedBox(
@@ -148,7 +149,7 @@ class _AuthView extends State<AuthView> {
     });
   }
 
-  Widget generateFormTextField(Icon icon, String hintText, TextEditingController controller, bool obscureText, String failedValidatorText) {
+  Widget generateNicknameTextField(Icon icon, String hintText, TextEditingController controller) {
     return SizedBox(
       width: MediaQuery.of(context).size.width * 0.5,
       child: Container(
@@ -172,11 +173,11 @@ class _AuthView extends State<AuthView> {
             icon: icon,
             hintText: hintText,
           ),
-          obscureText: obscureText,
+          obscureText: false,
           controller: controller,
           validator: (String? value) {
             if (value == null || value.isEmpty) {
-              return failedValidatorText;
+              return "Пожалуйста введите никнейм";
             }
             return null;
           },
@@ -185,7 +186,7 @@ class _AuthView extends State<AuthView> {
     );
   }
 
-  Widget generateFormEmailField(Icon icon, String hintText, TextEditingController controller, bool obscureText) {
+  Widget generateFormEmailField(Icon icon, String hintText, TextEditingController controller) {
     return SizedBox(
       width: MediaQuery.of(context).size.width * 0.5,
       child: Container(
@@ -209,7 +210,7 @@ class _AuthView extends State<AuthView> {
             icon: icon,
             hintText: hintText,
           ),
-          obscureText: obscureText,
+          obscureText: false,
           controller: controller,
           validator: (String? value) {
             if (value == null || value.isEmpty) {
@@ -224,7 +225,7 @@ class _AuthView extends State<AuthView> {
     );
   }
 
-  Widget generateFormPasswordField(Icon icon, String hintText, TextEditingController controller, bool obscureText) {
+  Widget generateFormPasswordField(Icon icon, String hintText, TextEditingController controller) {
     return SizedBox(
       width: MediaQuery.of(context).size.width * 0.5,
       child: Container(
@@ -248,7 +249,7 @@ class _AuthView extends State<AuthView> {
             icon: icon,
             hintText: hintText,
           ),
-          obscureText: obscureText,
+          obscureText: true,
           controller: controller,
           validator: (String? value) {
             if (value == null || value.isEmpty) {
@@ -321,11 +322,11 @@ class _AuthView extends State<AuthView> {
                             child: Column(
                               children: [
                                 ///Login field
-                                generateFormEmailField(const Icon(Icons.login), "Введите email", _emailLoginController, false),
+                                generateFormEmailField(const Icon(Icons.login), "Введите email", _emailLoginController),
                                 Padding(
                                     padding: const EdgeInsets.only(top: 30),
                                     ///Password field
-                                      child: generateFormPasswordField(const Icon(Icons.password), "Введите пароль", _passwordLoginController, true)
+                                      child: generateFormPasswordField(const Icon(Icons.password), "Введите пароль", _passwordLoginController)
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.only(top: 20),
@@ -355,6 +356,9 @@ class _AuthView extends State<AuthView> {
                                         ),
                                         onPressed: () {
                                           if (_formLoginKey.currentState!.validate()) {
+                                            setState(() {
+                                              const CircularProgressIndicator();
+                                            });
                                             auth(authBloc);
                                           }
                                         },
@@ -387,7 +391,7 @@ class _AuthView extends State<AuthView> {
                     BlocListener<AuthBloc, AuthState>(
                       listener: (context, state) {
                         if (state is AuthStateAuthenticated) {
-                          Navigator.pushNamed(context, '/menu_screen');
+                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MenuScreen()));
                         }
                       },
                       child: Container(),
@@ -406,18 +410,21 @@ class _AuthView extends State<AuthView> {
     _password = _passwordLoginController.text;
     if ((await _authService.signIn(_email.trim(), _password.trim())) == null) {
       return Fluttertoast.showToast(
-          msg: "Неверный логин или пароль",
+          msg: "Ошибка авторизации",
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.CENTER,
-          timeInSecForIosWeb: 2,
+          timeInSecForIosWeb: 3,
           backgroundColor: Colors.red,
-          webBgColor: Colors.red,
           textColor: Colors.white,
           fontSize: 16.0
       );
     } else {
       UserModel user = await _authService.signIn(_email.trim(), _password.trim());
       if (user.id.isNotEmpty && FirebaseAuth.instance.currentUser!.emailVerified) {
+        if (!await CustomUserService().collectionContainsUser(user.id)) {
+          CustomUserModel _customUserModel = CustomUserModel(user.id, user.nickName);
+          CustomUserService().addCustomUser(_customUserModel);
+        }
         authBloc.add(UserLoggedIn(user: user));
       } else {
         return Fluttertoast.showToast(
@@ -449,9 +456,8 @@ class _AuthView extends State<AuthView> {
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.CENTER,
         timeInSecForIosWeb: 3,
-        backgroundColor: Theme.of(context).accentColor,
-        webBgColor: Theme.of(context).accentColor,
-        textColor: Theme.of(context).textTheme.bodyText1!.color,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
         fontSize: 16.0
     );
   }

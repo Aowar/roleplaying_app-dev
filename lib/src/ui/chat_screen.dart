@@ -2,8 +2,6 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_database/firebase_database.dart';
-import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
@@ -11,12 +9,11 @@ import 'package:roleplaying_app/src/models/chat.dart';
 import 'package:roleplaying_app/src/models/customUserModel.dart';
 import 'package:roleplaying_app/src/models/message.dart';
 import 'package:roleplaying_app/src/services/chat_service.dart';
-import 'package:roleplaying_app/src/services/customUserService.dart';
 import 'package:roleplaying_app/src/services/message_service.dart';
-import 'package:roleplaying_app/src/ui/utils/Utils.dart';
+import 'package:roleplaying_app/src/ui/menu_screen.dart';
+import 'package:roleplaying_app/src/ui/utils/Utils.dart' as utils;
 import 'package:roleplaying_app/src/ui/auth_screen.dart';
 import 'package:roleplaying_app/src/ui/chat_description_screen.dart';
-import 'package:roleplaying_app/src/ui/chat_edit_screen.dart';
 import 'package:roleplaying_app/src/ui/user_profile_screen.dart';
 
 late Chat? _chat;
@@ -131,7 +128,7 @@ class _ChatScreenState extends State<ChatScreen> {
               Positioned(
                 left: 10,
                 top: 10,
-                child: Utils.GenerateButton2(Icons.account_circle_sharp, context, MaterialPageRoute(builder: (context) => UserProfileScreen(userId: userId))),
+                child: utils.PushButton(icon: Icons.account_circle_sharp, route: MaterialPageRoute(builder: (context) => UserProfileScreen(userId: userId))),
               ),
               Padding(
                   padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 100, left: MediaQuery.of(context).size.width / 5),
@@ -178,7 +175,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   Positioned(
                     right: 10,
                     top: 10,
-                    child: Utils.GenerateButton2(Icons.account_circle_sharp, context, MaterialPageRoute(builder: (context) => UserProfileScreen(userId: userId))),
+                    child: utils.PushButton(icon: Icons.account_circle_sharp, route: MaterialPageRoute(builder: (context) => UserProfileScreen(userId: userId))),
                   ),
                   Padding(
                       padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 100, right: MediaQuery.of(context).size.width / 5),
@@ -207,10 +204,10 @@ class _ChatScreenState extends State<ChatScreen> {
             return Scaffold(
               body: Stack(
                 children: [
-                  Positioned(
+                  const Positioned(
                     left: 15,
                     top: 15,
-                    child: Utils.GenerateBackButton(context),
+                    child: utils.BackButton()
                   ),
                   Positioned(
                     right: 15,
@@ -218,7 +215,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     child: FutureBuilder<Chat>(
                         future: ChatService().getChat(_chat!.id),
                         builder: (context, snapshot) {
-                          return Utils.GenerateButton2(Icons.menu, context, MaterialPageRoute(builder: (context) => ChatDescriptionScreen(chat: snapshot.data)));
+                          return utils.PushButton(icon: Icons.menu, route: MaterialPageRoute(builder: (context) => ChatDescriptionScreen(chat: snapshot.data)));
                         }
                     ),
                   ),
@@ -363,10 +360,10 @@ class _ChatScreenState extends State<ChatScreen> {
             return Scaffold(
               body: Stack(
                 children: [
-                  Positioned(
+                  const Positioned(
                     left: 15,
                     top: 15,
-                    child: Utils.GenerateBackButton(context),
+                    child: utils.BackButton()
                   ),
                   Center(
                     child: Container(

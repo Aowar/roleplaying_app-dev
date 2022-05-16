@@ -36,77 +36,77 @@ class _MenuScreenState extends State<MenuScreen> {
 
   final List<String> _containersNames = ["Открытые чаты", "Мои анкеты", "Мои чаты"];
 
-  generateMenuBlock(String _containersName, String route, [bool? _buttonFlag, String? _route, IconData? icon]){
-    return SizedBox(
-      width: MediaQuery.of(context).size.width / 1.1,
-      height: MediaQuery.of(context).size.height / 5.2,
-      child: Container(
-        decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: const BorderRadius.all(
-              Radius.circular(20.0),
-            ),
-            boxShadow: [
-              BoxShadow(
-                  color: Theme.of(context).cardColor.withOpacity(0.2),
-                  spreadRadius: 2,
-                  offset: const Offset(5, 5),
-                  blurRadius: 10
-              )
-            ]
-        ),
-        child: Stack(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 10, top: 2),
-              child: Text(_containersName,
-                style: Theme.of(context).textTheme.headline2,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 20, top: 35),
-              child: Column(
-                children: [
-                  SizedBox(
-                      width: MediaQuery.of(context).size.width / 4.5,
-                      height: MediaQuery.of(context).size.height / 8.4,
-                      child: GestureDetector(
-                        child: Container(
-                          decoration: BoxDecoration(
-                              color: Theme.of(context).accentColor,
-                              borderRadius: const BorderRadius.all(
-                                Radius.circular(5.0),
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                    color: Theme.of(context).accentColor.withOpacity(0.2),
-                                    spreadRadius: 5,
-                                    offset: const Offset(5, 5),
-                                    blurRadius: 10
-                                )
-                              ]
-                          ),
-                          child: Icon(Icons.image_outlined,
-                            size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width)*3),
-                          ),
-                        ),
-                        onTap: () => Navigator.pushNamed(context, route),
-                      )
-                  )
-                ],
-              ),
-            ),
-            if (_buttonFlag == true)
-              Positioned(
-                  right: 15,
-                  top: 15,
-                  child: Utils.GenerateButton(_route!, icon!, context)
-              )
-          ],
-        ),
-      ),
-    );
-  }
+  // generateMenuBlock(String _containersName, String route, [bool? _buttonFlag, MaterialPageRoute? _route, IconData? icon]){
+  //   return SizedBox(
+  //     width: MediaQuery.of(context).size.width / 1.1,
+  //     height: MediaQuery.of(context).size.height / 5.2,
+  //     child: Container(
+  //       decoration: BoxDecoration(
+  //           color: Theme.of(context).cardColor,
+  //           borderRadius: const BorderRadius.all(
+  //             Radius.circular(20.0),
+  //           ),
+  //           boxShadow: [
+  //             BoxShadow(
+  //                 color: Theme.of(context).cardColor.withOpacity(0.2),
+  //                 spreadRadius: 2,
+  //                 offset: const Offset(5, 5),
+  //                 blurRadius: 10
+  //             )
+  //           ]
+  //       ),
+  //       child: Stack(
+  //         children: [
+  //           Padding(
+  //             padding: const EdgeInsets.only(left: 10, top: 2),
+  //             child: Text(_containersName,
+  //               style: Theme.of(context).textTheme.headline2,
+  //             ),
+  //           ),
+  //           Padding(
+  //             padding: const EdgeInsets.only(left: 20, top: 35),
+  //             child: Column(
+  //               children: [
+  //                 SizedBox(
+  //                     width: MediaQuery.of(context).size.width / 4.5,
+  //                     height: MediaQuery.of(context).size.height / 8.4,
+  //                     child: GestureDetector(
+  //                       child: Container(
+  //                         decoration: BoxDecoration(
+  //                             color: Theme.of(context).accentColor,
+  //                             borderRadius: const BorderRadius.all(
+  //                               Radius.circular(5.0),
+  //                             ),
+  //                             boxShadow: [
+  //                               BoxShadow(
+  //                                   color: Theme.of(context).accentColor.withOpacity(0.2),
+  //                                   spreadRadius: 5,
+  //                                   offset: const Offset(5, 5),
+  //                                   blurRadius: 10
+  //                               )
+  //                             ]
+  //                         ),
+  //                         child: Icon(Icons.image_outlined,
+  //                           size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width)*3),
+  //                         ),
+  //                       ),
+  //                       onTap: () => Navigator.pushNamed(context, route),
+  //                     )
+  //                 )
+  //               ],
+  //             ),
+  //           ),
+  //           if (_buttonFlag == true)
+  //             Positioned(
+  //                 right: 15,
+  //                 top: 15,
+  //                 child: Utils.GenerateReplacementButton(_route!, icon!, context)
+  //             )
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -120,12 +120,35 @@ class _MenuScreenState extends State<MenuScreen> {
                   Positioned(
                     left: 15,
                     top: 15,
-                    child: Utils.GenerateButton2(Icons.account_circle_sharp, context, MaterialPageRoute(builder: (context) => UserProfileScreen(userId: state.getUser()!.id))),
+                    child: PushButton(icon: Icons.account_circle_sharp, route: MaterialPageRoute(builder: (context) => UserProfileScreen(userId: state.getUser()!.id))),
                   ),
                   Positioned(
                       right: 15,
                       top: 15,
-                      child: Utils.GenerateLogOutButton('/auth_screen', _authService, Icons.logout, context, authBloc)
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: Theme.of(context).primaryColor,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Theme.of(context).primaryColor.withOpacity(0.2),
+                                  spreadRadius: 5,
+                                  offset: const Offset(5, 5),
+                                  blurRadius: 10
+                              )
+                            ]
+                        ),
+                        child: IconButton(
+                          icon: const Icon(Icons.logout),
+                          color: Colors.white,
+                          iconSize: sqrt(MediaQuery.of(context).size.height + MediaQuery.of(context).size.width),
+                          onPressed: () {
+                            _authService.logOut();
+                            authBloc.add(const UserLoggedOut());
+                            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => AuthScreen()), (route) => false);
+                          },
+                        ),
+                      )
                   ),
                   Padding(
                       padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 4.5),
@@ -206,7 +229,7 @@ class _MenuScreenState extends State<MenuScreen> {
                                         Positioned(
                                             right: 5,
                                             top: 5,
-                                            child: Utils.GenerateButton2(Icons.add, context, MaterialPageRoute(builder: (context) => ProfileEditScreen.create()))
+                                            child: ReplacementButton(icon: Icons.add, route: MaterialPageRoute(builder: (context) => ProfileEditScreen.create()))
                                         )
                                       ],
                                     ),
@@ -251,7 +274,7 @@ class _MenuScreenState extends State<MenuScreen> {
                                         Positioned(
                                             right: 5,
                                             top: 5,
-                                            child: Utils.GenerateButton2(Icons.add, context, MaterialPageRoute(builder: (context) => ChatEditScreen.create()))
+                                            child: ReplacementButton(icon: Icons.add, route: MaterialPageRoute(builder: (context) => ChatEditScreen.create()))
                                         )
                                       ],
                                     ),

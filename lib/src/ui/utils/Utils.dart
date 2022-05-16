@@ -5,31 +5,45 @@ import 'package:flutter/material.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
 import 'package:roleplaying_app/src/services/auth_service.dart';
 
-class Utils{
-  static GenerateButton(String _route, IconData icon, BuildContext context){
+class ReplacementButton extends StatelessWidget {
+  final IconData icon;
+  final MaterialPageRoute route;
+
+  const ReplacementButton({Key? key, required this.icon, required this.route}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-        decoration: BoxDecoration(
-            color: Theme.of(context).primaryColor,
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                  color: Theme.of(context).primaryColor.withOpacity(0.2),
-                  spreadRadius: 5,
-                  offset: const Offset(5, 5),
-                  blurRadius: 10
-              )
-            ]
-        ),
-        child: IconButton(
+      decoration: BoxDecoration(
+          color: Theme.of(context).primaryColor,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+                color: Theme.of(context).primaryColor.withOpacity(0.2),
+                spreadRadius: 5,
+                offset: const Offset(5, 5),
+                blurRadius: 10
+            )
+          ]
+      ),
+      child: IconButton(
         icon: Icon(icon),
         color: Colors.white,
         iconSize: sqrt(MediaQuery.of(context).size.height + MediaQuery.of(context).size.width),
-        onPressed: () => Navigator.pushNamed(context, _route),
+        onPressed: () => Navigator.pushReplacement(context, route),
       ),
     );
   }
+}
 
-  static GenerateLogOutButton(String _route, AuthService authService, IconData icon, BuildContext context, AuthBloc authBloc){
+class PushButton extends StatelessWidget {
+  final IconData icon;
+  final MaterialPageRoute route;
+
+  const PushButton({Key? key, required this.icon, required this.route}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
           color: Theme.of(context).primaryColor,
@@ -48,38 +62,18 @@ class Utils{
         color: Colors.white,
         iconSize: sqrt(MediaQuery.of(context).size.height + MediaQuery.of(context).size.width),
         onPressed: () {
-          authService.logOut();
-          authBloc.add(const UserLoggedOut());
-          Navigator.pushNamed(context, _route);
+          Navigator.push(context, route);
         },
       ),
     );
   }
+}
 
-  static GenerateButton2(IconData icon, BuildContext context, MaterialPageRoute materialPageRoute){
-    return Container(
-      decoration: BoxDecoration(
-          color: Theme.of(context).primaryColor,
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-                color: Theme.of(context).primaryColor.withOpacity(0.2),
-                spreadRadius: 5,
-                offset: const Offset(5, 5),
-                blurRadius: 10
-            )
-          ]
-      ),
-      child: IconButton(
-        icon: Icon(icon),
-        color: Colors.white,
-        iconSize: sqrt(MediaQuery.of(context).size.height + MediaQuery.of(context).size.width),
-        onPressed: () => Navigator.push(context, materialPageRoute),
-      ),
-    );
-  }
+class BackButton extends StatelessWidget {
+  const BackButton({Key? key}) : super(key: key);
 
-  static GenerateBackButton(BuildContext context){
+  @override
+  Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
           color: Theme.of(context).primaryColor,
@@ -101,47 +95,32 @@ class Utils{
       ),
     );
   }
+}
 
-  static GenerateMessageContainer(String _route, IconData icon, BuildContext context, String user){
-    return SizedBox(
-      width: MediaQuery.of(context).size.width / 1.2,
-      height: MediaQuery.of(context).size.height / 6,
-      child: Container(
-        decoration: BoxDecoration(
-            color: Theme.of(context).accentColor,
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                  color: Theme.of(context).accentColor.withOpacity(0.2),
-                  spreadRadius: 2,
-                  offset: const Offset(5, 5),
-                  blurRadius: 10
-              )
-            ]
-        ),
-        child: Stack(
-          children: [
-            Positioned(
-              left: 10,
-              top: 10,
-              child: Utils.GenerateButton(_route, icon, context),
-            ),
-            Padding(
-              padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 100, left: MediaQuery.of(context).size.width / 5.5),
-              child: Text(user,
-                  style: Theme.of(context).textTheme.subtitle1
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 12, left: MediaQuery.of(context).size.width / 5),
-              child: Text("Текст",
-                  style: Theme.of(context).textTheme.subtitle2
-              ),
+class ApplyButton extends StatelessWidget {
+  const ApplyButton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+          color: Theme.of(context).primaryColor,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+                color: Theme.of(context).primaryColor.withOpacity(0.2),
+                spreadRadius: 5,
+                offset: const Offset(5, 5),
+                blurRadius: 10
             )
-          ],
-        ),
+          ]
+      ),
+      child: IconButton(
+        icon: const Icon(Icons.check),
+        color: Colors.white,
+        iconSize: sqrt(MediaQuery.of(context).size.height + MediaQuery.of(context).size.width),
+        onPressed: () => Navigator.pop(context),
       ),
     );
   }
-
 }

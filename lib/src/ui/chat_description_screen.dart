@@ -10,9 +10,10 @@ import 'package:roleplaying_app/src/models/customUserModel.dart';
 import 'package:roleplaying_app/src/models/profile.dart';
 import 'package:roleplaying_app/src/services/chat_service.dart';
 import 'package:roleplaying_app/src/services/customUserService.dart';
+import 'package:roleplaying_app/src/ui/chat_screen.dart';
 import 'package:roleplaying_app/src/ui/profile_screen.dart';
 import 'package:roleplaying_app/src/ui/user_profile_screen.dart';
-import 'package:roleplaying_app/src/ui/utils/Utils.dart';
+import 'package:roleplaying_app/src/ui/utils/Utils.dart' as utils;
 import 'package:roleplaying_app/src/ui/auth_screen.dart';
 import 'package:roleplaying_app/src/ui/chat_edit_screen.dart';
 import 'package:roleplaying_app/src/ui/menu_screen.dart';
@@ -58,7 +59,7 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
         ),
         onPressed: () {
           ChatService().deleteChat(_chat.id);
-          Navigator.push(context, MaterialPageRoute(builder: (context) => MenuScreen()));
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MenuScreen()));
         },
       );
     } else {
@@ -69,7 +70,7 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
         ),
         onPressed: () {
           ChatService().deleteUserFromChat(_chat, userId);
-          Navigator.push(context, MaterialPageRoute(builder: (context) => MenuScreen()));
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MenuScreen()));
         },
       );
     }
@@ -83,15 +84,15 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
             return Scaffold(
               body: Stack(
                 children: [
-                  Positioned(
+                  const Positioned(
                       top: 15,
                       left: 15,
-                      child: Utils.GenerateBackButton(context),
+                      child: utils.BackButton(),
                   ),
                   Positioned(
                     top: 15,
                     right: 15,
-                    child: Utils.GenerateButton2(Icons.menu, context, MaterialPageRoute(builder: (context) => ChatEditScreen.update(chat: _chat))),
+                    child: utils.PushButton(icon: Icons.edit, route: MaterialPageRoute(builder: (context) => ChatEditScreen.update(chat: _chat))),
                   ),
                   Center(
                     child: Padding(
@@ -260,7 +261,7 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
                                                             return Column(
                                                               children: [
                                                                 ElevatedButton(
-                                                                    onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => UserProfileScreen(userId: _chat.usersId[index]))),
+                                                                    onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => UserProfileScreen(userId: _chat.usersId[index]))),
                                                                     child: Icon(Icons.account_circle_sharp,
                                                                       size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width)*2),
                                                                     ),

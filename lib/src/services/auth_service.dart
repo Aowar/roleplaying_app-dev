@@ -10,7 +10,7 @@ class AuthService {
     try {
       UserCredential result = await _firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
       User? user = result.user;
-      return UserModel(id: user!.uid, email: user.email);
+      return UserModel(id: user!.uid, email: user.email, nickName: user.displayName);
     }
     catch (e) {
       return null;
