@@ -24,7 +24,7 @@ import 'utils/Utils.dart';
 
 class MenuScreen extends StatefulWidget{
 
-  MenuScreen({Key? key}) : super(key: key);
+  const MenuScreen({Key? key}) : super(key: key);
 
   @override
   State<MenuScreen> createState() => _MenuScreenState();
@@ -33,80 +33,6 @@ class MenuScreen extends StatefulWidget{
 class _MenuScreenState extends State<MenuScreen> {
 
   final AuthService _authService = AuthService();
-
-  final List<String> _containersNames = ["Открытые чаты", "Мои анкеты", "Мои чаты"];
-
-  // generateMenuBlock(String _containersName, String route, [bool? _buttonFlag, MaterialPageRoute? _route, IconData? icon]){
-  //   return SizedBox(
-  //     width: MediaQuery.of(context).size.width / 1.1,
-  //     height: MediaQuery.of(context).size.height / 5.2,
-  //     child: Container(
-  //       decoration: BoxDecoration(
-  //           color: Theme.of(context).cardColor,
-  //           borderRadius: const BorderRadius.all(
-  //             Radius.circular(20.0),
-  //           ),
-  //           boxShadow: [
-  //             BoxShadow(
-  //                 color: Theme.of(context).cardColor.withOpacity(0.2),
-  //                 spreadRadius: 2,
-  //                 offset: const Offset(5, 5),
-  //                 blurRadius: 10
-  //             )
-  //           ]
-  //       ),
-  //       child: Stack(
-  //         children: [
-  //           Padding(
-  //             padding: const EdgeInsets.only(left: 10, top: 2),
-  //             child: Text(_containersName,
-  //               style: Theme.of(context).textTheme.headline2,
-  //             ),
-  //           ),
-  //           Padding(
-  //             padding: const EdgeInsets.only(left: 20, top: 35),
-  //             child: Column(
-  //               children: [
-  //                 SizedBox(
-  //                     width: MediaQuery.of(context).size.width / 4.5,
-  //                     height: MediaQuery.of(context).size.height / 8.4,
-  //                     child: GestureDetector(
-  //                       child: Container(
-  //                         decoration: BoxDecoration(
-  //                             color: Theme.of(context).accentColor,
-  //                             borderRadius: const BorderRadius.all(
-  //                               Radius.circular(5.0),
-  //                             ),
-  //                             boxShadow: [
-  //                               BoxShadow(
-  //                                   color: Theme.of(context).accentColor.withOpacity(0.2),
-  //                                   spreadRadius: 5,
-  //                                   offset: const Offset(5, 5),
-  //                                   blurRadius: 10
-  //                               )
-  //                             ]
-  //                         ),
-  //                         child: Icon(Icons.image_outlined,
-  //                           size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width)*3),
-  //                         ),
-  //                       ),
-  //                       onTap: () => Navigator.pushNamed(context, route),
-  //                     )
-  //                 )
-  //               ],
-  //             ),
-  //           ),
-  //           if (_buttonFlag == true)
-  //             Positioned(
-  //                 right: 15,
-  //                 top: 15,
-  //                 child: Utils.GenerateReplacementButton(_route!, icon!, context)
-  //             )
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
 
   @override
   Widget build(BuildContext context) {

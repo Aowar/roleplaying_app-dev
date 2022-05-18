@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:html';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +15,8 @@ import 'package:roleplaying_app/src/ui/menu_screen.dart';
 import 'dart:developer' as developer;
 
 import '../models/user.dart';
+
+enum authProblems { userExists, networkError, invalidEmail, invalidPassword,  userDisabled, userNotFound, unknownProblem }
 
 class AuthScreen extends StatelessWidget {
   final AuthService authService = AuthService();
@@ -31,19 +36,28 @@ class AuthView extends StatefulWidget {
 
 class _AuthView extends State<AuthView> {
   final GlobalKey<FormState> _formLoginKey = GlobalKey<FormState>();
-  final GlobalKey<FormState> _formRegisterKey = GlobalKey<FormState>();
   final TextEditingController _passwordLoginController = TextEditingController();
   final TextEditingController _emailLoginController = TextEditingController();
+  final GlobalKey<FormState> _formRegisterKey = GlobalKey<FormState>();
   final TextEditingController _emailRegisterController = TextEditingController();
   final TextEditingController _userNicknameController = TextEditingController();
   final TextEditingController _passwordRegisterController = TextEditingController();
-  late bool isOpen = false;
+  bool isOpen = false;
   late OverlayEntry _overlayEntry;
-
+  bool isLoading = false;
   final AuthService _authService = AuthService();
   late String _email;
   late String _nickName;
   late String _password;
+  Map<authProblems, String> registerErrorsMessages = {
+    authProblems.userExists: "Данный email уже используется",
+    authProblems.networkError: "Произошла ошибка, повторите попытку позже",
+    authProblems.invalidEmail: "Неверная почта или пароль",
+    authProblems.invalidPassword: "Неверная почта или пароль",
+    authProblems.userDisabled: "Аккаунт пользователя деактивирован",
+    authProblems.userNotFound: "Пользователя с таким email не существует",
+    authProblems.unknownProblem: "Произошла неизвестная ошибка"
+  };
 
   void openRegisterForm() {
     isOpen = true;
@@ -54,6 +68,114 @@ class _AuthView extends State<AuthView> {
   void closeRegisterForm() {
     isOpen = false;
     _overlayEntry.remove();
+  }
+
+  auth(authBloc) async {
+    authProblems? errorType;
+    _email = _emailLoginController.text;
+    _password = _passwordLoginController.text;
+    dynamic signInResult;
+    signInResult = await _authService.signIn(_email.trim(), _password.trim());
+    if (signInResult.runtimeType == UserModel) {
+      if (!FirebaseAuth.instance.currentUser!.emailVerified) {
+        return Fluttertoast.showToast(
+            msg: "Подтвердите адрес электронной почты",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 4,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0
+        );
+      }
+      if (!await CustomUserService().collectionContainsUser(signInResult.id)) {
+        CustomUserModel _customUserModel = CustomUserModel(signInResult.id, signInResult.nickName);
+        CustomUserService().addCustomUser(_customUserModel);
+      }
+      authBloc.add(UserLoggedIn(user: signInResult));
+    }
+    setState(() {
+      isLoading = false;
+    });
+    switch (signInResult.code) {
+      case "internal-error":
+        errorType = authProblems.networkError;
+        break;
+      case "invalid-auth-event":
+        errorType = authProblems.networkError;
+        break;
+      case "network-request-failed":
+        errorType = authProblems.networkError;
+        break;
+      case "user-not-found":
+        errorType = authProblems.userNotFound;
+        break;
+      case "wrong-password":
+        errorType = authProblems.invalidPassword;
+        break;
+      case "invalid-email" :
+        errorType = authProblems.invalidEmail;
+        break;
+      default:
+        errorType = authProblems.unknownProblem;
+        break;
+    }
+    return Fluttertoast.showToast(
+        msg: registerErrorsMessages[errorType]!,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 4,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0
+    );
+  }
+
+  registration() async {
+    authProblems? errorType;
+    _email = _emailRegisterController.text;
+    _nickName = _userNicknameController.text;
+    _password = _passwordRegisterController.text;
+    dynamic registrationResult;
+
+    registrationResult = await _authService.registration(_email, _password, _nickName);
+    if (registrationResult.runtimeType == FirebaseAuthException) {
+      switch (registrationResult.code) {
+        case "email-already-in-use":
+          errorType = authProblems.userExists;
+          break;
+        case "internal-error":
+          errorType = authProblems.networkError;
+          break;
+        case "invalid-auth-event":
+          errorType = authProblems.networkError;
+          break;
+        case "network-request-failed":
+          errorType = authProblems.networkError;
+          break;
+        default:
+          errorType = authProblems.unknownProblem;
+          break;
+      }
+      return Fluttertoast.showToast(
+          msg: registerErrorsMessages[errorType]!,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 5,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0
+      );
+    }
+    return Fluttertoast.showToast(
+        msg: "Письмо отправлено на указанный адрес",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 3,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 16.0
+    );
   }
 
   OverlayEntry _createRegisterOverlay() {
@@ -67,7 +189,7 @@ class _AuthView extends State<AuthView> {
               color: const Color(0x41000000),
               child: Center(
                 child: SizedBox(
-                  width: MediaQuery.of(context).size.width / 1.8,
+                  width: MediaQuery.of(context).size.width / 1.3,
                   child: GestureDetector(
                       onTap: () { },
                       child: Container(
@@ -85,17 +207,17 @@ class _AuthView extends State<AuthView> {
                               children: [
                                 ///Login field
                                 Material(
-                                    child: generateFormEmailField(const Icon(Icons.login), "Введите email", _emailRegisterController),
+                                    child: EmailFormField(icon: const Icon(Icons.login), hintText: "Введите email", controller: _emailRegisterController),
                                     color: Theme.of(context).accentColor
                                 ),
                                 ///User nickname field
                                 Material(
-                                  child: generateNicknameTextField(const Icon(Icons.text_fields_outlined), "Введите желаемый никнейм", _userNicknameController),
+                                  child: NicknameFormField(icon: const Icon(Icons.text_fields_outlined), hintText: "Введите никнейм", controller: _userNicknameController),
                                   color: Theme.of(context).accentColor,
                                 ),
                                 ///Password field
                                 Material(
-                                  child: generateFormPasswordField(const Icon(Icons.password), "Введите пароль", _passwordRegisterController),
+                                  child: PasswordFormField(icon: const Icon(Icons.password), hintText: "Введите пароль", controller: _passwordRegisterController, registerFlag: true),
                                   color: Theme.of(context).accentColor,
                                 ),
                                 SizedBox(
@@ -124,14 +246,20 @@ class _AuthView extends State<AuthView> {
                                       child: Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Center(
-                                          child: Text("Зарегистрироваться", style: Theme.of(context).textTheme.bodyText1),
+                                          child: Text("Зарегистрироваться",
+                                              style: TextStyle(
+                                                  fontStyle: Theme.of(context).textTheme.bodyText1!.fontStyle,
+                                                  color: Theme.of(context).textTheme.bodyText1!.color,
+                                                  fontSize: 12
+                                              )
+                                          ),
                                         ),
                                       ),
                                       onPressed: () {
                                         if (_formRegisterKey.currentState!.validate()) {
-                                          register();
+                                          registration();
                                         }
-                                      },
+                                      }
                                     ),
                                   ),
                                 ),
@@ -147,134 +275,6 @@ class _AuthView extends State<AuthView> {
         ),
       );
     });
-  }
-
-  Widget generateNicknameTextField(Icon icon, String hintText, TextEditingController controller) {
-    return SizedBox(
-      width: MediaQuery.of(context).size.width * 0.5,
-      child: Container(
-              decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  borderRadius: const BorderRadius.all(
-                    Radius.circular(10.0),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Theme.of(context).cardColor.withOpacity(0.2),
-                        spreadRadius: 5,
-                        offset: const Offset(5, 5),
-                        blurRadius: 10
-                    )
-                  ]
-              ),
-        child: TextFormField(
-          decoration: InputDecoration(
-            border: InputBorder.none,
-            icon: icon,
-            hintText: hintText,
-          ),
-          obscureText: false,
-          controller: controller,
-          validator: (String? value) {
-            if (value == null || value.isEmpty) {
-              return "Пожалуйста введите никнейм";
-            }
-            return null;
-          },
-        ),
-      ),
-    );
-  }
-
-  Widget generateFormEmailField(Icon icon, String hintText, TextEditingController controller) {
-    return SizedBox(
-      width: MediaQuery.of(context).size.width * 0.5,
-      child: Container(
-        decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: const BorderRadius.all(
-              Radius.circular(10.0),
-            ),
-            boxShadow: [
-              BoxShadow(
-                  color: Theme.of(context).cardColor.withOpacity(0.2),
-                  spreadRadius: 5,
-                  offset: const Offset(5, 5),
-                  blurRadius: 10
-              )
-            ]
-        ),
-        child: TextFormField(
-          decoration: InputDecoration(
-            border: InputBorder.none,
-            icon: icon,
-            hintText: hintText,
-          ),
-          obscureText: false,
-          controller: controller,
-          validator: (String? value) {
-            if (value == null || value.isEmpty) {
-              return "Пожалуйста введите email";
-            } else if (value.contains(RegExp(r'\w+@\w+\.\w+'))) {
-              return null;
-            }
-            return "Неправильный адрес электронной почты";
-          },
-        ),
-      ),
-    );
-  }
-
-  Widget generateFormPasswordField(Icon icon, String hintText, TextEditingController controller) {
-    return SizedBox(
-      width: MediaQuery.of(context).size.width * 0.5,
-      child: Container(
-        decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: const BorderRadius.all(
-              Radius.circular(10.0),
-            ),
-            boxShadow: [
-              BoxShadow(
-                  color: Theme.of(context).cardColor.withOpacity(0.2),
-                  spreadRadius: 5,
-                  offset: const Offset(5, 5),
-                  blurRadius: 10
-              )
-            ]
-        ),
-        child: TextFormField(
-          decoration: InputDecoration(
-            border: InputBorder.none,
-            icon: icon,
-            hintText: hintText,
-          ),
-          obscureText: true,
-          controller: controller,
-          validator: (String? value) {
-            if (value == null || value.isEmpty) {
-              return "Пожалуйста введите пароль";
-            } else if (value.length < 6) {
-              return "Пароль должен быть больше 6 символов";
-            } else if (!value.contains(RegExp(r'[A-Z]'))) {
-              return "Пароль должен содержать хотя бы одну латинскую заглавную букву";
-            } else if (!value.contains(RegExp(r'[a-z]'))) {
-              return "Пароль должен содержать хотя бы одну латинскую строчную букву";
-            } else if (!value.contains(RegExp(r'[0-9]'))) {
-              return "Пароль должен содержать хотя бы одну цифру";
-            } else if (!value.contains(RegExp(r'[!-|]'))) {
-              return "Пароль должен содержать хотя бы один спецсимвол";
-            } else if (value.contains(RegExp(r'[ ]'))) {
-              return "Пароль должен содержать хотя бы";
-            }
-            if (value.contains(RegExp(r'[A-Za-z]\w+'))) {
-              return null;
-            }
-            return "Пароль содержит недопустимый символ (Проверьте раскладку)";
-          },
-        ),
-      ),
-    );
   }
 
   @override
@@ -322,11 +322,11 @@ class _AuthView extends State<AuthView> {
                             child: Column(
                               children: [
                                 ///Login field
-                                generateFormEmailField(const Icon(Icons.login), "Введите email", _emailLoginController),
+                                EmailFormField(icon: const Icon(Icons.login), hintText: "Введите email", controller: _emailLoginController),
                                 Padding(
                                     padding: const EdgeInsets.only(top: 30),
                                     ///Password field
-                                      child: generateFormPasswordField(const Icon(Icons.password), "Введите пароль", _passwordLoginController)
+                                      child: PasswordFormField(icon: const Icon(Icons.password), hintText: "Введите пароль", controller: _passwordLoginController, registerFlag: false)
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.only(top: 20),
@@ -354,15 +354,13 @@ class _AuthView extends State<AuthView> {
                                                 )
                                             )
                                         ),
-                                        onPressed: () {
-                                          if (_formLoginKey.currentState!.validate()) {
-                                            setState(() {
-                                              const CircularProgressIndicator();
-                                            });
+                                        onPressed: isLoading ? null : () {
+                                          setState(() {
+                                            isLoading = true;
                                             auth(authBloc);
-                                          }
+                                          });
                                         },
-                                        child: Padding(
+                                        child: isLoading ? const CircularProgressIndicator() : Padding(
                                           padding: const EdgeInsets.all(8.0),
                                           child: Center(
                                             child: Text("Войти", style: Theme.of(context).textTheme.bodyText1),
@@ -404,61 +402,171 @@ class _AuthView extends State<AuthView> {
       );
     });
   }
+}
 
-  auth(authBloc) async {
-    _email = _emailLoginController.text;
-    _password = _passwordLoginController.text;
-    if ((await _authService.signIn(_email.trim(), _password.trim())) == null) {
-      return Fluttertoast.showToast(
-          msg: "Ошибка авторизации",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.CENTER,
-          timeInSecForIosWeb: 3,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0
-      );
-    } else {
-      UserModel user = await _authService.signIn(_email.trim(), _password.trim());
-      if (user.id.isNotEmpty && FirebaseAuth.instance.currentUser!.emailVerified) {
-        if (!await CustomUserService().collectionContainsUser(user.id)) {
-          CustomUserModel _customUserModel = CustomUserModel(user.id, user.nickName);
-          CustomUserService().addCustomUser(_customUserModel);
-        }
-        authBloc.add(UserLoggedIn(user: user));
-      } else {
-        return Fluttertoast.showToast(
-            msg: "Ошибка авторизации",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.CENTER,
-            timeInSecForIosWeb: 3,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: 16.0
-        );
-      }
-    }
+class NicknameFormField extends StatelessWidget {
+  final Icon icon;
+  final String hintText;
+  final TextEditingController controller;
+
+  const NicknameFormField({Key? key, required this.icon, required this.hintText, required this.controller}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width / 1.5,
+      child: Container(
+        decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: const BorderRadius.all(
+              Radius.circular(10.0),
+            ),
+            boxShadow: [
+              BoxShadow(
+                  color: Theme.of(context).cardColor.withOpacity(0.2),
+                  spreadRadius: 5,
+                  offset: const Offset(5, 5),
+                  blurRadius: 10
+              )
+            ]
+        ),
+        child: TextFormField(
+          decoration: InputDecoration(
+            errorStyle: const TextStyle(
+                fontSize: 10
+            ),
+            border: InputBorder.none,
+            icon: icon,
+            hintText: hintText,
+          ),
+          obscureText: false,
+          controller: controller,
+          validator: (String? value) {
+            if (value == null || value.isEmpty) {
+              return "Пожалуйста введите никнейм";
+            }
+            return null;
+          },
+        ),
+      ),
+    );
   }
+}
 
-  register() async {
-    _email = _emailRegisterController.text;
-    _nickName = _userNicknameController.text;
-    _password = _passwordRegisterController.text;
-    final auth = FirebaseAuth.instance;
-    User user;
-    auth.createUserWithEmailAndPassword(email: _email, password: _password).then((_) {
-      user = auth.currentUser!;
-      user.sendEmailVerification();
-      user.updateDisplayName(_nickName);
-    });
-    return Fluttertoast.showToast(
-        msg: "Письмо отправлено на указанный адрес",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 3,
-        backgroundColor: Colors.green,
-        textColor: Colors.white,
-        fontSize: 16.0
+
+class PasswordFormField extends StatelessWidget {
+  final Icon icon;
+  final TextEditingController controller;
+  final String hintText;
+  final bool registerFlag;
+
+  const PasswordFormField({Key? key, required this.icon, required this.controller, required this.hintText, required this.registerFlag}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width / 1.5,
+      child: Container(
+        decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: const BorderRadius.all(
+              Radius.circular(10.0),
+            ),
+            boxShadow: [
+              BoxShadow(
+                  color: Theme.of(context).cardColor.withOpacity(0.2),
+                  spreadRadius: 5,
+                  offset: const Offset(5, 5),
+                  blurRadius: 10
+              )
+            ]
+        ),
+        child: TextFormField(
+          decoration: InputDecoration(
+            errorStyle: const TextStyle(
+                fontSize: 10
+            ),
+            border: InputBorder.none,
+            icon: icon,
+            hintText: hintText,
+          ),
+          obscureText: true,
+          controller: controller,
+          validator: (String? value) {
+            if (value == null || value.isEmpty) {
+              return "Пожалуйста введите пароль";
+            } else if (registerFlag) {
+            if (value.length < 6) {
+              return "Пароль должен быть больше 6 символов";
+            } else if (!value.contains(RegExp(r'[A-Z]'))) {
+              return "Пароль должен содержать \nхотя бы одну латинскую заглавную букву";
+            } else if (!value.contains(RegExp(r'[a-z]'))) {
+              return "Пароль должен содержать \nхотя бы одну латинскую строчную букву";
+            } else if (!value.contains(RegExp(r'[0-9]'))) {
+              return "Пароль должен содержать \nхотя бы одну цифру";
+            } else if (!value.contains(RegExp(r'[!-|]'))) {
+              return "Пароль должен содержать \nхотя бы один спецсимвол";
+            } else if (value.contains(RegExp(r'[ ]'))) {
+              return "Пароль не должен содержать пробелов";
+            }
+            }
+            if (value.contains(RegExp(r'[A-Za-z]\w+'))) {
+              return null;
+            }
+            return "Пароль содержит недопустимый символ (Проверьте раскладку)";
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class EmailFormField extends StatelessWidget {
+  final Icon icon;
+  final String hintText;
+  final TextEditingController controller;
+  const EmailFormField({Key? key, required this.icon, required this.hintText, required this.controller}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width / 1.5,
+      child: Container(
+        decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: const BorderRadius.all(
+              Radius.circular(10.0),
+            ),
+            boxShadow: [
+              BoxShadow(
+                  color: Theme.of(context).cardColor.withOpacity(0.2),
+                  spreadRadius: 5,
+                  offset: const Offset(5, 5),
+                  blurRadius: 10
+              )
+            ]
+        ),
+        child: TextFormField(
+          decoration: InputDecoration(
+            errorStyle: const TextStyle(
+              fontSize: 10
+            ),
+            border: InputBorder.none,
+            icon: icon,
+            hintText: hintText,
+          ),
+          obscureText: false,
+          controller: controller,
+          validator: (String? value) {
+            if (value == null || value.isEmpty) {
+              return "Пожалуйста введите email";
+            } else if (value.contains(RegExp(r'\w+@\w+\.\w+'))) {
+              return null;
+            }
+            return "Неправильный email";
+          },
+        ),
+      ),
     );
   }
 }

@@ -5,14 +5,16 @@ class Profile extends Equatable {
   late String userId;
   late String title;
   late String text;
+  late Map<String, String>? additionalFields;
 
-  Profile(this.userId,this.title, this.text);
+  Profile(this.userId, this.title, this.text, this.additionalFields);
 
   Profile.fromJson(Map<String, dynamic> data) {
     id = data['id'];
     userId = data['userId'];
     title = data['title'];
     text = data['text'];
+    additionalFields = data['additionalFields'];
   }
 
   @override
@@ -22,7 +24,9 @@ class Profile extends Equatable {
     return {
       "userId": userId,
       "title": title,
-      "text": text
+      "text": text,
+      "additionalFields": additionalFields,
+      "id": id
     };
   }
 }

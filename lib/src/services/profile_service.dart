@@ -11,10 +11,8 @@ class ProfileService {
   Future addProfile(Profile profile) async {
     DocumentReference docRef = _profileCollection.doc();
     return await docRef.set({
-      'title': profile.title,
-      'text': profile.text,
-      'userId': profile.userId,
-      'id': docRef.id
+      profile.id = docRef.id,
+      profile.toMap()
     });
   }
 
@@ -31,7 +29,7 @@ class ProfileService {
   Future<Profile> getProfile(String profileId) async {
     DocumentReference docRef =  _profileCollection.doc(profileId);
     return await docRef.get().then((value) {
-      return Profile(value.get("userId"), value.get("title"), value.get("text"));
+      return Profile(value.get("userId"), value.get("title"), value.get("text"), value.get("additionalFields"));
     });
   }
 }

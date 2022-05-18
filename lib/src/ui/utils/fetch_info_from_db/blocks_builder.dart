@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:roleplaying_app/src/ui/utils/Utils.dart';
 
 import '../../../models/chat.dart';
 import '../../../models/profile.dart';
@@ -9,66 +10,29 @@ import '../../chat_screen.dart';
 import '../../profile_screen.dart';
 
 class BlocksBuilder {
-  ///Building chat block
-  static Widget buildChat(BuildContext context, Chat chat) => SizedBox(
-      height: 100,
-      child: Column(
-        children: [
-          GestureDetector(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).accentColor,
-                borderRadius: const BorderRadius.all(
-                  Radius.circular(5.0),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Theme.of(context).accentColor.withOpacity(0.2),
-                    spreadRadius: 5,
-                    offset: const Offset(5, 5),
-                    blurRadius: 10
-                  )
-                ]
-              ),
-              child: Icon(Icons.image_outlined,
-                  size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width)*3),
-                ),
-              ),
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(chat: chat))),
-          ),
-          Text(chat.title,
-              style: Theme.of(context).textTheme.subtitle2
-          ),
-        ],
-      )
-  );
-
   ///Building profile block
   static Widget buildProfile(BuildContext context, Profile profile) => SizedBox(
       height: 100,
       child: Column(
         children: [
-          GestureDetector(
-            child: Container(
-              decoration: BoxDecoration(
-                  color: Theme.of(context).accentColor,
-                  borderRadius: const BorderRadius.all(
-                    Radius.circular(5.0),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Theme.of(context).accentColor.withOpacity(0.2),
-                        spreadRadius: 5,
-                        offset: const Offset(5, 5),
-                        blurRadius: 10
+          SizedBox(
+            child: ElevatedButton(
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all<Color>(Theme.of(context).accentColor),
+                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(5.0),
+                      ),
                     )
-                  ]
-              ),
-              child: Icon(Icons.image_outlined,
-                  size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width)*3),
                 ),
               ),
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen(profile: profile))),
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen(profile: profile))),
+              child:
+              Icon(Icons.image_outlined,
+                size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width)*3),
+              ),
+            ),
           ),
           Text(profile.title,
               style: Theme.of(context).textTheme.subtitle2
@@ -76,4 +40,44 @@ class BlocksBuilder {
         ],
       )
   );
+}
+
+///Building chat block
+class ChatBlock extends StatelessWidget {
+  final Chat chat;
+
+  const ChatBlock({Key? key, required this.chat}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+        height: 100,
+        child: Column(
+          children: [
+            SizedBox(
+              child: ElevatedButton(
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all<Color>(Theme.of(context).accentColor),
+                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(5.0),
+                        ),
+                      )
+                  ),
+                ),
+                onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(chat: chat))),
+                child:
+                Icon(Icons.image_outlined,
+                  size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width)*3),
+                ),
+              ),
+            ),
+            Text(chat.title,
+                style: Theme.of(context).textTheme.subtitle2
+            ),
+          ],
+        )
+    );
+  }
 }

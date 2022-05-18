@@ -1,17 +1,11 @@
 import 'dart:math';
 import 'dart:developer' as developer;
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
 import 'package:roleplaying_app/src/models/chat.dart';
-import 'package:roleplaying_app/src/models/customUserModel.dart';
-import 'package:roleplaying_app/src/models/profile.dart';
 import 'package:roleplaying_app/src/services/chat_service.dart';
-import 'package:roleplaying_app/src/services/customUserService.dart';
-import 'package:roleplaying_app/src/ui/chat_screen.dart';
-import 'package:roleplaying_app/src/ui/profile_screen.dart';
 import 'package:roleplaying_app/src/ui/user_profile_screen.dart';
 import 'package:roleplaying_app/src/ui/utils/Utils.dart' as utils;
 import 'package:roleplaying_app/src/ui/auth_screen.dart';
@@ -24,7 +18,7 @@ late Chat _chat;
 
 class ChatDescriptionScreen extends StatelessWidget {
   final AuthService authService = AuthService();
-  Chat? chat;
+  final Chat? chat;
 
   ChatDescriptionScreen({Key? key, required this.chat}) : super(key: key) {
     _chat = chat!;
@@ -49,32 +43,6 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
 
   late String title;
   late String text;
-
-  Widget buildExitButton(bool deleteFlag, String userId) {
-    if (deleteFlag) {
-      return ElevatedButton(
-        child: Text("Удалить чат", style: Theme.of(context).textTheme.bodyText1),
-        style: ElevatedButton.styleFrom(
-            primary: Theme.of(context).cardColor
-        ),
-        onPressed: () {
-          ChatService().deleteChat(_chat.id);
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MenuScreen()));
-        },
-      );
-    } else {
-      return ElevatedButton(
-        child: Text("Выйти", style: Theme.of(context).textTheme.bodyText1),
-        style: ElevatedButton.styleFrom(
-            primary: Theme.of(context).cardColor
-        ),
-        onPressed: () {
-          ChatService().deleteUserFromChat(_chat, userId);
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MenuScreen()));
-        },
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -291,7 +259,7 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.only(top: 10, bottom: 10),
-                                      child: state.getUser()!.id != _chat.organizerId ? buildExitButton(false, state.getUser()!.id) : buildExitButton(true, state.getUser()!.id)
+                                      child: state.getUser()!.id != _chat.organizerId ? BuildExitButton(deleteFlag: false, userId: state.getUser()!.id) : BuildExitButton(deleteFlag: true, userId: state.getUser()!.id)
                                     )
                                   ],
                                 )
@@ -311,5 +279,38 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
           }
         }
     );
+  }
+}
+
+class BuildExitButton extends StatelessWidget {
+  final bool deleteFlag;
+  final String userId;
+  const BuildExitButton({Key? key, required this.deleteFlag, required this.userId}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    if (deleteFlag) {
+      return ElevatedButton(
+        child: Text("Удалить чат", style: Theme.of(context).textTheme.bodyText1),
+        style: ElevatedButton.styleFrom(
+            primary: Theme.of(context).cardColor
+        ),
+        onPressed: () {
+          ChatService().deleteChat(_chat.id);
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MenuScreen()));
+        },
+      );
+    } else {
+      return ElevatedButton(
+        child: Text("Выйти", style: Theme.of(context).textTheme.bodyText1),
+        style: ElevatedButton.styleFrom(
+            primary: Theme.of(context).cardColor
+        ),
+        onPressed: () {
+          ChatService().deleteUserFromChat(_chat, userId);
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MenuScreen()));
+        },
+      );
+    }
   }
 }

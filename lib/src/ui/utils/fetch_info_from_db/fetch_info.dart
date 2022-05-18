@@ -66,7 +66,7 @@ class FetchInfoFromDb {
                       scrollDirection: Axis.horizontal,
                       itemCount: chats.length,
                       itemBuilder: (BuildContext context, int index) {
-                        return BlocksBuilder.buildChat(context, chats[index]);
+                        return ChatBlock(chat: chats[index]);
                       },
                       separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 10),
                     ),
@@ -101,7 +101,7 @@ class FetchInfoFromDb {
                       scrollDirection: Axis.horizontal,
                       itemCount: chats.length,
                       itemBuilder: (BuildContext context, int index) {
-                        return BlocksBuilder.buildChat(context, chats[index]);
+                        return ChatBlock(chat: chats[index]);
                       },
                       separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 10),
                     ),

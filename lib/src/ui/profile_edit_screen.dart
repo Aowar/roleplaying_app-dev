@@ -47,6 +47,7 @@ class _ProfileEditView extends State<ProfileEditView> {
 
   late String title;
   late String text;
+  Map<String, String>? additionalFields;
 
   @override
   Widget build(BuildContext context) {
@@ -131,33 +132,29 @@ class _ProfileEditView extends State<ProfileEditView> {
                                   ),
                                   ///Image container
                                   Padding(
-                                      padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 40),
-                                      child: SizedBox(
-                                        child: GestureDetector(
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                                color: Theme.of(context).accentColor,
-                                                borderRadius: const BorderRadius.all(
-                                                  Radius.circular(5.0),
-                                                ),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                      color: Theme.of(context).accentColor.withOpacity(0.2),
-                                                      spreadRadius: 5,
-                                                      offset: const Offset(5, 5),
-                                                      blurRadius: 10
+                                    padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 40),
+                                    child: SizedBox(
+                                        child: SizedBox(
+                                          child: ElevatedButton(
+                                            style: ButtonStyle(
+                                              backgroundColor: MaterialStateProperty.all<Color>(Theme.of(context).accentColor),
+                                              shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                                  const RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.all(
+                                                      Radius.circular(5.0),
+                                                    ),
                                                   )
-                                                ]
+                                              ),
                                             ),
+                                            onPressed: () => Navigator.pushNamed(context, ' '),
                                             child:
                                             Icon(Icons.image_outlined,
                                               size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width)*45),
                                             ),
                                           ),
-                                          onTap: () => Navigator.pushNamed(context, ''),
-                                        ),
-                                      )
-                                  ),
+                                        )
+                                    ),
+                                  )
                                 ],
                               ),
                               Column(
@@ -327,7 +324,7 @@ class _ProfileEditView extends State<ProfileEditView> {
     title = _titleController.text;
     text = _textController.text;
 
-    Profile _form = Profile(context.select((AuthBloc bloc) => bloc.state.getUser()!.id), title, text);
+    Profile _form = Profile(context.select((AuthBloc bloc) => bloc.state.getUser()!.id), title, text, additionalFields);
 
     _profileService.addProfile(_form);
 

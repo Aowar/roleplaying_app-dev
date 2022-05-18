@@ -130,30 +130,8 @@ class _ProfileView extends State<ProfileView> {
                                   ///Image container
                                   Padding(
                                       padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 80),
-                                      child: SizedBox(
-                                        child: GestureDetector(
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                                color: Theme.of(context).accentColor,
-                                                borderRadius: const BorderRadius.all(
-                                                  Radius.circular(5.0),
-                                                ),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                      color: Theme.of(context).accentColor.withOpacity(0.2),
-                                                      spreadRadius: 5,
-                                                      offset: const Offset(5, 5),
-                                                      blurRadius: 10
-                                                  )
-                                                ]
-                                            ),
-                                            child:
-                                            Icon(Icons.image_outlined,
-                                              size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width)*45),
-                                            ),
-                                          ),
-                                          onTap: () => Navigator.pushNamed(context, ''),
-                                        ),
+                                      child: const SizedBox(
+                                        child: utils.ImageContainer(imageScale: 45)
                                       )
                                   ),
                                   Padding(
@@ -317,18 +295,5 @@ class _ProfileView extends State<ProfileView> {
         return AuthScreen();
       },
     );
-  }
-
-  void confirmButtonAction(BuildContext context) async {
-    title = _titleController.text;
-    text = _textController.text;
-
-    Profile _form = Profile(context.select((AuthBloc bloc) => bloc.state.getUser()!.id), title, text);
-
-    print(_form.toString());
-
-    _profileService.addProfile(_form);
-
-    Navigator.pop(context);
   }
 }

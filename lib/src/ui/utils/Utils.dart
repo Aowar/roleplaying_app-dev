@@ -124,3 +124,34 @@ class ApplyButton extends StatelessWidget {
     );
   }
 }
+
+class ImageContainer extends StatelessWidget {
+  final int imageScale;
+
+  const ImageContainer({Key? key, required this.imageScale}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      child: Container(
+        decoration: BoxDecoration(
+            color: Theme.of(context).accentColor,
+            borderRadius: const BorderRadius.all(
+              Radius.circular(5.0),
+            ),
+            boxShadow: [
+              BoxShadow(
+                  color: Theme.of(context).accentColor.withOpacity(0.2),
+                  spreadRadius: 5,
+                  offset: const Offset(5, 5),
+                  blurRadius: 10
+              )
+            ]
+        ),
+        child: Icon(Icons.image_outlined,
+          size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width)*3),
+        ),
+      ),
+    );
+  }
+}
