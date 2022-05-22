@@ -47,12 +47,9 @@ class _ProfileEditView extends State<ProfileEditView> {
 
   late String title;
   late String text;
-  Map<String, String>? additionalFields;
 
   @override
   Widget build(BuildContext context) {
-    final AuthBloc authBloc = context.read<AuthBloc>();
-
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
         if (state is AuthStateAuthenticated) {
@@ -66,10 +63,36 @@ class _ProfileEditView extends State<ProfileEditView> {
                     child: utils.BackButton()
                 ),
                 ///Building apply button
-                const Positioned(
+                Positioned(
                     top: 15,
                     right: 15,
-                    child: utils.ApplyButton(),
+                    child: Container(
+                      decoration: BoxDecoration(
+                          color: Theme.of(context).primaryColor,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                                color: Theme.of(context).primaryColor.withOpacity(0.2),
+                                spreadRadius: 5,
+                                offset: const Offset(5, 5),
+                                blurRadius: 10
+                            )
+                          ]
+                      ),
+                      child: IconButton(
+                          icon: const Icon(Icons.check),
+                          color: Colors.white,
+                          iconSize: sqrt(MediaQuery.of(context).size.height + MediaQuery.of(context).size.width),
+                          onPressed: () {
+                            title = _titleController.text;
+                            text = _textController.text;
+                            _profileCreateFlag ? _profile = Profile(state.getUser()!.id, title, text, 'null') :
+                            { _profile.title = title, _profile.text = text };
+                            _profileCreateFlag ? ProfileService().addProfile(_profile) : ProfileService().updateProfile(_profile);
+                            Navigator.pop(context);
+                          }
+                      ),
+                    )
                 ),
                 Center(
                   child: Padding(
@@ -104,13 +127,13 @@ class _ProfileEditView extends State<ProfileEditView> {
                                       width: MediaQuery.of(context).size.width * 0.8,
                                       child: Container(
                                           decoration: BoxDecoration(
-                                              color: Theme.of(context).accentColor,
+                                              color: Theme.of(context).colorScheme.secondary,
                                               borderRadius: const BorderRadius.all(
                                                 Radius.circular(10.0),
                                               ),
                                               boxShadow: [
                                                 BoxShadow(
-                                                    color: Theme.of(context).accentColor.withOpacity(0.2),
+                                                    color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
                                                     spreadRadius: 5,
                                                     offset: const Offset(5, 5),
                                                     blurRadius: 10
@@ -137,7 +160,7 @@ class _ProfileEditView extends State<ProfileEditView> {
                                         child: SizedBox(
                                           child: ElevatedButton(
                                             style: ButtonStyle(
-                                              backgroundColor: MaterialStateProperty.all<Color>(Theme.of(context).accentColor),
+                                              backgroundColor: MaterialStateProperty.all<Color>(Theme.of(context).colorScheme.secondary),
                                               shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                                                   const RoundedRectangleBorder(
                                                     borderRadius: BorderRadius.all(
@@ -160,109 +183,6 @@ class _ProfileEditView extends State<ProfileEditView> {
                               Column(
                                 children: [
                                   Padding(
-                                    padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 60),
-                                    child: SizedBox(
-                                      width: MediaQuery.of(context).size.width / 1.27,
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                            color: Theme.of(context).accentColor,
-                                            borderRadius: const BorderRadius.all(
-                                              Radius.circular(5.0),
-                                            ),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                  color: Theme.of(context).accentColor.withOpacity(0.2),
-                                                  spreadRadius: 2,
-                                                  offset: const Offset(5, 5),
-                                                  blurRadius: 10
-                                              )
-                                            ]
-                                        ),
-                                        child: Center(
-                                          child: Padding(
-                                            padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 50, left: MediaQuery.of(context).size.width / 30),
-                                            child: Column(
-                                              children: [
-                                                Row(
-                                                  children: [
-                                                    Text(
-                                                      "Текст:",
-                                                      style: Theme.of(context).textTheme.bodyText2,
-                                                    ),
-                                                    Padding(
-                                                      padding: EdgeInsets.only(left: MediaQuery.of(context).size.width / 15),
-                                                      child: SizedBox(
-                                                        width: MediaQuery.of(context).size.width / 2,
-                                                        child: Container(
-                                                          decoration: BoxDecoration(
-                                                              color: Theme.of(context).accentColor,
-                                                              borderRadius: const BorderRadius.all(
-                                                                Radius.circular(5.0),
-                                                              ),
-                                                              boxShadow: [
-                                                                BoxShadow(
-                                                                    color: Theme.of(context).accentColor.withOpacity(0.2),
-                                                                    spreadRadius: 2,
-                                                                    offset: const Offset(5, 5),
-                                                                    blurRadius: 10
-                                                                )
-                                                              ]
-                                                          ),
-                                                          child: TextField(
-                                                            textAlignVertical: TextAlignVertical.top,
-                                                            textAlign: TextAlign.center,
-                                                            decoration: InputDecoration(
-                                                                border: InputBorder.none,
-                                                                hintText: "Текст",
-                                                                hintStyle: TextStyle(
-                                                                  color: Theme.of(context).textTheme.bodyText1?.color,
-                                                                )
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    )
-                                                  ],
-                                                ),
-                                                Padding(
-                                                  padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 80, bottom: 10),
-                                                  child: SizedBox(
-                                                    width: MediaQuery.of(context).size.width / 1.5,
-                                                    child: GestureDetector(
-                                                        child: Container(
-                                                          decoration: BoxDecoration(
-                                                              color: Theme.of(context).cardColor,
-                                                              borderRadius: const BorderRadius.all(
-                                                                Radius.circular(5.0),
-                                                              ),
-                                                              boxShadow: [
-                                                                BoxShadow(
-                                                                    color: Theme.of(context).cardColor.withOpacity(0.2),
-                                                                    spreadRadius: 2,
-                                                                    offset: const Offset(5, 5),
-                                                                    blurRadius: 10
-                                                                )
-                                                              ]
-                                                          ),
-                                                          child: Center(
-                                                            child: Icon(
-                                                              Icons.add,
-                                                              size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width) / 3),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        onTap: () => {}
-                                                    ),
-                                                  ),
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
                                     padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 80, bottom: 20),
                                     child: Container(
                                       constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height / 3.4,),
@@ -270,13 +190,13 @@ class _ProfileEditView extends State<ProfileEditView> {
                                         width: MediaQuery.of(context).size.width / 1.3,
                                         child: Container(
                                             decoration: BoxDecoration(
-                                                color: Theme.of(context).accentColor,
+                                                color: Theme.of(context).colorScheme.secondary,
                                                 borderRadius: const BorderRadius.all(
                                                   Radius.circular(5.0),
                                                 ),
                                                 boxShadow: [
                                                   BoxShadow(
-                                                      color: Theme.of(context).accentColor.withOpacity(0.2),
+                                                      color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
                                                       spreadRadius: 2,
                                                       offset: const Offset(5, 5),
                                                       blurRadius: 10
@@ -324,7 +244,7 @@ class _ProfileEditView extends State<ProfileEditView> {
     title = _titleController.text;
     text = _textController.text;
 
-    Profile _form = Profile(context.select((AuthBloc bloc) => bloc.state.getUser()!.id), title, text, additionalFields);
+    Profile _form = Profile(context.select((AuthBloc bloc) => bloc.state.getUser()!.id), title, text, 'null');
 
     _profileService.addProfile(_form);
 

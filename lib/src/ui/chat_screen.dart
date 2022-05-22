@@ -121,14 +121,14 @@ class _ChatScreenState extends State<ChatScreen> {
           constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 6, maxWidth: MediaQuery.of(context).size.width / 1.2),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(5),
-            color: Theme.of(context).accentColor,
+            color: Theme.of(context).colorScheme.secondary,
           ),
           child: Stack(
             children: [
               Positioned(
                 left: 10,
                 top: 10,
-                child: utils.PushButton(icon: Icons.account_circle_sharp, route: MaterialPageRoute(builder: (context) => UserProfileScreen(userId: userId))),
+                child: utils.PushWidgetButton(icon: Icons.account_circle_sharp, route: UserProfileScreen(userId: userId)),
               ),
               Padding(
                   padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 100, left: MediaQuery.of(context).size.width / 5),
@@ -157,13 +157,13 @@ class _ChatScreenState extends State<ChatScreen> {
             constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 6, maxWidth: MediaQuery.of(context).size.width / 1.2, minWidth: MediaQuery.of(context).size.width / 2),
             child: Container(
               decoration: BoxDecoration(
-                  color: Theme.of(context).accentColor,
+                  color: Theme.of(context).colorScheme.secondary,
                   borderRadius: const BorderRadius.all(
                     Radius.circular(5.0),
                   ),
                   boxShadow: [
                     BoxShadow(
-                        color: Theme.of(context).accentColor.withOpacity(0.2),
+                        color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
                         spreadRadius: 2,
                         offset: const Offset(5, 5),
                         blurRadius: 10
@@ -175,7 +175,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   Positioned(
                     right: 10,
                     top: 10,
-                    child: utils.PushButton(icon: Icons.account_circle_sharp, route: MaterialPageRoute(builder: (context) => UserProfileScreen(userId: userId))),
+                    child: utils.PushWidgetButton(icon: Icons.account_circle_sharp, route: UserProfileScreen(userId: userId)),
                   ),
                   Padding(
                       padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 100, right: MediaQuery.of(context).size.width / 5),
@@ -275,13 +275,13 @@ class _ChatScreenState extends State<ChatScreen> {
                                                             constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 4.5),
                                                             child: Container(
                                                                 decoration: BoxDecoration(
-                                                                    color: Theme.of(context).accentColor,
+                                                                    color: Theme.of(context).colorScheme.secondary,
                                                                     borderRadius: const BorderRadius.all(
                                                                       Radius.circular(20.0),
                                                                     ),
                                                                     boxShadow: [
                                                                       BoxShadow(
-                                                                          color: Theme.of(context).accentColor.withOpacity(0.2),
+                                                                          color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
                                                                           spreadRadius: 5,
                                                                           offset: const Offset(5, 5),
                                                                           blurRadius: 10

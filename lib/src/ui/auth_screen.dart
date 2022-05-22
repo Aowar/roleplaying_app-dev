@@ -1,8 +1,6 @@
 import 'dart:async';
-import 'dart:html';
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -16,19 +14,21 @@ import 'dart:developer' as developer;
 
 import '../models/user.dart';
 
-enum authProblems { userExists, networkError, invalidEmail, invalidPassword,  userDisabled, userNotFound, unknownProblem }
+enum AuthProblems { userExists, networkError, invalidEmail, invalidPassword,  userDisabled, userNotFound, unknownProblem }
 
 class AuthScreen extends StatelessWidget {
   final AuthService authService = AuthService();
 
+  AuthScreen({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return AuthView();
+    return const AuthView();
   }
 }
 
 class AuthView extends StatefulWidget {
-  AuthView({Key? key}) : super(key: key);
+  const AuthView({Key? key}) : super(key: key);
 
   @override
   State<AuthView> createState() => _AuthView();
@@ -49,14 +49,14 @@ class _AuthView extends State<AuthView> {
   late String _email;
   late String _nickName;
   late String _password;
-  Map<authProblems, String> registerErrorsMessages = {
-    authProblems.userExists: "Данный email уже используется",
-    authProblems.networkError: "Произошла ошибка, повторите попытку позже",
-    authProblems.invalidEmail: "Неверная почта или пароль",
-    authProblems.invalidPassword: "Неверная почта или пароль",
-    authProblems.userDisabled: "Аккаунт пользователя деактивирован",
-    authProblems.userNotFound: "Пользователя с таким email не существует",
-    authProblems.unknownProblem: "Произошла неизвестная ошибка"
+  Map<AuthProblems, String> registerErrorsMessages = {
+    AuthProblems.userExists: "Данный email уже используется",
+    AuthProblems.networkError: "Произошла ошибка, повторите попытку позже",
+    AuthProblems.invalidEmail: "Неверная почта или пароль",
+    AuthProblems.invalidPassword: "Неверная почта или пароль",
+    AuthProblems.userDisabled: "Аккаунт пользователя деактивирован",
+    AuthProblems.userNotFound: "Пользователя с таким email не существует",
+    AuthProblems.unknownProblem: "Произошла неизвестная ошибка"
   };
 
   void openRegisterForm() {
@@ -71,7 +71,7 @@ class _AuthView extends State<AuthView> {
   }
 
   auth(authBloc) async {
-    authProblems? errorType;
+    AuthProblems? errorType;
     _email = _emailLoginController.text;
     _password = _passwordLoginController.text;
     dynamic signInResult;
@@ -89,50 +89,51 @@ class _AuthView extends State<AuthView> {
         );
       }
       if (!await CustomUserService().collectionContainsUser(signInResult.id)) {
-        CustomUserModel _customUserModel = CustomUserModel(signInResult.id, signInResult.nickName);
+        CustomUserModel _customUserModel = CustomUserModel(signInResult.id, signInResult.nickName, "null");
         CustomUserService().addCustomUser(_customUserModel);
       }
       authBloc.add(UserLoggedIn(user: signInResult));
+    } else if (signInResult.runtimeType == FirebaseAuthException) {
+      setState(() {
+        isLoading = false;
+      });
+      switch (signInResult.code) {
+        case "internal-error":
+          errorType = AuthProblems.networkError;
+          break;
+        case "invalid-auth-event":
+          errorType = AuthProblems.networkError;
+          break;
+        case "network-request-failed":
+          errorType = AuthProblems.networkError;
+          break;
+        case "user-not-found":
+          errorType = AuthProblems.userNotFound;
+          break;
+        case "wrong-password":
+          errorType = AuthProblems.invalidPassword;
+          break;
+        case "invalid-email" :
+          errorType = AuthProblems.invalidEmail;
+          break;
+        default:
+          errorType = AuthProblems.unknownProblem;
+          break;
+      }
+      return Fluttertoast.showToast(
+          msg: registerErrorsMessages[errorType]!,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 4,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0
+      );
     }
-    setState(() {
-      isLoading = false;
-    });
-    switch (signInResult.code) {
-      case "internal-error":
-        errorType = authProblems.networkError;
-        break;
-      case "invalid-auth-event":
-        errorType = authProblems.networkError;
-        break;
-      case "network-request-failed":
-        errorType = authProblems.networkError;
-        break;
-      case "user-not-found":
-        errorType = authProblems.userNotFound;
-        break;
-      case "wrong-password":
-        errorType = authProblems.invalidPassword;
-        break;
-      case "invalid-email" :
-        errorType = authProblems.invalidEmail;
-        break;
-      default:
-        errorType = authProblems.unknownProblem;
-        break;
-    }
-    return Fluttertoast.showToast(
-        msg: registerErrorsMessages[errorType]!,
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 4,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0
-    );
   }
 
   registration() async {
-    authProblems? errorType;
+    AuthProblems? errorType;
     _email = _emailRegisterController.text;
     _nickName = _userNicknameController.text;
     _password = _passwordRegisterController.text;
@@ -142,19 +143,19 @@ class _AuthView extends State<AuthView> {
     if (registrationResult.runtimeType == FirebaseAuthException) {
       switch (registrationResult.code) {
         case "email-already-in-use":
-          errorType = authProblems.userExists;
+          errorType = AuthProblems.userExists;
           break;
         case "internal-error":
-          errorType = authProblems.networkError;
+          errorType = AuthProblems.networkError;
           break;
         case "invalid-auth-event":
-          errorType = authProblems.networkError;
+          errorType = AuthProblems.networkError;
           break;
         case "network-request-failed":
-          errorType = authProblems.networkError;
+          errorType = AuthProblems.networkError;
           break;
         default:
-          errorType = authProblems.unknownProblem;
+          errorType = AuthProblems.unknownProblem;
           break;
       }
       return Fluttertoast.showToast(
@@ -196,7 +197,7 @@ class _AuthView extends State<AuthView> {
                         constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 2),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
-                          color: Theme.of(context).accentColor,
+                          color: Theme.of(context).colorScheme.secondary,
                         ),
                           ///Register form
                         child: Center(
@@ -208,17 +209,17 @@ class _AuthView extends State<AuthView> {
                                 ///Login field
                                 Material(
                                     child: EmailFormField(icon: const Icon(Icons.login), hintText: "Введите email", controller: _emailRegisterController),
-                                    color: Theme.of(context).accentColor
+                                    color: Theme.of(context).colorScheme.secondary
                                 ),
                                 ///User nickname field
                                 Material(
                                   child: NicknameFormField(icon: const Icon(Icons.text_fields_outlined), hintText: "Введите никнейм", controller: _userNicknameController),
-                                  color: Theme.of(context).accentColor,
+                                  color: Theme.of(context).colorScheme.secondary,
                                 ),
                                 ///Password field
                                 Material(
                                   child: PasswordFormField(icon: const Icon(Icons.password), hintText: "Введите пароль", controller: _passwordRegisterController, registerFlag: true),
-                                  color: Theme.of(context).accentColor,
+                                  color: Theme.of(context).colorScheme.secondary,
                                 ),
                                 SizedBox(
                                   width: MediaQuery.of(context).size.width * 0.5,
@@ -286,116 +287,114 @@ class _AuthView extends State<AuthView> {
           body: SingleChildScrollView(
             child: ConstrainedBox(
               constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height),
-              child: Container(
-                child: Stack(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 5, top: 5),
-                      child: SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.5,
-                          height: MediaQuery.of(context).size.height / 16,
-                          child: Container(
-                              decoration: BoxDecoration(
-                                  color: Theme.of(context).primaryColor,
-                                  borderRadius: const BorderRadius.all(
-                                    Radius.circular(20.0),
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                        color: Theme.of(context).primaryColor.withOpacity(0.2),
-                                        spreadRadius: 2,
-                                        offset: const Offset(5, 5),
-                                        blurRadius: 10
-                                    )
-                                  ]
-                              ),
-                              child: Center(
-                                child: Text("Ролевые игры", style: Theme.of(context).textTheme.headline1),
-                              ))),
-                    ),
-                    ///Auth form
-                    Center(
-                        child: Form(
-                          key: _formLoginKey,
-                          child: Padding(
-                            padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 2.4),
-                            child: Column(
-                              children: [
-                                ///Login field
-                                EmailFormField(icon: const Icon(Icons.login), hintText: "Введите email", controller: _emailLoginController),
-                                Padding(
-                                    padding: const EdgeInsets.only(top: 30),
-                                    ///Password field
-                                      child: PasswordFormField(icon: const Icon(Icons.password), hintText: "Введите пароль", controller: _passwordLoginController, registerFlag: false)
+              child: Stack(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 5, top: 5),
+                    child: SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.5,
+                        height: MediaQuery.of(context).size.height / 16,
+                        child: Container(
+                            decoration: BoxDecoration(
+                                color: Theme.of(context).primaryColor,
+                                borderRadius: const BorderRadius.all(
+                                  Radius.circular(20.0),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 20),
-                                  ///Login button
-                                  child: SizedBox(
-                                    width: MediaQuery.of(context).size.width * 0.5,
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(20.0),
-                                          boxShadow: [
-                                            BoxShadow(
-                                                color: Theme.of(context).primaryColor.withOpacity(0.2),
-                                                spreadRadius: 5,
-                                                offset: const Offset(0, 3),
-                                                blurRadius: 10
-                                            )
-                                          ]
+                                boxShadow: [
+                                  BoxShadow(
+                                      color: Theme.of(context).primaryColor.withOpacity(0.2),
+                                      spreadRadius: 2,
+                                      offset: const Offset(5, 5),
+                                      blurRadius: 10
+                                  )
+                                ]
+                            ),
+                            child: Center(
+                              child: Text("Ролевые игры", style: Theme.of(context).textTheme.headline1),
+                            ))),
+                  ),
+                  ///Auth form
+                  Center(
+                      child: Form(
+                        key: _formLoginKey,
+                        child: Padding(
+                          padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 2.4),
+                          child: Column(
+                            children: [
+                              ///Login field
+                              EmailFormField(icon: const Icon(Icons.login), hintText: "Введите email", controller: _emailLoginController),
+                              Padding(
+                                  padding: const EdgeInsets.only(top: 30),
+                                  ///Password field
+                                    child: PasswordFormField(icon: const Icon(Icons.password), hintText: "Введите пароль", controller: _passwordLoginController, registerFlag: false)
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 20),
+                                ///Login button
+                                child: SizedBox(
+                                  width: MediaQuery.of(context).size.width * 0.5,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(20.0),
+                                        boxShadow: [
+                                          BoxShadow(
+                                              color: Theme.of(context).primaryColor.withOpacity(0.2),
+                                              spreadRadius: 5,
+                                              offset: const Offset(0, 3),
+                                              blurRadius: 10
+                                          )
+                                        ]
+                                    ),
+                                    child: ElevatedButton(
+                                      style: ButtonStyle(
+                                          backgroundColor: MaterialStateProperty.all<Color>(Theme.of(context).primaryColor),
+                                          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                              RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(20.0)
+                                              )
+                                          )
                                       ),
-                                      child: ElevatedButton(
-                                        style: ButtonStyle(
-                                            backgroundColor: MaterialStateProperty.all<Color>(Theme.of(context).primaryColor),
-                                            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                                                RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.circular(20.0)
-                                                )
-                                            )
-                                        ),
-                                        onPressed: isLoading ? null : () {
-                                          setState(() {
-                                            isLoading = true;
-                                            auth(authBloc);
-                                          });
-                                        },
-                                        child: isLoading ? const CircularProgressIndicator() : Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Center(
-                                            child: Text("Войти", style: Theme.of(context).textTheme.bodyText1),
-                                          ),
+                                      onPressed: isLoading ? null : () {
+                                        setState(() {
+                                          isLoading = true;
+                                          auth(authBloc);
+                                        });
+                                      },
+                                      child: isLoading ? const CircularProgressIndicator() : Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Center(
+                                          child: Text("Войти", style: Theme.of(context).textTheme.bodyText1),
                                         ),
                                       ),
                                     ),
                                   ),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 10),
-                                  child: TextButton(
-                                      onPressed: () {
-                                        openRegisterForm();
-                                      },
-                                      child: Text("Ещё не зарегистрированы? Создать аккаунт",
-                                          style: Theme.of(context).textTheme.subtitle2
-                                      )
-                                  ),
-                                )
-                              ],
-                            ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 10),
+                                child: TextButton(
+                                    onPressed: () {
+                                      openRegisterForm();
+                                    },
+                                    child: Text("Ещё не зарегистрированы? Создать аккаунт",
+                                        style: Theme.of(context).textTheme.subtitle2
+                                    )
+                                ),
+                              )
+                            ],
                           ),
-                        )
-                    ),
-                    BlocListener<AuthBloc, AuthState>(
-                      listener: (context, state) {
-                        if (state is AuthStateAuthenticated) {
-                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MenuScreen()));
-                        }
-                      },
-                      child: Container(),
-                    )
-                  ],
-                )
+                        ),
+                      )
+                  ),
+                  BlocListener<AuthBloc, AuthState>(
+                    listener: (context, state) {
+                      if (state is AuthStateAuthenticated) {
+                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MenuScreen()));
+                      }
+                    },
+                    child: Container(),
+                  )
+                ],
               )
             ),
           )

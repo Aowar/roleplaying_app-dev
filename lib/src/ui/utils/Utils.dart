@@ -2,8 +2,6 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
-import 'package:roleplaying_app/src/services/auth_service.dart';
 
 class ReplacementButton extends StatelessWidget {
   final IconData icon;
@@ -61,9 +59,38 @@ class PushButton extends StatelessWidget {
         icon: Icon(icon),
         color: Colors.white,
         iconSize: sqrt(MediaQuery.of(context).size.height + MediaQuery.of(context).size.width),
-        onPressed: () {
-          Navigator.push(context, route);
-        },
+        onPressed: () => Navigator.push(context, route)
+      ),
+    );
+  }
+}
+
+class PushWidgetButton extends StatelessWidget {
+  final IconData icon;
+  final Widget route;
+
+  const PushWidgetButton({Key? key, required this.icon, required this.route}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+          color: Theme.of(context).primaryColor,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+                color: Theme.of(context).primaryColor.withOpacity(0.2),
+                spreadRadius: 5,
+                offset: const Offset(5, 5),
+                blurRadius: 10
+            )
+          ]
+      ),
+      child: IconButton(
+          icon: Icon(icon),
+          color: Colors.white,
+          iconSize: sqrt(MediaQuery.of(context).size.height + MediaQuery.of(context).size.width),
+          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => route))
       ),
     );
   }
@@ -97,34 +124,6 @@ class BackButton extends StatelessWidget {
   }
 }
 
-class ApplyButton extends StatelessWidget {
-  const ApplyButton({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-          color: Theme.of(context).primaryColor,
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-                color: Theme.of(context).primaryColor.withOpacity(0.2),
-                spreadRadius: 5,
-                offset: const Offset(5, 5),
-                blurRadius: 10
-            )
-          ]
-      ),
-      child: IconButton(
-        icon: const Icon(Icons.check),
-        color: Colors.white,
-        iconSize: sqrt(MediaQuery.of(context).size.height + MediaQuery.of(context).size.width),
-        onPressed: () => Navigator.pop(context),
-      ),
-    );
-  }
-}
-
 class ImageContainer extends StatelessWidget {
   final int imageScale;
 
@@ -149,7 +148,7 @@ class ImageContainer extends StatelessWidget {
             ]
         ),
         child: Icon(Icons.image_outlined,
-          size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width)*3),
+          size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width)*imageScale),
         ),
       ),
     );

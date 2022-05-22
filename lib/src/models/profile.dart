@@ -5,28 +5,28 @@ class Profile extends Equatable {
   late String userId;
   late String title;
   late String text;
-  late Map<String, String>? additionalFields;
+  late String image;
 
-  Profile(this.userId, this.title, this.text, this.additionalFields);
+  Profile(this.userId, this.title, this.text, this.image);
 
   Profile.fromJson(Map<String, dynamic> data) {
     id = data['id'];
     userId = data['userId'];
     title = data['title'];
     text = data['text'];
-    additionalFields = data['additionalFields'];
+    image = data['image'];
   }
 
   @override
-  List<Object?> get props => [userId, title, text];
+  List<Object?> get props => [id, userId, title, text, image];
 
   Map<String, dynamic> toMap() {
     return {
       "userId": userId,
       "title": title,
       "text": text,
-      "additionalFields": additionalFields,
-      "id": id
+      "id": id,
+      "image": image
     };
   }
 }

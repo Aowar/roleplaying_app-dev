@@ -16,7 +16,7 @@ class FetchInfoFromDb {
       stream: ProfileService.readProfiles(userId),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return Text("Ошибка получения данных", style: Theme.of(context).textTheme.subtitle2);
+          return Text("Ошибка получения данных" + snapshot.error.toString(), style: Theme.of(context).textTheme.subtitle2);
         }
         if (snapshot.hasData) {
           final profiles = snapshot.data!;

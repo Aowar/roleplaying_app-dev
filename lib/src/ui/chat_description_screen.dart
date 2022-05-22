@@ -96,13 +96,13 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
                                             height: MediaQuery.of(context).size.height / 22,
                                             child: Container(
                                               decoration: BoxDecoration(
-                                                  color: Theme.of(context).accentColor,
+                                                  color: Theme.of(context).colorScheme.secondary,
                                                   borderRadius: const BorderRadius.all(
                                                     Radius.circular(10.0),
                                                   ),
                                                   boxShadow: [
                                                     BoxShadow(
-                                                        color: Theme.of(context).accentColor.withOpacity(0.2),
+                                                        color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
                                                         spreadRadius: 5,
                                                         offset: const Offset(5, 5),
                                                         blurRadius: 10
@@ -129,13 +129,13 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
                                               child: GestureDetector(
                                                 child: Container(
                                                   decoration: BoxDecoration(
-                                                      color: Theme.of(context).accentColor,
+                                                      color: Theme.of(context).colorScheme.secondary,
                                                       borderRadius: const BorderRadius.all(
                                                         Radius.circular(5.0),
                                                       ),
                                                       boxShadow: [
                                                         BoxShadow(
-                                                            color: Theme.of(context).accentColor.withOpacity(0.2),
+                                                            color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
                                                             spreadRadius: 5,
                                                             offset: const Offset(5, 5),
                                                             blurRadius: 10
@@ -163,13 +163,13 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
                                           width: MediaQuery.of(context).size.width / 1.3,
                                           child: Container(
                                               decoration: BoxDecoration(
-                                                  color: Theme.of(context).accentColor,
+                                                  color: Theme.of(context).colorScheme.secondary,
                                                   borderRadius: const BorderRadius.all(
                                                     Radius.circular(5.0),
                                                   ),
                                                   boxShadow: [
                                                     BoxShadow(
-                                                        color: Theme.of(context).accentColor.withOpacity(0.2),
+                                                        color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
                                                         spreadRadius: 5,
                                                         offset: const Offset(5, 5),
                                                         blurRadius: 10
@@ -202,13 +202,13 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
                                           width: MediaQuery.of(context).size.width / 1.3,
                                           child: Container(
                                               decoration: BoxDecoration(
-                                                  color: Theme.of(context).accentColor,
+                                                  color: Theme.of(context).colorScheme.secondary,
                                                   borderRadius: const BorderRadius.all(
                                                     Radius.circular(5.0),
                                                   ),
                                                   boxShadow: [
                                                     BoxShadow(
-                                                        color: Theme.of(context).accentColor.withOpacity(0.2),
+                                                        color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
                                                         spreadRadius: 2,
                                                         offset: const Offset(5, 5),
                                                         blurRadius: 10
@@ -297,7 +297,7 @@ class BuildExitButton extends StatelessWidget {
         ),
         onPressed: () {
           ChatService().deleteChat(_chat.id);
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MenuScreen()));
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MenuScreen()));
         },
       );
     } else {
@@ -308,7 +308,7 @@ class BuildExitButton extends StatelessWidget {
         ),
         onPressed: () {
           ChatService().deleteUserFromChat(_chat, userId);
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MenuScreen()));
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MenuScreen()));
         },
       );
     }

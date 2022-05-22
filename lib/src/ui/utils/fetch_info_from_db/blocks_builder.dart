@@ -18,7 +18,7 @@ class BlocksBuilder {
           SizedBox(
             child: ElevatedButton(
               style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all<Color>(Theme.of(context).accentColor),
+                backgroundColor: MaterialStateProperty.all<Color>(Theme.of(context).colorScheme.secondary),
                 shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                     const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(
@@ -27,7 +27,7 @@ class BlocksBuilder {
                     )
                 ),
               ),
-              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen(profile: profile))),
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ProfileScreen(profile: profile))),
               child:
               Icon(Icons.image_outlined,
                 size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width)*3),
@@ -57,7 +57,7 @@ class ChatBlock extends StatelessWidget {
             SizedBox(
               child: ElevatedButton(
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all<Color>(Theme.of(context).accentColor),
+                  backgroundColor: MaterialStateProperty.all<Color>(Theme.of(context).colorScheme.secondary),
                   shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                       const RoundedRectangleBorder(
                         borderRadius: BorderRadius.all(

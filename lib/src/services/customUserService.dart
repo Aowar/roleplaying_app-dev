@@ -10,8 +10,7 @@ class CustomUserService {
   Future addCustomUser(CustomUserModel customUserModel) async {
     DocumentReference docRef = _usersCollection.doc(customUserModel.idUser);
     await docRef.set({
-      'userId': customUserModel.idUser,
-      'nickName' : customUserModel.nickName
+      customUserModel.toMap()
     });
   }
 

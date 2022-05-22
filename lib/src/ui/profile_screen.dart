@@ -40,8 +40,6 @@ class _ProfileView extends State<ProfileView> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _textController = TextEditingController();
 
-  final ProfileService _profileService = ProfileService();
-
   late String title = _profile.title;
   late String text = _profile.text;
 
@@ -100,13 +98,13 @@ class _ProfileView extends State<ProfileView> {
                                       width: MediaQuery.of(context).size.width * 0.8,
                                       child: Container(
                                           decoration: BoxDecoration(
-                                              color: Theme.of(context).accentColor,
+                                              color: Theme.of(context).colorScheme.secondary,
                                               borderRadius: const BorderRadius.all(
                                                 Radius.circular(10.0),
                                               ),
                                               boxShadow: [
                                                 BoxShadow(
-                                                    color: Theme.of(context).accentColor.withOpacity(0.2),
+                                                    color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
                                                     spreadRadius: 5,
                                                     offset: const Offset(5, 5),
                                                     blurRadius: 10
@@ -135,110 +133,6 @@ class _ProfileView extends State<ProfileView> {
                                       )
                                   ),
                                   Padding(
-                                    padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 60),
-                                    child: SizedBox(
-                                      width: MediaQuery.of(context).size.width / 1.27,
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                            color: Theme.of(context).accentColor,
-                                            borderRadius: const BorderRadius.all(
-                                              Radius.circular(5.0),
-                                            ),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                  color: Theme.of(context).accentColor.withOpacity(0.2),
-                                                  spreadRadius: 2,
-                                                  offset: const Offset(5, 5),
-                                                  blurRadius: 10
-                                              )
-                                            ]
-                                        ),
-                                        child: Center(
-                                          child: Padding(
-                                            padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 50, left: MediaQuery.of(context).size.width / 30),
-                                            child: Column(
-                                              children: [
-                                                Row(
-                                                  children: [
-                                                    Text(
-                                                      "Текст:",
-                                                      style: Theme.of(context).textTheme.bodyText2,
-                                                    ),
-                                                    Padding(
-                                                      padding: EdgeInsets.only(left: MediaQuery.of(context).size.width / 15),
-                                                      child: SizedBox(
-                                                        width: MediaQuery.of(context).size.width / 2,
-                                                        height: MediaQuery.of(context).size.height / 28,
-                                                        child: Container(
-                                                          decoration: BoxDecoration(
-                                                              color: Theme.of(context).accentColor,
-                                                              borderRadius: const BorderRadius.all(
-                                                                Radius.circular(5.0),
-                                                              ),
-                                                              boxShadow: [
-                                                                BoxShadow(
-                                                                    color: Theme.of(context).accentColor.withOpacity(0.2),
-                                                                    spreadRadius: 2,
-                                                                    offset: const Offset(5, 5),
-                                                                    blurRadius: 10
-                                                                )
-                                                              ]
-                                                          ),
-                                                          child: TextField(
-                                                            textAlignVertical: TextAlignVertical.center,
-                                                            textAlign: TextAlign.center,
-                                                            decoration: InputDecoration(
-                                                                border: InputBorder.none,
-                                                                hintText: "Текст",
-                                                                hintStyle: TextStyle(
-                                                                  color: Theme.of(context).textTheme.bodyText1?.color,
-                                                                )
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    )
-                                                  ],
-                                                ),
-                                                Padding(
-                                                  padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 80, bottom: 10),
-                                                  child: SizedBox(
-                                                    width: MediaQuery.of(context).size.width / 1.5,
-                                                    child: GestureDetector(
-                                                        child: Container(
-                                                          decoration: BoxDecoration(
-                                                              color: Theme.of(context).cardColor,
-                                                              borderRadius: const BorderRadius.all(
-                                                                Radius.circular(5.0),
-                                                              ),
-                                                              boxShadow: [
-                                                                BoxShadow(
-                                                                    color: Theme.of(context).cardColor.withOpacity(0.2),
-                                                                    spreadRadius: 2,
-                                                                    offset: const Offset(5, 5),
-                                                                    blurRadius: 10
-                                                                )
-                                                              ]
-                                                          ),
-                                                          child: Center(
-                                                            child: Icon(
-                                                              Icons.add,
-                                                              size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width) / 3),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        onTap: () => {}
-                                                    ),
-                                                  ),
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
                                     padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 80),
                                     child: Container(
                                       constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height / 3.4),
@@ -246,13 +140,13 @@ class _ProfileView extends State<ProfileView> {
                                         width: MediaQuery.of(context).size.width / 1.3,
                                         child: Container(
                                             decoration: BoxDecoration(
-                                                color: Theme.of(context).accentColor,
+                                                color: Theme.of(context).colorScheme.secondary,
                                                 borderRadius: const BorderRadius.all(
                                                   Radius.circular(5.0),
                                                 ),
                                                 boxShadow: [
                                                   BoxShadow(
-                                                      color: Theme.of(context).accentColor.withOpacity(0.2),
+                                                      color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
                                                       spreadRadius: 2,
                                                       offset: const Offset(5, 5),
                                                       blurRadius: 10

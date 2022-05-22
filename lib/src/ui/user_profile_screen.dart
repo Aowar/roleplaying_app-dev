@@ -1,11 +1,12 @@
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
 import 'package:roleplaying_app/src/models/customUserModel.dart';
+import 'package:roleplaying_app/src/services/file_upload_service.dart';
 import 'package:roleplaying_app/src/ui/auth_screen.dart';
 import 'package:roleplaying_app/src/ui/profile_edit_screen.dart';
 import 'package:roleplaying_app/src/ui/utils/Utils.dart' as utils;
@@ -25,10 +26,45 @@ class UserProfileScreen extends StatefulWidget{
 }
 
 class _UserProfileScreenState extends State<UserProfileScreen> {
+  bool isOpen = false;
+  late OverlayEntry _overlayEntry;
 
   Stream<List<CustomUserModel>> _readUser(String userId) => FirebaseFirestore.instance.collection("users").where("userId", isEqualTo:  _userId).snapshots().map(
           (snapshot) => snapshot.docs.map((doc) => CustomUserModel.fromJson(doc.data())).toList()
   );
+
+  void openContextMenu() {
+    isOpen = true;
+    _overlayEntry = _createRegisterOverlay();
+    Overlay.of(context)!.insert(_overlayEntry);
+  }
+
+  void closeContextMenu() {
+    isOpen = false;
+    _overlayEntry.remove();
+  }
+
+  OverlayEntry _createRegisterOverlay() {
+    return OverlayEntry(builder: (context) {
+      return GestureDetector(
+        onTap: closeContextMenu,
+        child: Container(
+          decoration: BoxDecoration(
+              color: Theme.of(context).primaryColor,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                    color: Theme.of(context).primaryColor.withOpacity(0.2),
+                    spreadRadius: 5,
+                    offset: const Offset(5, 5),
+                    blurRadius: 10
+                )
+              ]
+          ),
+        )
+      );
+    });
+  }
 
   ///Getting user
   userNickName(String userId) {
@@ -85,23 +121,21 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                          padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 10),
                          child: Column(
                            children: [
-                             Container(
-                               decoration: BoxDecoration(
-                                   color: Theme.of(context).primaryColor,
-                                   shape: BoxShape.circle,
-                                   boxShadow: [
-                                     BoxShadow(
-                                         color: Theme.of(context).primaryColor.withOpacity(0.2),
-                                         spreadRadius: 3,
-                                         offset: const Offset(5, 5),
-                                         blurRadius: 10
-                                     )
-                                   ]
+                             ElevatedButton(
+                               style: ButtonStyle(
+                                 backgroundColor: MaterialStateProperty.all<Color>(Theme.of(context).primaryColor),
+                                 shape: MaterialStateProperty.all(const CircleBorder()),
                                ),
                                child: Icon(Icons.account_circle_sharp,
                                  size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width)*20),
                                  color: Colors.white,
                                ),
+                               onPressed: () async
+                               {
+                                 final ImagePicker _picker = ImagePicker();
+                                 XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+                                 FileUploadService().uploadImage("users_pics", image!.path, image.name);
+                               },
                              ),
                              Padding(
                                  padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 40),

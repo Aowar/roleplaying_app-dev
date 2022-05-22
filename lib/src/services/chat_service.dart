@@ -8,11 +8,8 @@ class ChatService {
   Future addChat(Chat chat) async {
     DocumentReference docRef = _chatCollection.doc();
     return await docRef.set({
-      'title': chat.title,
-      'description': chat.description,
-      'usersId': chat.usersId,
-      'organizerId': chat.organizerId,
-      'id': docRef.id
+      chat.id = docRef.id,
+      chat.toMap()
     });
   }
 
@@ -48,7 +45,7 @@ class ChatService {
   Future<Chat> getChat(String chatId) async {
     DocumentReference docRef =  _chatCollection.doc(chatId);
     return await docRef.get().then((value) {
-      return Chat(value.get("usersId"), value.get("organizerId"), value.get("title"), value.get("description"));
+      return Chat(value.get("usersId"), value.get("organizerId"), value.get("title"), value.get("description"), value.get("image"));
     });
   }
 

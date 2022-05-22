@@ -91,7 +91,7 @@ class _ChatEditView extends State<ChatEditView> {
                               _chat.title = title;
                               _chat.description = description;
                             }
-                            Chat chat = Chat(usersList, state.getUser()!.id, title, description);
+                            Chat chat = Chat(usersList, state.getUser()!.id, title, description, 'null');
                             !_chatCreateFlag ? _chatService.updateChat(_chat) : _chatService.addChat(chat);
                             Navigator.pop(context);
                           },
@@ -132,13 +132,13 @@ class _ChatEditView extends State<ChatEditView> {
                                             height: MediaQuery.of(context).size.height / 22,
                                             child: Container(
                                               decoration: BoxDecoration(
-                                                  color: Theme.of(context).accentColor,
+                                                  color: Theme.of(context).colorScheme.secondary,
                                                   borderRadius: const BorderRadius.all(
                                                     Radius.circular(10.0),
                                                   ),
                                                   boxShadow: [
                                                     BoxShadow(
-                                                        color: Theme.of(context).accentColor.withOpacity(0.2),
+                                                        color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
                                                         spreadRadius: 5,
                                                         offset: const Offset(5, 5),
                                                         blurRadius: 10
@@ -164,13 +164,13 @@ class _ChatEditView extends State<ChatEditView> {
                                             child: GestureDetector(
                                               child: Container(
                                                 decoration: BoxDecoration(
-                                                    color: Theme.of(context).accentColor,
+                                                    color: Theme.of(context).colorScheme.secondary,
                                                     borderRadius: const BorderRadius.all(
                                                       Radius.circular(5.0),
                                                     ),
                                                     boxShadow: [
                                                       BoxShadow(
-                                                          color: Theme.of(context).accentColor.withOpacity(0.2),
+                                                          color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
                                                           spreadRadius: 5,
                                                           offset: const Offset(5, 5),
                                                           blurRadius: 10
@@ -198,13 +198,13 @@ class _ChatEditView extends State<ChatEditView> {
                                           width: MediaQuery.of(context).size.width / 1.3,
                                           child: Container(
                                               decoration: BoxDecoration(
-                                                  color: Theme.of(context).accentColor,
+                                                  color: Theme.of(context).colorScheme.secondary,
                                                   borderRadius: const BorderRadius.all(
                                                     Radius.circular(5.0),
                                                   ),
                                                   boxShadow: [
                                                     BoxShadow(
-                                                        color: Theme.of(context).accentColor.withOpacity(0.2),
+                                                        color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
                                                         spreadRadius: 2,
                                                         offset: const Offset(5, 5),
                                                         blurRadius: 10

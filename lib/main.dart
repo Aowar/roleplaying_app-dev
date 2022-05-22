@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
 import 'package:roleplaying_app/src/services/auth_service.dart';
 import 'package:roleplaying_app/src/ui/auth_screen.dart';
-import 'package:roleplaying_app/src/ui/menu_screen.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -51,7 +50,6 @@ class RpApp extends StatelessWidget {
               scaffoldBackgroundColor: darkPrimary,
               backgroundColor: darkPrimary,
               primaryColor: Colors.black,
-              accentColor: const Color(0xff9e9e9e),
               canvasColor: Colors.white,
               brightness: Brightness.dark,
               cardTheme: const CardTheme(
@@ -64,13 +62,14 @@ class RpApp extends StatelessWidget {
                 bodyText2: TextStyle(color: Color(0xD2FFFFFF), fontSize: 20),
                 subtitle1: TextStyle(color: Color(0xff000000), fontSize: 18),
                 subtitle2: TextStyle(color: Color(0xffe3e3e3), fontSize: 14),
-              )
+              ),
+              colorScheme: ColorScheme.fromSwatch().copyWith(secondary: const Color(0xff9e9e9e))
           ),
           theme: ThemeData(
               scaffoldBackgroundColor: lightPrimary,
               backgroundColor: lightPrimary,
               primaryColor: const Color(0xFF2F69FF),
-              accentColor: const Color(0xffc2c2c2),
+              canvasColor: Colors.white,
               textTheme: const TextTheme(
                 headline1: TextStyle(color: Colors.white, fontSize: 24),
                 headline2: TextStyle(color: Colors.black, fontSize: 24),
@@ -78,7 +77,8 @@ class RpApp extends StatelessWidget {
                 bodyText2: TextStyle(color: Colors.white, fontSize: 20),
                 subtitle1: TextStyle(color: Color(0xff000000), fontSize: 18),
                 subtitle2: TextStyle(color: Color(0xff525252), fontSize: 14),
-              )
+              ),
+              colorScheme: ColorScheme.fromSwatch().copyWith(secondary: const Color(0xffc2c2c2))
           ),
         )
     );
