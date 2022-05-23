@@ -73,7 +73,7 @@ class _ChatEditView extends State<ChatEditView> {
                                   color: Theme.of(context).primaryColor.withOpacity(0.2),
                                   spreadRadius: 5,
                                   offset: const Offset(5, 5),
-                                  blurRadius: 10
+                                  blurRadius: 10,
                               )
                             ]
                         ),

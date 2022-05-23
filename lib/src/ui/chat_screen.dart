@@ -9,12 +9,13 @@ import 'package:roleplaying_app/src/models/chat.dart';
 import 'package:roleplaying_app/src/models/customUserModel.dart';
 import 'package:roleplaying_app/src/models/message.dart';
 import 'package:roleplaying_app/src/services/chat_service.dart';
+import 'package:roleplaying_app/src/services/customUserService.dart';
 import 'package:roleplaying_app/src/services/message_service.dart';
-import 'package:roleplaying_app/src/ui/menu_screen.dart';
 import 'package:roleplaying_app/src/ui/utils/Utils.dart' as utils;
 import 'package:roleplaying_app/src/ui/auth_screen.dart';
 import 'package:roleplaying_app/src/ui/chat_description_screen.dart';
 import 'package:roleplaying_app/src/ui/user_profile_screen.dart';
+import 'package:roleplaying_app/src/ui/utils/Utils.dart';
 
 late Chat? _chat;
 
@@ -128,7 +129,18 @@ class _ChatScreenState extends State<ChatScreen> {
               Positioned(
                 left: 10,
                 top: 10,
-                child: utils.PushWidgetButton(icon: Icons.account_circle_sharp, route: UserProfileScreen(userId: userId)),
+                child: FutureBuilder<CustomUserModel>(
+                    future: CustomUserService().getUser(userId),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData){
+                        return const CircularProgressIndicator();
+                      } else if (snapshot.hasError) {
+                        return Text(snapshot.error.toString());
+                      } else {
+                        return utils.PushButton(icon: Icons.account_circle_sharp, onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => UserProfileScreen(user: snapshot.data!))));
+                      }
+                    }
+                ),
               ),
               Padding(
                   padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 100, left: MediaQuery.of(context).size.width / 5),
@@ -175,7 +187,18 @@ class _ChatScreenState extends State<ChatScreen> {
                   Positioned(
                     right: 10,
                     top: 10,
-                    child: utils.PushWidgetButton(icon: Icons.account_circle_sharp, route: UserProfileScreen(userId: userId)),
+                    child: FutureBuilder<CustomUserModel>(
+                        future: CustomUserService().getUser(userId),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData){
+                            return const CircularProgressIndicator();
+                          } else if (snapshot.hasError) {
+                            return Text(snapshot.error.toString());
+                          } else {
+                            return utils.PushButton(icon: Icons.account_circle_sharp, onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => UserProfileScreen(user: snapshot.data!))));
+                          }
+                        }
+                    ),
                   ),
                   Padding(
                       padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 100, right: MediaQuery.of(context).size.width / 5),
@@ -215,7 +238,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     child: FutureBuilder<Chat>(
                         future: ChatService().getChat(_chat!.id),
                         builder: (context, snapshot) {
-                          return utils.PushButton(icon: Icons.menu, route: MaterialPageRoute(builder: (context) => ChatDescriptionScreen(chat: snapshot.data)));
+                          return utils.PushButton(icon: Icons.menu, onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDescriptionScreen(chat: snapshot.data))));
                         }
                     ),
                   ),

@@ -1,9 +1,6 @@
 import 'dart:math';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:roleplaying_app/src/ui/utils/Utils.dart';
-
 import '../../../models/chat.dart';
 import '../../../models/profile.dart';
 import '../../chat_screen.dart';

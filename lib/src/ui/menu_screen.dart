@@ -1,11 +1,12 @@
 import 'dart:developer' as dev;
 import 'dart:math';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
+import 'package:roleplaying_app/src/models/customUserModel.dart';
 import 'package:roleplaying_app/src/services/auth_service.dart';
+import 'package:roleplaying_app/src/services/customUserService.dart';
 import 'package:roleplaying_app/src/ui/auth_screen.dart';
 import 'package:roleplaying_app/src/ui/chat_edit_screen.dart';
 import 'package:roleplaying_app/src/ui/profile_edit_screen.dart';
@@ -38,7 +39,18 @@ class _MenuScreenState extends State<MenuScreen> {
                   Positioned(
                     left: 15,
                     top: 15,
-                    child: PushWidgetButton(icon: Icons.account_circle_sharp, route: UserProfileScreen(userId: state.getUser()!.id)),
+                    child: FutureBuilder<CustomUserModel>(
+                        future: CustomUserService().getUser(state.getUser()!.id),
+                        builder: (context, snapshot) {
+                          if(!snapshot.hasData){
+                            return const CircularProgressIndicator();
+                          } else if (snapshot.hasError) {
+                            return const Text("Error");
+                          } else {
+                            return PushButton(icon: Icons.account_circle_sharp, onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => UserProfileScreen(user: snapshot.data!))));
+                          }
+                        }
+                    ),
                   ),
                   Positioned(
                       right: 15,
@@ -74,136 +86,132 @@ class _MenuScreenState extends State<MenuScreen> {
                         child: Column(
                           children: [
                             ///Chats block
-                            ListView(
-                                children: [
-                                  Container (
-                                    constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height / 7, maxHeight: MediaQuery.of(context).size.height / 4.7),
-                                    child: SizedBox(
-                                      width: MediaQuery.of(context).size.width / 1.1,
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                            color: Theme.of(context).cardColor,
-                                            borderRadius: const BorderRadius.all(
-                                              Radius.circular(20.0),
-                                            ),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                  color: Theme.of(context).cardColor.withOpacity(0.2),
-                                                  spreadRadius: 2,
-                                                  offset: const Offset(5, 5),
-                                                  blurRadius: 10
-                                              )
-                                            ]
-                                        ),
-                                        child: Stack(
-                                          children: [
-                                            Padding(
-                                              padding: const EdgeInsets.only(left: 10, top: 2),
-                                              child: Text("Чаты",
-                                                style: Theme.of(context).textTheme.headline2,
-                                              ),
-                                            ),
-                                            Padding(
-                                                padding: const EdgeInsets.only(left: 20, top: 35),
-                                                child: FetchInfoFromDb.itemOfChatsList()
-                                            ),
-                                          ],
+                            Container (
+                              constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height / 7, maxHeight: MediaQuery.of(context).size.height / 4.7),
+                              child: SizedBox(
+                                width: MediaQuery.of(context).size.width / 1.1,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      color: Theme.of(context).cardColor,
+                                      borderRadius: const BorderRadius.all(
+                                        Radius.circular(20.0),
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                            color: Theme.of(context).cardColor.withOpacity(0.2),
+                                            spreadRadius: 2,
+                                            offset: const Offset(5, 5),
+                                            blurRadius: 10
+                                        )
+                                      ]
+                                  ),
+                                  child: Stack(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(left: 10, top: 2),
+                                        child: Text("Чаты",
+                                          style: Theme.of(context).textTheme.headline2,
                                         ),
                                       ),
-                                    ),
+                                      Padding(
+                                          padding: const EdgeInsets.only(left: 20, top: 35),
+                                          child: FetchInfoFromDb.itemOfChatsList()
+                                      ),
+                                    ],
                                   ),
-                                  ///Profiles block
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 30),
-                                    child: Container (
-                                      constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height / 7, maxHeight: MediaQuery.of(context).size.height / 4.7),
-                                      child: SizedBox(
-                                        width: MediaQuery.of(context).size.width / 1.1,
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                              color: Theme.of(context).cardColor,
-                                              borderRadius: const BorderRadius.all(
-                                                Radius.circular(20.0),
-                                              ),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                    color: Theme.of(context).cardColor.withOpacity(0.2),
-                                                    spreadRadius: 2,
-                                                    offset: const Offset(5, 5),
-                                                    blurRadius: 10
-                                                )
-                                              ]
-                                          ),
-                                          child: Stack(
-                                            children: [
-                                              Padding(
-                                                padding: const EdgeInsets.only(left: 10, top: 2),
-                                                child: Text("Мои анкеты",
-                                                  style: Theme.of(context).textTheme.headline2,
-                                                ),
-                                              ),
-                                              Padding(
-                                                  padding: const EdgeInsets.only(left: 20, top: 35),
-                                                  child: FetchInfoFromDb.itemOfProfilesList(state.getUser()!.id)
-                                              ),
-                                              Positioned(
-                                                  right: 5,
-                                                  top: 5,
-                                                  child: PushWidgetButton(icon: Icons.add, route: ProfileEditScreen.create())
-                                              )
-                                            ],
+                                ),
+                              ),
+                            ),
+                            ///Profiles block
+                            Padding(
+                              padding: const EdgeInsets.only(top: 30),
+                              child: Container (
+                                constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height / 7, maxHeight: MediaQuery.of(context).size.height / 4.7),
+                                child: SizedBox(
+                                  width: MediaQuery.of(context).size.width / 1.1,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        color: Theme.of(context).cardColor,
+                                        borderRadius: const BorderRadius.all(
+                                          Radius.circular(20.0),
+                                        ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                              color: Theme.of(context).cardColor.withOpacity(0.2),
+                                              spreadRadius: 2,
+                                              offset: const Offset(5, 5),
+                                              blurRadius: 10
+                                          )
+                                        ]
+                                    ),
+                                    child: Stack(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.only(left: 10, top: 2),
+                                          child: Text("Мои анкеты",
+                                            style: Theme.of(context).textTheme.headline2,
                                           ),
                                         ),
-                                      ),
+                                        Padding(
+                                            padding: const EdgeInsets.only(left: 20, top: 35),
+                                            child: FetchInfoFromDb.itemOfProfilesList(state.getUser()!.id)
+                                        ),
+                                        Positioned(
+                                            right: 5,
+                                            top: 5,
+                                            child: PushButton(icon: Icons.add, onPressed: () => MaterialPageRoute(builder: (context) => ProfileEditScreen.create()))
+                                        )
+                                      ],
                                     ),
                                   ),
-                                  ///User chats block
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 30),
-                                    child: Container (
-                                      constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height / 7, maxHeight: MediaQuery.of(context).size.height / 4.7),
-                                      child: SizedBox(
-                                        width: MediaQuery.of(context).size.width / 1.1,
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                              color: Theme.of(context).cardColor,
-                                              borderRadius: const BorderRadius.all(
-                                                Radius.circular(20.0),
-                                              ),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                    color: Theme.of(context).cardColor.withOpacity(0.2),
-                                                    spreadRadius: 2,
-                                                    offset: const Offset(5, 5),
-                                                    blurRadius: 10
-                                                )
-                                              ]
-                                          ),
-                                          child: Stack(
-                                            children: [
-                                              Padding(
-                                                padding: const EdgeInsets.only(left: 10, top: 2),
-                                                child: Text("Мои чаты",
-                                                  style: Theme.of(context).textTheme.headline2,
-                                                ),
-                                              ),
-                                              Padding(
-                                                  padding: const EdgeInsets.only(left: 20, top: 35),
-                                                  child: FetchInfoFromDb.itemOfUserChatsList(state.getUser()!.id)
-                                              ),
-                                              Positioned(
-                                                  right: 5,
-                                                  top: 5,
-                                                  child: PushWidgetButton(icon: Icons.add, route: ChatEditScreen.create())
-                                              )
-                                            ],
+                                ),
+                              ),
+                            ),
+                            ///User chats block
+                            Padding(
+                              padding: const EdgeInsets.only(top: 30),
+                              child: Container (
+                                constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height / 7, maxHeight: MediaQuery.of(context).size.height / 4.7),
+                                child: SizedBox(
+                                  width: MediaQuery.of(context).size.width / 1.1,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        color: Theme.of(context).cardColor,
+                                        borderRadius: const BorderRadius.all(
+                                          Radius.circular(20.0),
+                                        ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                              color: Theme.of(context).cardColor.withOpacity(0.2),
+                                              spreadRadius: 2,
+                                              offset: const Offset(5, 5),
+                                              blurRadius: 10
+                                          )
+                                        ]
+                                    ),
+                                    child: Stack(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.only(left: 10, top: 2),
+                                          child: Text("Мои чаты",
+                                            style: Theme.of(context).textTheme.headline2,
                                           ),
                                         ),
-                                      ),
+                                        Padding(
+                                            padding: const EdgeInsets.only(left: 20, top: 35),
+                                            child: FetchInfoFromDb.itemOfUserChatsList(state.getUser()!.id)
+                                        ),
+                                        Positioned(
+                                            right: 5,
+                                            top: 5,
+                                            child: PushButton(icon: Icons.add, onPressed: () => MaterialPageRoute(builder: (context) => ChatEditScreen.create()))
+                                        )
+                                      ],
                                     ),
                                   ),
-                                ]
-                            )
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       )

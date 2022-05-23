@@ -1,8 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
 import 'package:roleplaying_app/src/models/user.dart';
-import 'package:roleplaying_app/src/ui/auth_screen.dart';
 
 class AuthService {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
@@ -41,7 +38,7 @@ class AuthService {
   }
 
   Future<bool> isSignedIn() async {
-    final currentUser  = await _firebaseAuth.currentUser;
+    final currentUser  = _firebaseAuth.currentUser;
     return currentUser != null;
   }
 

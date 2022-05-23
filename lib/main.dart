@@ -32,7 +32,6 @@ class RpApp extends StatelessWidget {
     ]);
   }
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     const lightPrimary = Color(0xffa2cbea);
@@ -51,7 +50,6 @@ class RpApp extends StatelessWidget {
               backgroundColor: darkPrimary,
               primaryColor: Colors.black,
               canvasColor: Colors.white,
-              brightness: Brightness.dark,
               cardTheme: const CardTheme(
                 shadowColor: Colors.white,
               ),
@@ -61,24 +59,21 @@ class RpApp extends StatelessWidget {
                 bodyText1: TextStyle(color: Colors.white, fontSize: 20),
                 bodyText2: TextStyle(color: Color(0xD2FFFFFF), fontSize: 20),
                 subtitle1: TextStyle(color: Color(0xff000000), fontSize: 18),
-                subtitle2: TextStyle(color: Color(0xffe3e3e3), fontSize: 14),
-              ),
-              colorScheme: ColorScheme.fromSwatch().copyWith(secondary: const Color(0xff9e9e9e))
+                subtitle2: TextStyle(color: Color(0xffffffff), fontSize: 14),
+              ), colorScheme: ColorScheme.fromSwatch().copyWith(secondary: const Color(0xff9e9e9e), brightness: Brightness.dark)
           ),
           theme: ThemeData(
               scaffoldBackgroundColor: lightPrimary,
               backgroundColor: lightPrimary,
               primaryColor: const Color(0xFF2F69FF),
-              canvasColor: Colors.white,
               textTheme: const TextTheme(
                 headline1: TextStyle(color: Colors.white, fontSize: 24),
                 headline2: TextStyle(color: Colors.black, fontSize: 24),
                 bodyText1: TextStyle(color: Colors.black, fontSize: 20),
                 bodyText2: TextStyle(color: Colors.white, fontSize: 20),
                 subtitle1: TextStyle(color: Color(0xff000000), fontSize: 18),
-                subtitle2: TextStyle(color: Color(0xff525252), fontSize: 14),
-              ),
-              colorScheme: ColorScheme.fromSwatch().copyWith(secondary: const Color(0xffc2c2c2))
+                subtitle2: TextStyle(color: Color(0xff000000), fontSize: 14),
+              ), colorScheme: ColorScheme.fromSwatch().copyWith(secondary: const Color(0xffc2c2c2), brightness: Brightness.light)
           ),
         )
     );

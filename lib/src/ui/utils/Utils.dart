@@ -1,44 +1,12 @@
 import 'dart:math';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-class ReplacementButton extends StatelessWidget {
-  final IconData icon;
-  final MaterialPageRoute route;
-
-  const ReplacementButton({Key? key, required this.icon, required this.route}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-          color: Theme.of(context).primaryColor,
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-                color: Theme.of(context).primaryColor.withOpacity(0.2),
-                spreadRadius: 5,
-                offset: const Offset(5, 5),
-                blurRadius: 10
-            )
-          ]
-      ),
-      child: IconButton(
-        icon: Icon(icon),
-        color: Colors.white,
-        iconSize: sqrt(MediaQuery.of(context).size.height + MediaQuery.of(context).size.width),
-        onPressed: () => Navigator.pushReplacement(context, route),
-      ),
-    );
-  }
-}
 
 class PushButton extends StatelessWidget {
   final IconData icon;
-  final MaterialPageRoute route;
+  final void Function() onPressed;
 
-  const PushButton({Key? key, required this.icon, required this.route}) : super(key: key);
+  const PushButton({Key? key, required this.icon, required this.onPressed}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -59,38 +27,7 @@ class PushButton extends StatelessWidget {
         icon: Icon(icon),
         color: Colors.white,
         iconSize: sqrt(MediaQuery.of(context).size.height + MediaQuery.of(context).size.width),
-        onPressed: () => Navigator.push(context, route)
-      ),
-    );
-  }
-}
-
-class PushWidgetButton extends StatelessWidget {
-  final IconData icon;
-  final Widget route;
-
-  const PushWidgetButton({Key? key, required this.icon, required this.route}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-          color: Theme.of(context).primaryColor,
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-                color: Theme.of(context).primaryColor.withOpacity(0.2),
-                spreadRadius: 5,
-                offset: const Offset(5, 5),
-                blurRadius: 10
-            )
-          ]
-      ),
-      child: IconButton(
-          icon: Icon(icon),
-          color: Colors.white,
-          iconSize: sqrt(MediaQuery.of(context).size.height + MediaQuery.of(context).size.width),
-          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => route))
+        onPressed: onPressed
       ),
     );
   }

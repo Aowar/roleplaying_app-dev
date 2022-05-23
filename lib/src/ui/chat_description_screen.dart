@@ -60,7 +60,7 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
                   Positioned(
                     top: 15,
                     right: 15,
-                    child: utils.PushButton(icon: Icons.edit, route: MaterialPageRoute(builder: (context) => ChatEditScreen.update(chat: _chat))),
+                    child: utils.PushButton(icon: Icons.edit, onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => ChatEditScreen.update(chat: _chat)))),
                   ),
                   Center(
                     child: Padding(
@@ -229,7 +229,7 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
                                                             return Column(
                                                               children: [
                                                                 ElevatedButton(
-                                                                    onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => UserProfileScreen(userId: _chat.usersId[index]))),
+                                                                    onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => UserProfileScreen(user: _chat.usersId[index]))),
                                                                     child: Icon(Icons.account_circle_sharp,
                                                                       size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width)*2),
                                                                     ),

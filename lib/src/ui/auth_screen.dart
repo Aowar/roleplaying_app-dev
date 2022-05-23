@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -89,7 +87,7 @@ class _AuthView extends State<AuthView> {
         );
       }
       if (!await CustomUserService().collectionContainsUser(signInResult.id)) {
-        CustomUserModel _customUserModel = CustomUserModel(signInResult.id, signInResult.nickName, "null");
+        CustomUserModel _customUserModel = CustomUserModel(signInResult.id, signInResult.nickName, "default_user_icon.png");
         CustomUserService().addCustomUser(_customUserModel);
       }
       authBloc.add(UserLoggedIn(user: signInResult));

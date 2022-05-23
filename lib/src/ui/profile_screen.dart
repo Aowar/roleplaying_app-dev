@@ -62,7 +62,7 @@ class _ProfileView extends State<ProfileView> {
                   Positioned(
                     top: 15,
                     right: 15,
-                    child: utils.PushButton(icon: Icons.edit, route: MaterialPageRoute(builder: (context) => ProfileEditScreen.edit(profile: _profile))),
+                    child: utils.PushButton(icon: Icons.edit, onPressed: () => MaterialPageRoute(builder: (context) => ProfileEditScreen.edit(profile: _profile))),
                   ),
                 ],
                 Center(

@@ -1,8 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:roleplaying_app/src/ui/utils/fetch_info_from_db/blocks_builder.dart';
 
-import '../../../bloc/auth/auth_bloc.dart';
 import '../../../models/chat.dart';
 import '../../../models/profile.dart';
 import '../../../services/chat_service.dart';
@@ -13,7 +11,7 @@ class FetchInfoFromDb {
   ///Getting profiles from DB
   static itemOfProfilesList(String userId) {
     return StreamBuilder<List<Profile>>(
-      stream: ProfileService.readProfiles(userId),
+      stream: ProfileService().readProfiles(userId),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return Text("Ошибка получения данных" + snapshot.error.toString(), style: Theme.of(context).textTheme.subtitle2);
@@ -48,7 +46,7 @@ class FetchInfoFromDb {
   ///Getting chats from DB
   static itemOfChatsList() {
     return StreamBuilder<List<Chat>>(
-      stream: ChatService.readChats(),
+      stream: ChatService().readChats(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return Text("Ошибка получения данных", style: Theme.of(context).textTheme.subtitle2);
@@ -83,7 +81,7 @@ class FetchInfoFromDb {
   ///Getting user chats from DB
   static itemOfUserChatsList(String userId) {
     return StreamBuilder<List<Chat>>(
-      stream: ChatService.readUserChats(userId),
+      stream: ChatService().readUserChats(userId),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return Text("Ошибка получения данных", style: Theme.of(context).textTheme.subtitle2);

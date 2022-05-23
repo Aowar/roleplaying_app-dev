@@ -50,16 +50,12 @@ class ChatService {
   }
 
   ///Getting list stream of chats
-  static Stream<List<Chat>> readChats() => FirebaseFirestore.instance.collection("chats").snapshots().map(
+  Stream<List<Chat>> readChats() => FirebaseFirestore.instance.collection("chats").snapshots().map(
           (snapshot) => snapshot.docs.map((doc) => Chat.fromJson(doc.data())).toList()
   );
 
   ///Getting list stream of user chats
-  static Stream<List<Chat>> readUserChats(String userId) => FirebaseFirestore.instance.collection("chats").where("usersId", arrayContains: userId).snapshots().map(
+  Stream<List<Chat>> readUserChats(String userId) => FirebaseFirestore.instance.collection("chats").where("usersId", arrayContains: userId).snapshots().map(
           (snapshot) => snapshot.docs.map((doc) => Chat.fromJson(doc.data())).toList()
   );
-
-  CollectionReference getCollection() {
-    return _chatCollection;
-  }
 }
