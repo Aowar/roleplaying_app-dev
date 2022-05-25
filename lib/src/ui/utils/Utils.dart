@@ -36,16 +36,17 @@ class PushButton extends StatelessWidget {
   }
 }
 
-class ChatUserButton extends StatelessWidget {
+class CustomIconButton extends StatelessWidget {
   final void Function() onPressed;
   final CustomUserModel user;
+  final double scale;
 
-  const ChatUserButton({Key? key, required this.onPressed, required this.user}) : super(key: key);
+  const CustomIconButton({Key? key, required this.onPressed, required this.user, required this.scale}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return IconButton(
-          iconSize: sqrt(MediaQuery.of(context).size.height+MediaQuery.of(context).size.width)*1.5,
+          iconSize: sqrt(MediaQuery.of(context).size.height+MediaQuery.of(context).size.width) * scale,
           icon: FutureBuilder<String>(
               future: FileService().getUserImage(user.idUser, user.image),
               builder: (context, snapshot) {
@@ -56,9 +57,9 @@ class ChatUserButton extends StatelessWidget {
                 } else {
                   return Container(
                     decoration: BoxDecoration(
-                        color: Theme.of(context).primaryColor,
+                        color: Theme.of(context).colorScheme.primaryContainer,
                         shape: BoxShape.circle,
-                        border: Border.all(width: 2, color: Theme.of(context).primaryColor),
+                        border: Border.all(width: 2, color: Theme.of(context).colorScheme.primaryContainer),
                         image: DecorationImage(
                           fit: BoxFit.fitHeight,
                           alignment: FractionalOffset.topCenter,

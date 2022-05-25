@@ -388,7 +388,7 @@ class CurUserMessageBox extends StatelessWidget {
                           } else if (snapshot.hasError) {
                             return Text(snapshot.error.toString());
                           } else {
-                            return utils.ChatUserButton(user: snapshot.data!, onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => UserProfileScreen(user: snapshot.data!))));
+                            return utils.CustomIconButton(user: snapshot.data!, onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => UserProfileScreen(user: snapshot.data!))), scale: 15);
                           }
                         }
                     ),
@@ -433,7 +433,7 @@ class MessageBox extends StatelessWidget {
                         } else if (snapshot.hasError) {
                           return Text(snapshot.error.toString());
                         } else {
-                          return utils.ChatUserButton(user: snapshot.data!, onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => UserProfileScreen(user: snapshot.data!))));
+                          return utils.CustomIconButton(user: snapshot.data!, onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => UserProfileScreen(user: snapshot.data!))), scale: 15);
                         }
                       }
                   ),

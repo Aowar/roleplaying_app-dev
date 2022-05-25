@@ -6,7 +6,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
 import 'package:roleplaying_app/src/models/chat.dart';
+import 'package:roleplaying_app/src/models/custom_user_model.dart';
 import 'package:roleplaying_app/src/services/chat_service.dart';
+import 'package:roleplaying_app/src/services/custom_user_service.dart';
 import 'package:roleplaying_app/src/services/file_service.dart';
 import 'package:roleplaying_app/src/ui/user_profile_screen.dart';
 import 'package:roleplaying_app/src/ui/utils/Utils.dart' as utils;
@@ -127,9 +129,8 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
                                       ///image container
                                       Padding(
                                           padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 80),
-                                          child: SizedBox(
-                                              width: sqrt(MediaQuery.of(context).size.width * 45),
-                                              height: sqrt(MediaQuery.of(context).size.height * 45),
+                                          child: SizedBox.square(
+                                              dimension: sqrt(MediaQuery.of(context).size.width + MediaQuery.of(context).size.height) * 8,
                                               child: FutureBuilder<String>(
                                                 future: FileService().getChatImage(_chat.id, _chat.image),
                                                 builder: (context, snapshot) {
@@ -241,25 +242,48 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
                                                           scrollDirection: Axis.horizontal,
                                                           itemCount: _chat.usersId.length,
                                                           itemBuilder: (BuildContext context, int index) {
-                                                            return Column(
-                                                              children: [
-                                                                ElevatedButton(
-                                                                    onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => UserProfileScreen(user: _chat.usersId[index]))),
-                                                                    child: Icon(Icons.account_circle_sharp,
-                                                                      size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width)*2),
-                                                                    ),
-                                                                  style: ElevatedButton.styleFrom(
-                                                                    shape: const CircleBorder(),
-                                                                    primary: Theme.of(context).cardColor
-                                                                  )
-                                                                ),
-                                                                Padding(
-                                                                    padding: const EdgeInsets.only(top: 10),
-                                                                    child: Text(_chat.usersId[index],
-                                                                        style: Theme.of(context).textTheme.subtitle2
-                                                                    )
-                                                                )
-                                                              ],
+                                                            return FutureBuilder<CustomUserModel>(
+                                                                future: CustomUserService().getUser(_chat.usersId[index]),
+                                                                builder: (context, snapshot) {
+                                                                  if (!snapshot.hasData) {
+                                                                    return SizedBox.square(
+                                                                      dimension: sqrt(MediaQuery.of(context).size.height+MediaQuery.of(context).size.width) * 1.5,
+                                                                      child: Container(
+                                                                        decoration: BoxDecoration(
+                                                                            color: Theme.of(context).colorScheme.primaryContainer,
+                                                                            shape: BoxShape.circle,
+                                                                            border: Border.all(width: 2, color: Theme.of(context).colorScheme.primaryContainer),
+                                                                        ),
+                                                                        child: const CircularProgressIndicator(),
+                                                                      ),
+                                                                    );
+                                                                  } else if (snapshot.hasError) {
+                                                                    return SizedBox.square(
+                                                                      dimension: sqrt(MediaQuery.of(context).size.height+MediaQuery.of(context).size.width) * 1.5,
+                                                                      child: Container(
+                                                                        decoration: BoxDecoration(
+                                                                          color: Theme.of(context).colorScheme.primaryContainer,
+                                                                          shape: BoxShape.circle,
+                                                                          border: Border.all(width: 2, color: Theme.of(context).colorScheme.primaryContainer),
+                                                                        ),
+                                                                        child: const Icon(Icons.account_circle_sharp),
+                                                                      ),
+                                                                    );
+                                                                  } else {
+                                                                    return Column(
+                                                                      children: [
+                                                                        utils.CustomIconButton(
+                                                                            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => UserProfileScreen(user: snapshot.data!))),
+                                                                            user: snapshot.data!,
+                                                                            scale: 1.5
+                                                                        ),
+                                                                        Text(snapshot.data!.nickName,
+                                                                            style: Theme.of(context).textTheme.subtitle2
+                                                                        )
+                                                                      ],
+                                                                    );
+                                                                  }
+                                                                }
                                                             );
                                                           },
                                                           separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 10),
@@ -308,7 +332,7 @@ class BuildExitButton extends StatelessWidget {
       return ElevatedButton(
         child: Text("Удалить чат", style: Theme.of(context).textTheme.bodyText1),
         style: ElevatedButton.styleFrom(
-            primary: Theme.of(context).cardColor
+            primary: Theme.of(context).colorScheme.errorContainer
         ),
         onPressed: () {
           ChatService().deleteChat(_chat.id);
@@ -319,7 +343,7 @@ class BuildExitButton extends StatelessWidget {
       return ElevatedButton(
         child: Text("Выйти", style: Theme.of(context).textTheme.bodyText1),
         style: ElevatedButton.styleFrom(
-            primary: Theme.of(context).cardColor
+            primary: Theme.of(context).colorScheme.errorContainer
         ),
         onPressed: () {
           ChatService().deleteUserFromChat(_chat, userId);

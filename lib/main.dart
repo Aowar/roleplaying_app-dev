@@ -60,7 +60,13 @@ class RpApp extends StatelessWidget {
                 bodyText2: TextStyle(color: Color(0xD2FFFFFF), fontSize: 20),
                 subtitle1: TextStyle(color: Color(0xff000000), fontSize: 18),
                 subtitle2: TextStyle(color: Color(0xffffffff), fontSize: 14),
-              ), colorScheme: ColorScheme.fromSwatch().copyWith(secondary: const Color(0xff9e9e9e), brightness: Brightness.dark, primaryContainer: const Color(0xffdbdbdb))
+              ),
+              colorScheme: ColorScheme.fromSwatch().copyWith(
+                secondary: const Color(0xff9e9e9e),
+                brightness: Brightness.dark,
+                primaryContainer: const Color(0xffdbdbdb),
+                errorContainer: const Color(0xff6d0000)
+              )
           ),
           theme: ThemeData(
               scaffoldBackgroundColor: lightPrimary,
@@ -73,7 +79,13 @@ class RpApp extends StatelessWidget {
                 bodyText2: TextStyle(color: Colors.white, fontSize: 20),
                 subtitle1: TextStyle(color: Color(0xff000000), fontSize: 18),
                 subtitle2: TextStyle(color: Color(0xff000000), fontSize: 14),
-              ), colorScheme: ColorScheme.fromSwatch().copyWith(secondary: const Color(0xffc2c2c2), brightness: Brightness.light, primaryContainer: const Color(0xFF2F69FF))
+              ),
+              colorScheme: ColorScheme.fromSwatch().copyWith(
+                  secondary: const Color(0xffc2c2c2),
+                  brightness: Brightness.light,
+                  primaryContainer: const Color(0xFF2F69FF),
+                  errorContainer: const Color(0xffff0000)
+              )
           ),
         )
     );

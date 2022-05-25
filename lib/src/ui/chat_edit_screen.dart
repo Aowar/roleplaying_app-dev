@@ -273,7 +273,7 @@ class _ChatEditView extends State<ChatEditView> {
                                               onPointerUp: getCoordinates,
                                               child: IconButton(
                                                 iconSize: sqrt(MediaQuery.of(context).size.height+MediaQuery.of(context).size.width)*8,
-                                                icon: imageInMemory == null ?
+                                                icon: imageInMemory == null && _chatCreateFlag ?
                                                 Container(
                                                   child: const Icon(Icons.image_outlined),
                                                   decoration: BoxDecoration(

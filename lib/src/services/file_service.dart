@@ -24,6 +24,6 @@ class FileService {
 
   Future<String> getChatImage(String folder, String imageName) async {
     final _storageRef = storageRef.child("chats");
-    return _storageRef.child(folder + "/" + imageName).getDownloadURL();
+    return _storageRef.child(folder).child(imageName).getDownloadURL();
   }
 }
