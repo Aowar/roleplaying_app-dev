@@ -1,16 +1,22 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
 import 'package:roleplaying_app/src/models/chat.dart';
+import 'package:roleplaying_app/src/services/file_service.dart';
 
 class ChatService {
   final CollectionReference _chatCollection = FirebaseFirestore.instance.collection("chats");
 
-  Future addChat(Chat chat) async {
+  Future addChat(Chat chat, String imagePath) async {
     DocumentReference docRef = _chatCollection.doc();
-    return await docRef.set({
-      chat.id = docRef.id,
-      chat.toMap()
+    await docRef.set({
+      "id": docRef.id,
+      "usersId": chat.usersId,
+      "organizerId": chat.organizerId,
+      "title": chat.title,
+      "description": chat.description,
+      "image": chat.image
     });
+    return await FileService().uploadImage("chats/" + docRef.id, imagePath, "chat_picture");
   }
 
   Future updateChat(Chat chat) async {

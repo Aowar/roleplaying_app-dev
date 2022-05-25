@@ -2,8 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:roleplaying_app/src/models/customUserModel.dart';
-import 'package:roleplaying_app/src/services/file_upload_service.dart';
+import 'package:roleplaying_app/src/models/custom_user_model.dart';
+import 'package:roleplaying_app/src/services/file_service.dart';
 
 class PushButton extends StatelessWidget {
   final IconData icon;
@@ -47,7 +47,7 @@ class ChatUserButton extends StatelessWidget {
     return IconButton(
           iconSize: sqrt(MediaQuery.of(context).size.height+MediaQuery.of(context).size.width)*1.5,
           icon: FutureBuilder<String>(
-              future: FileUploadService().getImage(user.idUser, user.image),
+              future: FileService().getUserImage(user.idUser, user.image),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return const CircularProgressIndicator();

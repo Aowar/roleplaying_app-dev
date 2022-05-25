@@ -1,11 +1,13 @@
 import 'dart:math';
-import 'dart:developer' as developer;
+import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
 import 'package:roleplaying_app/src/models/chat.dart';
 import 'package:roleplaying_app/src/services/chat_service.dart';
+import 'package:roleplaying_app/src/services/file_service.dart';
 import 'package:roleplaying_app/src/ui/user_profile_screen.dart';
 import 'package:roleplaying_app/src/ui/utils/Utils.dart' as utils;
 import 'package:roleplaying_app/src/ui/auth_screen.dart';
@@ -18,10 +20,10 @@ late Chat _chat;
 
 class ChatDescriptionScreen extends StatelessWidget {
   final AuthService authService = AuthService();
-  final Chat? chat;
+  final Chat chat;
 
   ChatDescriptionScreen({Key? key, required this.chat}) : super(key: key) {
-    _chat = chat!;
+    _chat = chat;
   }
 
   @override
@@ -126,28 +128,41 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
                                       Padding(
                                           padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 80),
                                           child: SizedBox(
-                                              child: GestureDetector(
-                                                child: Container(
-                                                  decoration: BoxDecoration(
-                                                      color: Theme.of(context).colorScheme.secondary,
-                                                      borderRadius: const BorderRadius.all(
-                                                        Radius.circular(5.0),
+                                              width: sqrt(MediaQuery.of(context).size.width * 45),
+                                              height: sqrt(MediaQuery.of(context).size.height * 45),
+                                              child: FutureBuilder<String>(
+                                                future: FileService().getChatImage(_chat.id, _chat.image),
+                                                builder: (context, snapshot) {
+                                                  if (!snapshot.hasData) {
+                                                    return const LinearProgressIndicator();
+                                                  } else if (snapshot.hasError) {
+                                                    Fluttertoast.showToast(
+                                                        msg: "Письмо отправлено на указанный адрес",
+                                                        toastLength: Toast.LENGTH_SHORT,
+                                                        gravity: ToastGravity.CENTER,
+                                                        timeInSecForIosWeb: 3,
+                                                        backgroundColor: Colors.green,
+                                                        textColor: Colors.white,
+                                                        fontSize: 16.0
+                                                    );
+                                                    return const Icon(Icons.image_outlined);
+                                                  } else {
+                                                    return Container(
+                                                      decoration: BoxDecoration(
+                                                          color: Theme.of(context).colorScheme.secondary,
+                                                          borderRadius: const BorderRadius.all(
+                                                            Radius.circular(5.0),
+                                                          ),
+                                                          image: DecorationImage(
+                                                            image: NetworkImage(snapshot.data!),
+                                                            fit: BoxFit.fitHeight,
+                                                            alignment: FractionalOffset.topCenter,
+                                                          )
                                                       ),
-                                                      boxShadow: [
-                                                        BoxShadow(
-                                                            color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
-                                                            spreadRadius: 5,
-                                                            offset: const Offset(5, 5),
-                                                            blurRadius: 10
-                                                        )
-                                                      ]
-                                                  ),
-                                                  child: Icon(Icons.image_outlined,
-                                                    size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width)*45),
-                                                  ),
-                                                ),
-                                                onTap: () => Navigator.pushNamed(context, ''),
-                                              )
+                                                    );
+                                                  }
+                                                },
+                                              ),
                                           )
                                       ),
                                     ]

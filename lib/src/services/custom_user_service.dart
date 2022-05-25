@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:roleplaying_app/src/models/customUserModel.dart';
+import 'package:roleplaying_app/src/models/custom_user_model.dart';
 
 class CustomUserService {
   final CollectionReference _usersCollection = FirebaseFirestore.instance.collection("users");

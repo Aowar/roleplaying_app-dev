@@ -7,9 +7,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
-import 'package:roleplaying_app/src/models/customUserModel.dart';
-import 'package:roleplaying_app/src/services/customUserService.dart';
-import 'package:roleplaying_app/src/services/file_upload_service.dart';
+import 'package:roleplaying_app/src/models/custom_user_model.dart';
+import 'package:roleplaying_app/src/services/custom_user_service.dart';
+import 'package:roleplaying_app/src/services/file_service.dart';
 import 'package:roleplaying_app/src/ui/auth_screen.dart';
 import 'package:roleplaying_app/src/ui/profile_edit_screen.dart';
 import 'package:roleplaying_app/src/ui/utils/Utils.dart' as utils;
@@ -56,7 +56,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     } else {
       _user.image = "loading";
       CustomUserService().updateCustomUser(_user);
-      TaskState state = await FileUploadService().uploadImage(_user.idUser, image.path, "user_pic");
+      TaskState state = await FileService().uploadImage(_user.idUser, image.path, "user_pic");
       _user.image = "user_pic";
       CustomUserService().updateCustomUser(_user);
       if (state == TaskState.success) {
@@ -143,7 +143,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                child: IconButton(
                                  iconSize: sqrt(MediaQuery.of(context).size.height+MediaQuery.of(context).size.width)*6,
                                  icon: FutureBuilder<String>(
-                                     future: FileUploadService().getImage(_user.idUser, _user.image),
+                                     future: FileService().getUserImage(_user.idUser, _user.image),
                                      builder: (context, snapshot) {
                                        if (!snapshot.hasData) {
                                          return const CircularProgressIndicator();

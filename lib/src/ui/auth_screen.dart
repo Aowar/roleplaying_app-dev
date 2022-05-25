@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
-import 'package:roleplaying_app/src/models/customUserModel.dart';
+import 'package:roleplaying_app/src/models/custom_user_model.dart';
 import 'package:roleplaying_app/src/services/auth_service.dart';
-import 'package:roleplaying_app/src/services/customUserService.dart';
+import 'package:roleplaying_app/src/services/custom_user_service.dart';
 import 'package:roleplaying_app/src/ui/menu_screen.dart';
 
 import 'dart:developer' as developer;
@@ -247,8 +247,8 @@ class _AuthView extends State<AuthView> {
                                         child: Center(
                                           child: Text("Зарегистрироваться",
                                               style: TextStyle(
-                                                  fontStyle: Theme.of(context).textTheme.bodyText1!.fontStyle,
-                                                  color: Theme.of(context).textTheme.bodyText1!.color,
+                                                  fontStyle: Theme.of(context).textTheme.headline2!.fontStyle,
+                                                  color: Theme.of(context).textTheme.headline2!.color,
                                                   fontSize: 12
                                               )
                                           ),
@@ -361,7 +361,7 @@ class _AuthView extends State<AuthView> {
                                       child: isLoading ? const CircularProgressIndicator() : Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Center(
-                                          child: Text("Войти", style: Theme.of(context).textTheme.bodyText1),
+                                          child: Text("Войти", style: Theme.of(context).textTheme.headline2),
                                         ),
                                       ),
                                     ),

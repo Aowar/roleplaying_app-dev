@@ -20,7 +20,7 @@ class Chat extends Equatable {
   }
 
   @override
-  List<Object?> get props => [usersId, organizerId, title, description, image];
+  List<Object?> get props => [id, usersId, organizerId, title, description, image];
 
   Map<String, dynamic> toMap() {
     return {

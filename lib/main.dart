@@ -44,7 +44,7 @@ class RpApp extends StatelessWidget {
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Roleplaying app',
-          home: AuthScreen(),
+          home: GestureDetector(child: AuthScreen(), onTap: () => FocusScope.of(context).unfocus(),),
           darkTheme: ThemeData(
               scaffoldBackgroundColor: darkPrimary,
               backgroundColor: darkPrimary,
@@ -56,11 +56,11 @@ class RpApp extends StatelessWidget {
               textTheme: const TextTheme(
                 headline1: TextStyle(color: Colors.white, fontSize: 24),
                 headline2: TextStyle(color: Colors.white, fontSize: 24),
-                bodyText1: TextStyle(color: Colors.white, fontSize: 20),
+                bodyText1: TextStyle(color: Colors.black, fontSize: 20),
                 bodyText2: TextStyle(color: Color(0xD2FFFFFF), fontSize: 20),
                 subtitle1: TextStyle(color: Color(0xff000000), fontSize: 18),
                 subtitle2: TextStyle(color: Color(0xffffffff), fontSize: 14),
-              ), colorScheme: ColorScheme.fromSwatch().copyWith(secondary: const Color(0xff9e9e9e), brightness: Brightness.dark)
+              ), colorScheme: ColorScheme.fromSwatch().copyWith(secondary: const Color(0xff9e9e9e), brightness: Brightness.dark, primaryContainer: const Color(0xffdbdbdb))
           ),
           theme: ThemeData(
               scaffoldBackgroundColor: lightPrimary,
@@ -73,7 +73,7 @@ class RpApp extends StatelessWidget {
                 bodyText2: TextStyle(color: Colors.white, fontSize: 20),
                 subtitle1: TextStyle(color: Color(0xff000000), fontSize: 18),
                 subtitle2: TextStyle(color: Color(0xff000000), fontSize: 14),
-              ), colorScheme: ColorScheme.fromSwatch().copyWith(secondary: const Color(0xffc2c2c2), brightness: Brightness.light)
+              ), colorScheme: ColorScheme.fromSwatch().copyWith(secondary: const Color(0xffc2c2c2), brightness: Brightness.light, primaryContainer: const Color(0xFF2F69FF))
           ),
         )
     );

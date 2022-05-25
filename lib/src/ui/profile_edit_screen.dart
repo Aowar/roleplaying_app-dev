@@ -149,6 +149,9 @@ class _ProfileEditView extends State<ProfileEditView> {
                                               hintText: "Название",
                                             ),
                                             controller: !_profileCreateFlag ? (_titleController..text = _profile.title) : _titleController,
+                                            onChanged: (String value) async {
+                                              _profile.title = value;
+                                            },
                                           )
                                       ),
                                     ),
@@ -216,6 +219,9 @@ class _ProfileEditView extends State<ProfileEditView> {
                                                     )
                                                 ),
                                                 controller: !_profileCreateFlag ? (_textController..text = _profile.text) : _textController,
+                                                onChanged: (String value) async {
+                                                  _profile.text = value;
+                                                },
                                               ),
                                             )
                                         ),
