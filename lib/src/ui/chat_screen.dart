@@ -10,6 +10,7 @@ import 'package:roleplaying_app/src/models/customUserModel.dart';
 import 'package:roleplaying_app/src/models/message.dart';
 import 'package:roleplaying_app/src/services/chat_service.dart';
 import 'package:roleplaying_app/src/services/customUserService.dart';
+import 'package:roleplaying_app/src/services/file_upload_service.dart';
 import 'package:roleplaying_app/src/services/message_service.dart';
 import 'package:roleplaying_app/src/ui/utils/Utils.dart' as utils;
 import 'package:roleplaying_app/src/ui/auth_screen.dart';
@@ -53,9 +54,11 @@ class _ChatScreenState extends State<ChatScreen> {
                   itemCount: messages.length,
                   itemBuilder: (BuildContext context, int index) {
                     if (state.getUser()!.id == messages[index].authorId) {
-                      return Padding(
-                        padding: const EdgeInsets.only(left: 25),
-                        child: curUserMessageBox(messages[index].text, messages[index].authorId, state.getUser()!.id),
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          curUserMessageBox(messages[index].text, messages[index].authorId, state.getUser()!.id),
+                        ],
                       );
                     } else {
                       return Padding(
@@ -75,41 +78,28 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  Stream<List<CustomUserModel>> _readUser(String userId) => FirebaseFirestore.instance.collection("users").where("userId", isEqualTo:  userId).snapshots().map(
-          (snapshot) => snapshot.docs.map((doc) => CustomUserModel.fromJson(doc.data())).toList()
-  );
-
   ///Getting message author
   authorOfMessage(String userId, String currentUserId) {
-    return StreamBuilder<List<CustomUserModel>>(
-      stream: _readUser(userId),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return Text("Ошибка получения данных", style: Theme.of(context).textTheme.subtitle2);
+    return FutureBuilder<CustomUserModel>(
+        future: CustomUserService().getUser(userId),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return Padding(
+              padding: const EdgeInsets.only(left: 5, right: 5),
+              child: Text("Загрузка", style: Theme.of(context).textTheme.subtitle1),
+            );
+          } else if (snapshot.hasError) {
+            return Padding(
+              padding: const EdgeInsets.only(left: 5, right: 5),
+              child: Text("Ошибка получения данных", style: Theme.of(context).textTheme.subtitle1),
+            );
+          } else {
+            return Padding(
+              padding: const EdgeInsets.only(left: 5, right: 5),
+              child: Text(snapshot.data!.nickName.toString(), style: Theme.of(context).textTheme.subtitle1, overflow: TextOverflow.fade),
+            );
+          }
         }
-        if (snapshot.hasData) {
-          final user = snapshot.data!;
-          return Padding(
-              padding: const EdgeInsets.only(right: 25),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Flexible(
-                    fit: FlexFit.loose,
-                    child: ListView.separated(
-                      itemCount: user.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return Text(user[index].nickName.toString(), style: Theme.of(context).textTheme.subtitle1, textAlign: userId == currentUserId ? TextAlign.right : TextAlign.left);
-                      },
-                      separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 10),
-                    ),
-                  )
-                ],
-              )
-          );
-        }
-        return const CircularProgressIndicator();
-      },
     );
   }
 
@@ -119,40 +109,41 @@ class _ChatScreenState extends State<ChatScreen> {
     child: Stack(
       children: [
         Container(
-          constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 6, maxWidth: MediaQuery.of(context).size.width / 1.2),
+          constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 6, minHeight: MediaQuery.of(context).size.height / 8, maxWidth: MediaQuery.of(context).size.width / 1.2),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(5),
             color: Theme.of(context).colorScheme.secondary,
           ),
           child: Stack(
             children: [
-              Positioned(
-                left: 10,
-                top: 10,
-                child: FutureBuilder<CustomUserModel>(
-                    future: CustomUserService().getUser(userId),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData){
-                        return const CircularProgressIndicator();
-                      } else if (snapshot.hasError) {
-                        return Text(snapshot.error.toString());
-                      } else {
-                        return utils.PushButton(icon: Icons.account_circle_sharp, onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => UserProfileScreen(user: snapshot.data!))));
-                      }
+              FutureBuilder<CustomUserModel>(
+                  future: CustomUserService().getUser(userId),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData){
+                      return const CircularProgressIndicator();
+                    } else if (snapshot.hasError) {
+                      return Text(snapshot.error.toString());
+                    } else {
+                      return utils.ChatUserButton(user: snapshot.data!, onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => UserProfileScreen(user: snapshot.data!))));
                     }
-                ),
+                  }
               ),
               Padding(
-                  padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 100, left: MediaQuery.of(context).size.width / 5),
-                  child: authorOfMessage(userId, currentUserId)
-              ),
-              Padding(
-                  padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 20, left: MediaQuery.of(context).size.width / 5, right: 5, bottom: 10),
-                  child: Text(text,
-                    textAlign: TextAlign.left,
-                    style: Theme.of(context).textTheme.bodyText1,
+                  padding: EdgeInsets.only(left: MediaQuery.of(context).size.width / 5, top: 5, right: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      authorOfMessage(userId, currentUserId),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10),
+                        child: Text(text,
+                          textAlign: TextAlign.left,
+                          style: Theme.of(context).textTheme.bodyText1,
+                        ),
+                      ),
+                    ],
                   )
-              )
+              ),
             ],
           ),
         ),
@@ -166,7 +157,7 @@ class _ChatScreenState extends State<ChatScreen> {
       child: Stack(
         children: [
           Container(
-            constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 6, maxWidth: MediaQuery.of(context).size.width / 1.2, minWidth: MediaQuery.of(context).size.width / 2),
+            constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 6, maxWidth: MediaQuery.of(context).size.width / 1.2),
             child: Container(
               decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.secondary,
@@ -184,9 +175,23 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
               child: Stack(
                 children: [
+                  Padding(
+                    padding: EdgeInsets.only(left: 10, top: 5, right: MediaQuery.of(context).size.width / 5),
+                    child: Column(
+                      children: [
+                        authorOfMessage(userId, currentUserId),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10),
+                          child: Text(text,
+                            style: Theme.of(context).textTheme.bodyText1,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                   Positioned(
-                    right: 10,
-                    top: 10,
+                    right: 3,
+                    top: 3,
                     child: FutureBuilder<CustomUserModel>(
                         future: CustomUserService().getUser(userId),
                         builder: (context, snapshot) {
@@ -195,22 +200,11 @@ class _ChatScreenState extends State<ChatScreen> {
                           } else if (snapshot.hasError) {
                             return Text(snapshot.error.toString());
                           } else {
-                            return utils.PushButton(icon: Icons.account_circle_sharp, onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => UserProfileScreen(user: snapshot.data!))));
+                            return utils.ChatUserButton(user: snapshot.data!, onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => UserProfileScreen(user: snapshot.data!))));
                           }
                         }
                     ),
                   ),
-                  Padding(
-                      padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 100, right: MediaQuery.of(context).size.width / 5),
-                      child: authorOfMessage(userId, currentUserId)
-                  ),
-                  Padding(
-                      padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 20, left: 5, right: MediaQuery.of(context).size.width / 5, bottom: 10),
-                      child: Text(text,
-                        textAlign: TextAlign.right,
-                        style: Theme.of(context).textTheme.bodyText1,
-                      )
-                  )
                 ],
               ),
             ),

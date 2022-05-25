@@ -159,7 +159,7 @@ class _MenuScreenState extends State<MenuScreen> {
                                         Positioned(
                                             right: 5,
                                             top: 5,
-                                            child: PushButton(icon: Icons.add, onPressed: () => MaterialPageRoute(builder: (context) => ProfileEditScreen.create()))
+                                            child: PushButton(icon: Icons.add, onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileEditScreen.create())))
                                         )
                                       ],
                                     ),
@@ -204,7 +204,7 @@ class _MenuScreenState extends State<MenuScreen> {
                                         Positioned(
                                             right: 5,
                                             top: 5,
-                                            child: PushButton(icon: Icons.add, onPressed: () => MaterialPageRoute(builder: (context) => ChatEditScreen.create()))
+                                            child: PushButton(icon: Icons.add, onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ChatEditScreen.create())))
                                         )
                                       ],
                                     ),

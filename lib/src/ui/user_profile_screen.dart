@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
 import 'package:roleplaying_app/src/models/customUserModel.dart';
@@ -34,9 +35,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   late double y;
 
 
-  openContextMenu() {
+  openContextMenu(String curUserId) {
     isOpen = true;
-    _overlayEntry = _createContextMenuOverlay();
+    _overlayEntry = _createContextMenuOverlay(curUserId);
     Overlay.of(context)!.insert(_overlayEntry);
   }
 
@@ -45,27 +46,26 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     _overlayEntry.remove();
   }
 
-  update() {
-    setState(() {
-
-    });
-  }
-
   updateImage() async {
     closeContextMenu();
+    XFile? image;
     final ImagePicker _picker = ImagePicker();
-    XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    _user.image = "user_pic";
-    CustomUserService().updateCustomUser(_user);
-    TaskState state = await FileUploadService().uploadImage(_user.idUser, image!.path, "user_pic");
-    if (state == TaskState.success) {
-      setState(() {
-
-      });
+    image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image == null) {
+      return setState(() { });
+    } else {
+      _user.image = "loading";
+      CustomUserService().updateCustomUser(_user);
+      TaskState state = await FileUploadService().uploadImage(_user.idUser, image.path, "user_pic");
+      _user.image = "user_pic";
+      CustomUserService().updateCustomUser(_user);
+      if (state == TaskState.success) {
+        setState(() { });
+      }
     }
   }
 
-  OverlayEntry _createContextMenuOverlay() {
+  OverlayEntry _createContextMenuOverlay(String curUserId) {
     return OverlayEntry(builder: (context) {
       return GestureDetector(
         onTap: closeContextMenu,
@@ -94,12 +94,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       ),
                       child: Padding(
                         padding: const EdgeInsets.all(8),
-                        child: TextButton(
+                        child: curUserId == _user.idUser ? TextButton(
                           child: Text("Сменить картинку", style: Theme.of(context).textTheme.subtitle1),
                           onPressed: () {
                             updateImage();
                           },
-                        ),
+                        ) : null,
                       )
                   ),
                 ),
@@ -141,91 +141,97 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                onPointerDown: getCoordinates,
                                onPointerUp: getCoordinates,
                                child: IconButton(
-                                 iconSize: sqrt(MediaQuery.of(context).size.height)*8,
+                                 iconSize: sqrt(MediaQuery.of(context).size.height+MediaQuery.of(context).size.width)*6,
                                  icon: FutureBuilder<String>(
-                                   future: FileUploadService().getImage(_user.idUser, _user.image),
+                                     future: FileUploadService().getImage(_user.idUser, _user.image),
                                      builder: (context, snapshot) {
-                                   if (!snapshot.hasData) {
-                                     return const CircularProgressIndicator();
-                                   } else if (snapshot.hasError) {
-                                     return Text(snapshot.error.toString());
-                                   } else {
-                                     return Container(
-                                       decoration: BoxDecoration(
-                                           shape: BoxShape.circle,
-                                           border: Border.all(width: 0),
-                                           image: DecorationImage(
-                                             fit: BoxFit.fitHeight,
-                                             alignment: FractionalOffset.topCenter,
-                                             image: NetworkImage(snapshot.data!),
-                                           )
-                                       ),
-                                     );
-                                   }
-                                 }),
+                                       if (!snapshot.hasData) {
+                                         return const CircularProgressIndicator();
+                                       } else if (snapshot.hasError) {
+                                         Fluttertoast.showToast(
+                                             msg: "Ошибка загрузки изображения" + snapshot.error.toString(),
+                                             toastLength: Toast.LENGTH_SHORT,
+                                             gravity: ToastGravity.CENTER,
+                                             timeInSecForIosWeb: 3,
+                                             backgroundColor: Colors.black26,
+                                             textColor: Colors.black,
+                                             fontSize: 16.0
+                                         );
+                                         return const Icon(Icons.account_circle_sharp);
+                                       } else {
+                                         return Container(
+                                           decoration: BoxDecoration(
+                                               color: Theme.of(context).primaryColor,
+                                               shape: BoxShape.circle,
+                                               border: Border.all(width: 2, color: Theme.of(context).primaryColor),
+                                               image: _user.image != "loading" ? DecorationImage(
+                                                 fit: BoxFit.fitHeight,
+                                                 alignment: FractionalOffset.topCenter,
+                                                 image: NetworkImage(snapshot.data!),
+                                               ) : null
+                                           ),
+                                           child: _user.image == "loading" ? const CircularProgressIndicator() : null,
+                                         );
+                                       }
+                                     }
+                                 ),
                                  onPressed: ()
                                  {
-                                   openContextMenu();
+                                   openContextMenu(state.getUser()!.id);
                                  },
                                ),
                              ),
                              Padding(
-                                 padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 40),
+                                 padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 60),
                                  child: Center(
                                    child: SizedBox(
                                        height: MediaQuery.of(context).size.height / 10,
                                        width: MediaQuery.of(context).size.width / 2,
-                                       child: Padding(
-                                           padding: const EdgeInsets.only(right: 25),
-                                           child: Text(
-                                               _user.nickName,
-                                               textAlign: TextAlign.center,
-                                               style: Theme.of(context).textTheme.headline2
-                                           )
+                                       child: Text(
+                                           _user.nickName,
+                                           textAlign: TextAlign.center,
+                                           style: Theme.of(context).textTheme.headline2
                                        )
                                    ),
                                  )
                              ),
-                             Padding(
-                               padding: const EdgeInsets.only(top: 30),
-                               child: Container (
-                                 constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height / 7, maxHeight: MediaQuery.of(context).size.height / 4.7),
-                                 child: SizedBox(
-                                   width: MediaQuery.of(context).size.width / 1.1,
-                                   child: Container(
-                                     decoration: BoxDecoration(
-                                         color: Theme.of(context).cardColor,
-                                         borderRadius: const BorderRadius.all(
-                                           Radius.circular(20.0),
+                             Container (
+                               constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height / 7, maxHeight: MediaQuery.of(context).size.height / 4.7),
+                               child: SizedBox(
+                                 width: MediaQuery.of(context).size.width / 1.1,
+                                 child: Container(
+                                   decoration: BoxDecoration(
+                                       color: Theme.of(context).cardColor,
+                                       borderRadius: const BorderRadius.all(
+                                         Radius.circular(20.0),
+                                       ),
+                                       boxShadow: [
+                                         BoxShadow(
+                                             color: Theme.of(context).cardColor.withOpacity(0.2),
+                                             spreadRadius: 2,
+                                             offset: const Offset(5, 5),
+                                             blurRadius: 10
+                                         )
+                                       ]
+                                   ),
+                                   child: Stack(
+                                     children: [
+                                       Padding(
+                                         padding: const EdgeInsets.only(left: 10, top: 2),
+                                         child: Text(state.getUser()!.id == _user.idUser ? "Мои анкеты" : "Анкеты пользователя",
+                                           style: Theme.of(context).textTheme.headline2,
                                          ),
-                                         boxShadow: [
-                                           BoxShadow(
-                                               color: Theme.of(context).cardColor.withOpacity(0.2),
-                                               spreadRadius: 2,
-                                               offset: const Offset(5, 5),
-                                               blurRadius: 10
-                                           )
-                                         ]
-                                     ),
-                                     child: Stack(
-                                       children: [
-                                         Padding(
-                                           padding: const EdgeInsets.only(left: 10, top: 2),
-                                           child: Text(state.getUser()!.id == _user.idUser ? "Мои анкеты" : "Анкеты пользователя",
-                                             style: Theme.of(context).textTheme.headline2,
-                                           ),
-                                         ),
-                                         Padding(
-                                             padding: const EdgeInsets.only(left: 20, top: 35),
-                                             child: FetchInfoFromDb.itemOfProfilesList(_user.idUser)
-                                         ),
-                                         state.getUser()!.id == _user.idUser ? Positioned(
-                                             right: 5,
-                                             top: 5,
-                                             child: utils.PushButton(icon: Icons.add, onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileEditScreen.create())))
-                                         ) : Container()
-                                       ],
-                                     ),
+                                       ),
+                                       Padding(
+                                           padding: const EdgeInsets.only(left: 20, top: 35),
+                                           child: FetchInfoFromDb.itemOfProfilesList(_user.idUser)
+                                       ),
+                                       state.getUser()!.id == _user.idUser ? Positioned(
+                                           right: 5,
+                                           top: 5,
+                                           child: utils.PushButton(icon: Icons.add, onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileEditScreen.create())))
+                                       ) : Container()
+                                     ],
                                    ),
                                  ),
                                ),

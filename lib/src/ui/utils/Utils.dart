@@ -1,6 +1,9 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:roleplaying_app/src/models/customUserModel.dart';
+import 'package:roleplaying_app/src/services/file_upload_service.dart';
 
 class PushButton extends StatelessWidget {
   final IconData icon;
@@ -29,6 +32,45 @@ class PushButton extends StatelessWidget {
         iconSize: sqrt(MediaQuery.of(context).size.height + MediaQuery.of(context).size.width),
         onPressed: onPressed
       ),
+    );
+  }
+}
+
+class ChatUserButton extends StatelessWidget {
+  final void Function() onPressed;
+  final CustomUserModel user;
+
+  const ChatUserButton({Key? key, required this.onPressed, required this.user}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+          iconSize: sqrt(MediaQuery.of(context).size.height+MediaQuery.of(context).size.width)*1.5,
+          icon: FutureBuilder<String>(
+              future: FileUploadService().getImage(user.idUser, user.image),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const CircularProgressIndicator();
+                } else if (snapshot.hasError) {
+                  return const Icon(Icons.account_circle_sharp);
+                } else {
+                  return Container(
+                    decoration: BoxDecoration(
+                        color: Theme.of(context).primaryColor,
+                        shape: BoxShape.circle,
+                        border: Border.all(width: 2, color: Theme.of(context).primaryColor),
+                        image: DecorationImage(
+                          fit: BoxFit.fitHeight,
+                          alignment: FractionalOffset.topCenter,
+                          image: NetworkImage(snapshot.data!),
+                        )
+                    ),
+                  );
+                }
+              }
+          ),
+          color: Colors.white,
+          onPressed: onPressed
     );
   }
 }
