@@ -4,8 +4,10 @@ import 'dart:developer' as developer;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
 import 'package:roleplaying_app/src/models/profile.dart';
+import 'package:roleplaying_app/src/services/file_service.dart';
 import 'package:roleplaying_app/src/services/profile_service.dart';
 import 'package:roleplaying_app/src/ui/utils/Utils.dart' as utils;
 import 'package:roleplaying_app/src/ui/profile_edit_screen.dart';
@@ -62,7 +64,7 @@ class _ProfileView extends State<ProfileView> {
                   Positioned(
                     top: 15,
                     right: 15,
-                    child: utils.PushButton(icon: Icons.edit, onPressed: () => MaterialPageRoute(builder: (context) => ProfileEditScreen.edit(profile: _profile))),
+                    child: utils.PushButton(icon: Icons.edit, onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileEditScreen.edit(profile: _profile)))),
                   ),
                 ],
                 Center(
@@ -128,8 +130,41 @@ class _ProfileView extends State<ProfileView> {
                                   ///Image container
                                   Padding(
                                       padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 80),
-                                      child: const SizedBox(
-                                        child: utils.ImageContainer(imageScale: 45)
+                                      child: SizedBox.square(
+                                        dimension: sqrt(MediaQuery.of(context).size.width + MediaQuery.of(context).size.height) * 8,
+                                        child: FutureBuilder<String>(
+                                          future: FileService().getChatImage(_profile.id, _profile.image),
+                                          builder: (context, snapshot) {
+                                            if (!snapshot.hasData) {
+                                              return const LinearProgressIndicator();
+                                            } else if (snapshot.hasError) {
+                                              Fluttertoast.showToast(
+                                                  msg: "Письмо отправлено на указанный адрес",
+                                                  toastLength: Toast.LENGTH_SHORT,
+                                                  gravity: ToastGravity.CENTER,
+                                                  timeInSecForIosWeb: 3,
+                                                  backgroundColor: Colors.green,
+                                                  textColor: Colors.white,
+                                                  fontSize: 16.0
+                                              );
+                                              return const Icon(Icons.image_outlined);
+                                            } else {
+                                              return Container(
+                                                decoration: BoxDecoration(
+                                                    color: Theme.of(context).colorScheme.secondary,
+                                                    borderRadius: const BorderRadius.all(
+                                                      Radius.circular(5.0),
+                                                    ),
+                                                    image: DecorationImage(
+                                                      image: NetworkImage(snapshot.data!),
+                                                      fit: BoxFit.fitHeight,
+                                                      alignment: FractionalOffset.topCenter,
+                                                    )
+                                                ),
+                                              );
+                                            }
+                                          },
+                                        ),
                                       )
                                   ),
                                   Padding(

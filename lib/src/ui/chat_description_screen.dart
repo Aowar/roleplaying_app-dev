@@ -3,6 +3,7 @@ import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
 import 'package:roleplaying_app/src/models/chat.dart';
@@ -42,10 +43,8 @@ class ChatDescriptionView extends StatefulWidget {
 }
 
 class _ChatDescriptionView extends State<ChatDescriptionView> {
-  final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
 
-  late String title;
   late String text;
 
   @override
@@ -94,10 +93,9 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
                                     children: [
                                       ///Title block
                                       Padding(
-                                        padding: const EdgeInsets.only(top: 15),
+                                        padding: const EdgeInsets.only(top: 10),
                                         child: SizedBox(
                                             width: MediaQuery.of(context).size.width * 0.5,
-                                            height: MediaQuery.of(context).size.height / 22,
                                             child: Container(
                                               decoration: BoxDecoration(
                                                   color: Theme.of(context).colorScheme.secondary,
@@ -113,16 +111,15 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
                                                     )
                                                   ]
                                               ),
-                                              child: TextField(
-                                                readOnly: true,
-                                                textAlignVertical: TextAlignVertical.center,
-                                                textAlign: TextAlign.center,
-                                                decoration: const InputDecoration(
-                                                  border: InputBorder.none,
-                                                  hintText: "Название чата",
-                                                ),
-                                                controller: _titleController..text = _chat.title,
-                                              ),
+                                                child: Padding(
+                                                  padding: const EdgeInsets.all(2),
+                                                  child: Text(
+                                                    _chat.title,
+                                                    textAlign: TextAlign.center,
+                                                    style: Theme.of(context).textTheme.subtitle1,
+                                                    overflow: TextOverflow.fade,
+                                                  ),
+                                                )
                                             )
                                         ),
                                       ),
@@ -138,7 +135,7 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
                                                     return const LinearProgressIndicator();
                                                   } else if (snapshot.hasError) {
                                                     Fluttertoast.showToast(
-                                                        msg: "Письмо отправлено на указанный адрес",
+                                                        msg: "Ошибка загрузки изображения",
                                                         toastLength: Toast.LENGTH_SHORT,
                                                         gravity: ToastGravity.CENTER,
                                                         timeInSecForIosWeb: 3,
@@ -192,18 +189,21 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
                                                     )
                                                   ]
                                               ),
-                                              child: TextField(
-                                                readOnly: true,
-                                                keyboardType: TextInputType.multiline,
-                                                maxLines: null,
-                                                decoration: InputDecoration(
-                                                    border: InputBorder.none,
-                                                    hintText: "Текст",
-                                                    hintStyle: TextStyle(
-                                                      color: Theme.of(context).textTheme.bodyText1?.color,
-                                                    )
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(left: 5, bottom: 5, right: 5),
+                                                child: TextField(
+                                                  readOnly: true,
+                                                  keyboardType: TextInputType.multiline,
+                                                  maxLines: null,
+                                                  decoration: InputDecoration(
+                                                      border: InputBorder.none,
+                                                      hintText: "Текст",
+                                                      hintStyle: TextStyle(
+                                                        color: Theme.of(context).textTheme.bodyText1?.color,
+                                                      )
+                                                  ),
+                                                  controller: _descriptionController..text = _chat.description,
                                                 ),
-                                                controller: _descriptionController..text = _chat.description,
                                               )
                                           ),
                                         ),
@@ -272,9 +272,10 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
                                                                   } else {
                                                                     return Column(
                                                                       children: [
-                                                                        utils.CustomIconButton(
+                                                                        utils.CustomCircleIconButton(
+                                                                            future: FileService().getUserImage(snapshot.data!.idUser, snapshot.data!.image),
                                                                             onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => UserProfileScreen(user: snapshot.data!))),
-                                                                            user: snapshot.data!,
+                                                                            borderWidth: 2,
                                                                             scale: 1.5
                                                                         ),
                                                                         Text(snapshot.data!.nickName,

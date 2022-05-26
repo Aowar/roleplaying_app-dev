@@ -4,12 +4,14 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
 import 'package:roleplaying_app/src/models/chat.dart';
 import 'package:roleplaying_app/src/models/custom_user_model.dart';
 import 'package:roleplaying_app/src/models/message.dart';
 import 'package:roleplaying_app/src/services/chat_service.dart';
 import 'package:roleplaying_app/src/services/custom_user_service.dart';
+import 'package:roleplaying_app/src/services/file_service.dart';
 import 'package:roleplaying_app/src/services/message_service.dart';
 import 'package:roleplaying_app/src/ui/utils/Utils.dart' as utils;
 import 'package:roleplaying_app/src/ui/auth_screen.dart';
@@ -37,164 +39,166 @@ class _ChatScreenState extends State<ChatScreen> {
     return BlocBuilder<AuthBloc, AuthState> (
         builder: (context, state) {
           if (state is AuthStateAuthenticated && _chat!.usersId.contains(state.getUser()!.id)) {
-            return Scaffold(
-              body: Stack(
-                children: [
-                  const Positioned(
-                    left: 15,
-                    top: 15,
-                    child: utils.BackButton()
-                  ),
-                  Positioned(
-                    right: 15,
-                    top: 15,
-                    child: FutureBuilder<Chat>(
-                        future: ChatService().getChat(_chat!.id),
-                        builder: (context, snapshot) {
-                          if(!snapshot.hasData) {
-                            return utils.PushButton(icon: Icons.menu, onPressed: () { });
-                          } else {
-                            Chat chat = snapshot.data!;
-                            chat.id = _chat!.id;
-                            return utils.PushButton(icon: Icons.menu, onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDescriptionScreen(chat: chat))));
-                          }
-                        }
+            return KeyboardDismissOnTap(
+              child: Scaffold(
+                body: Stack(
+                  children: [
+                    const Positioned(
+                      left: 16,
+                      top: 15,
+                      child: utils.BackButton()
                     ),
-                  ),
-                  Center(
-                    child: Padding(
-                      padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 80),
-                      child: SizedBox(
-                        width: MediaQuery.of(context).size.width / 1.1,
-                        height: MediaQuery.of(context).size.height / 1.24,
-                        child: Container(
-                          decoration: BoxDecoration(
-                              color: Theme.of(context).cardColor,
-                              borderRadius: const BorderRadius.all(
-                                Radius.circular(5.0),
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                    color: Theme.of(context).cardColor.withOpacity(0.2),
-                                    spreadRadius: 2,
-                                    offset: const Offset(5, 5),
-                                    blurRadius: 10
-                                )
-                              ]
-                          ),
-                          child: Stack(
-                            children: [
-                              ListView(
-                                children: [
-                                  Center(
-                                    child: Padding(
-                                      padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 20),
-                                      child: Column(
-                                        children: [
-                                          Column(
-                                            children: [
-                                              SizedBox(
-                                                width: MediaQuery.of(context).size.width / 1.1 - 15,
-                                                height: MediaQuery.of(context).size.height / 1.6,
-                                                child: Stack(
-                                                  children: [
-                                                    ItemOfMessageList(loggedUserId: state.getUser()!.id, messageService: messageService)
-                                                  ],
+                    Positioned(
+                      right: 16,
+                      top: 15,
+                      child: FutureBuilder<Chat>(
+                          future: ChatService().getChat(_chat!.id),
+                          builder: (context, snapshot) {
+                            if(!snapshot.hasData) {
+                              return utils.PushButton(icon: Icons.menu, onPressed: () { });
+                            } else {
+                              Chat chat = snapshot.data!;
+                              chat.id = _chat!.id;
+                              return utils.PushButton(icon: Icons.menu, onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDescriptionScreen(chat: chat))));
+                            }
+                          }
+                      ),
+                    ),
+                    Center(
+                      child: Padding(
+                        padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 80),
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width / 1.1,
+                          height: MediaQuery.of(context).size.height / 1.24,
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Theme.of(context).cardColor,
+                                borderRadius: const BorderRadius.all(
+                                  Radius.circular(5.0),
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                      color: Theme.of(context).cardColor.withOpacity(0.2),
+                                      spreadRadius: 2,
+                                      offset: const Offset(5, 5),
+                                      blurRadius: 10
+                                  )
+                                ]
+                            ),
+                            child: Stack(
+                              children: [
+                                ListView(
+                                  children: [
+                                    Center(
+                                      child: Padding(
+                                        padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 20),
+                                        child: Column(
+                                          children: [
+                                            Column(
+                                              children: [
+                                                SizedBox(
+                                                  width: MediaQuery.of(context).size.width / 1.1 - 15,
+                                                  height: MediaQuery.of(context).size.height / 1.6,
+                                                  child: Stack(
+                                                    children: [
+                                                      ItemOfMessageList(loggedUserId: state.getUser()!.id, messageService: messageService)
+                                                    ],
+                                                  )
                                                 )
-                                              )
-                                            ],
-                                          ),
-                                          Center(
-                                            child: Padding(
-                                                padding: EdgeInsets.only(top: 5, left: MediaQuery.of(context).size.width / 90),
-                                                child: Row(
-                                                  children: [
-                                                    SizedBox(
-                                                        width: MediaQuery.of(context).size.width / 1.35,
-                                                        child: SizedBox(
-                                                          width: MediaQuery.of(context).size.width / 1.5,
-                                                          child: Container(
-                                                            constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 4.5),
-                                                            child: Container(
-                                                                decoration: BoxDecoration(
-                                                                    color: Theme.of(context).colorScheme.secondary,
-                                                                    borderRadius: const BorderRadius.all(
-                                                                      Radius.circular(20.0),
-                                                                    ),
-                                                                    boxShadow: [
-                                                                      BoxShadow(
-                                                                          color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
-                                                                          spreadRadius: 5,
-                                                                          offset: const Offset(5, 5),
-                                                                          blurRadius: 10
-                                                                      )
-                                                                    ]
-                                                                ),
-                                                                child: Padding(
-                                                                  padding: const EdgeInsets.only(left: 10),
-                                                                  child: TextField(
-                                                                      textAlign: TextAlign.left,
-                                                                      keyboardType: TextInputType.multiline,
-                                                                      maxLines: null,
-                                                                      controller: _textController,
-                                                                      decoration: InputDecoration(
-                                                                          border: InputBorder.none,
-                                                                          hintText: "Сообщение",
-                                                                          hintStyle: TextStyle(
-                                                                              color: Theme.of(context).textTheme.bodyText2?.color
-                                                                          )
-                                                                      )
-                                                                  ),
-                                                                )
-                                                            ),
-                                                          ),
-                                                        )
-                                                    ),
-                                                    Padding(
-                                                      padding: const EdgeInsets.only(left: 5),
-                                                      child: Container(
-                                                        decoration: BoxDecoration(
-                                                            color: Theme.of(context).primaryColor,
-                                                            shape: BoxShape.circle,
-                                                            boxShadow: [
-                                                              BoxShadow(
-                                                                  color: Theme.of(context).primaryColor.withOpacity(0.2),
-                                                                  spreadRadius: 5,
-                                                                  offset: const Offset(5, 5),
-                                                                  blurRadius: 10
-                                                              )
-                                                            ]
-                                                        ),
-                                                        child: IconButton(
-                                                          icon: const Icon(Icons.arrow_forward_ios_rounded),
-                                                          color: Colors.white,
-                                                          iconSize: sqrt(MediaQuery.of(context).size.height + MediaQuery.of(context).size.width),
-                                                          onPressed: () async {
-                                                            String _text = _textController.text;
-                                                            Message _message = Message(state.getUser()!.id, _text);
-                                                            messageService.addMessage(_message);
-                                                            _textController.clear();
-                                                          },
-                                                        ),
-                                                      ),
-                                                    )
-                                                  ],
-                                                )
+                                              ],
                                             ),
-                                          )
-                                        ],
+                                            Center(
+                                              child: Padding(
+                                                  padding: EdgeInsets.only(top: 5, left: MediaQuery.of(context).size.width / 90),
+                                                  child: Row(
+                                                    children: [
+                                                      SizedBox(
+                                                          width: MediaQuery.of(context).size.width / 1.35,
+                                                          child: SizedBox(
+                                                            width: MediaQuery.of(context).size.width / 1.5,
+                                                            child: Container(
+                                                              constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 4.5),
+                                                              child: Container(
+                                                                  decoration: BoxDecoration(
+                                                                      color: Theme.of(context).colorScheme.secondary,
+                                                                      borderRadius: const BorderRadius.all(
+                                                                        Radius.circular(20.0),
+                                                                      ),
+                                                                      boxShadow: [
+                                                                        BoxShadow(
+                                                                            color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
+                                                                            spreadRadius: 5,
+                                                                            offset: const Offset(5, 5),
+                                                                            blurRadius: 10
+                                                                        )
+                                                                      ]
+                                                                  ),
+                                                                  child: Padding(
+                                                                    padding: const EdgeInsets.only(left: 10),
+                                                                    child: TextField(
+                                                                        textAlign: TextAlign.left,
+                                                                        keyboardType: TextInputType.multiline,
+                                                                        maxLines: null,
+                                                                        controller: _textController,
+                                                                        decoration: InputDecoration(
+                                                                            border: InputBorder.none,
+                                                                            hintText: "Сообщение",
+                                                                            hintStyle: TextStyle(
+                                                                                color: Theme.of(context).textTheme.bodyText2?.color
+                                                                            )
+                                                                        )
+                                                                    ),
+                                                                  )
+                                                              ),
+                                                            ),
+                                                          )
+                                                      ),
+                                                      Padding(
+                                                        padding: const EdgeInsets.only(left: 5),
+                                                        child: Container(
+                                                          decoration: BoxDecoration(
+                                                              color: Theme.of(context).primaryColor,
+                                                              shape: BoxShape.circle,
+                                                              boxShadow: [
+                                                                BoxShadow(
+                                                                    color: Theme.of(context).primaryColor.withOpacity(0.2),
+                                                                    spreadRadius: 5,
+                                                                    offset: const Offset(5, 5),
+                                                                    blurRadius: 10
+                                                                )
+                                                              ]
+                                                          ),
+                                                          child: IconButton(
+                                                            icon: const Icon(Icons.arrow_forward_ios_rounded),
+                                                            color: Colors.white,
+                                                            iconSize: sqrt(MediaQuery.of(context).size.height + MediaQuery.of(context).size.width),
+                                                            onPressed: () async {
+                                                              String _text = _textController.text;
+                                                              Message _message = Message(state.getUser()!.id, _text);
+                                                              messageService.addMessage(_message);
+                                                              _textController.clear();
+                                                            },
+                                                          ),
+                                                        ),
+                                                      )
+                                                    ],
+                                                  )
+                                              ),
+                                            )
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
-                              )
-                            ],
+                                  ],
+                                )
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  )
-                ],
+                    )
+                  ],
+                ),
               ),
             );
           }
@@ -388,7 +392,12 @@ class CurUserMessageBox extends StatelessWidget {
                           } else if (snapshot.hasError) {
                             return Text(snapshot.error.toString());
                           } else {
-                            return utils.CustomIconButton(user: snapshot.data!, onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => UserProfileScreen(user: snapshot.data!))), scale: 15);
+                            return utils.CustomCircleIconButton(
+                                future: FileService().getUserImage(snapshot.data!.idUser, snapshot.data!.image),
+                                onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => UserProfileScreen(user: snapshot.data!))),
+                                scale: 15,
+                                borderWidth: 2,
+                            );
                           }
                         }
                     ),
@@ -433,7 +442,12 @@ class MessageBox extends StatelessWidget {
                         } else if (snapshot.hasError) {
                           return Text(snapshot.error.toString());
                         } else {
-                          return utils.CustomIconButton(user: snapshot.data!, onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => UserProfileScreen(user: snapshot.data!))), scale: 15);
+                          return utils.CustomCircleIconButton(
+                              future: FileService().getUserImage(snapshot.data!.idUser, snapshot.data!.image),
+                              onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => UserProfileScreen(user: snapshot.data!))),
+                              borderWidth: 2,
+                              scale: 15,
+                          );
                         }
                       }
                   ),

@@ -2,16 +2,18 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:roleplaying_app/src/models/profile.dart';
+import 'package:roleplaying_app/src/services/file_service.dart';
 
 class ProfileService {
   static final CollectionReference _profileCollection = FirebaseFirestore.instance.collection("profiles");
 
-  Future addProfile(Profile profile) async {
+  Future addProfile(Profile profile, String imagePath) async {
     DocumentReference docRef = _profileCollection.doc();
     await docRef.set({
       profile.id = docRef.id,
       profile.toMap()
     });
+    return await FileService().uploadImage("profiles/" + docRef.id, imagePath, "profile_pic");
   }
 
   Future updateProfile(Profile profile) async {

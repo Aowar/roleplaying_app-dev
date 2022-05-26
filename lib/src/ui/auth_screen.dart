@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
 import 'package:roleplaying_app/src/models/custom_user_model.dart';
@@ -189,84 +190,83 @@ class _AuthView extends State<AuthView> {
               child: Center(
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width / 1.3,
-                  child: GestureDetector(
-                      onTap: () { },
-                      child: Container(
-                        constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 2),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          color: Theme.of(context).colorScheme.secondary,
-                        ),
-                          ///Register form
-                        child: Center(
-                          child: Form(
-                            key: _formRegisterKey,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                ///Login field
-                                Material(
-                                    child: EmailFormField(icon: const Icon(Icons.login), hintText: "Введите email", controller: _emailRegisterController),
-                                    color: Theme.of(context).colorScheme.secondary
-                                ),
-                                ///User nickname field
-                                Material(
-                                  child: NicknameFormField(icon: const Icon(Icons.text_fields_outlined), hintText: "Введите никнейм", controller: _userNicknameController),
-                                  color: Theme.of(context).colorScheme.secondary,
-                                ),
-                                ///Password field
-                                Material(
-                                  child: PasswordFormField(icon: const Icon(Icons.password), hintText: "Введите пароль", controller: _passwordRegisterController, registerFlag: true),
-                                  color: Theme.of(context).colorScheme.secondary,
-                                ),
-                                SizedBox(
-                                  width: MediaQuery.of(context).size.width * 0.5,
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(20.0),
-                                        boxShadow: [
-                                          BoxShadow(
-                                              color: Theme.of(context).primaryColor.withOpacity(0.2),
-                                              spreadRadius: 5,
-                                              offset: const Offset(0, 3),
-                                              blurRadius: 10
-                                          )
-                                        ]
+                  child: KeyboardDismissOnTap(
+                    child: Container(
+                      constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 2),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: Theme.of(context).colorScheme.secondary,
+                      ),
+                        ///Register form
+                      child: Center(
+                        child: Form(
+                          key: _formRegisterKey,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              ///Login field
+                              Material(
+                                  child: EmailFormField(icon: const Icon(Icons.login), hintText: "Введите email", controller: _emailRegisterController),
+                                  color: Theme.of(context).colorScheme.secondary
+                              ),
+                              ///User nickname field
+                              Material(
+                                child: NicknameFormField(icon: const Icon(Icons.text_fields_outlined), hintText: "Введите никнейм", controller: _userNicknameController),
+                                color: Theme.of(context).colorScheme.secondary,
+                              ),
+                              ///Password field
+                              Material(
+                                child: PasswordFormField(icon: const Icon(Icons.password), hintText: "Введите пароль", controller: _passwordRegisterController, registerFlag: true),
+                                color: Theme.of(context).colorScheme.secondary,
+                              ),
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.5,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(20.0),
+                                      boxShadow: [
+                                        BoxShadow(
+                                            color: Theme.of(context).primaryColor.withOpacity(0.2),
+                                            spreadRadius: 5,
+                                            offset: const Offset(0, 3),
+                                            blurRadius: 10
+                                        )
+                                      ]
+                                  ),
+                                  child: ElevatedButton(
+                                    style: ButtonStyle(
+                                        backgroundColor: MaterialStateProperty.all<Color>(Theme.of(context).primaryColor),
+                                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                            RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(20.0)
+                                            )
+                                        )
                                     ),
-                                    child: ElevatedButton(
-                                      style: ButtonStyle(
-                                          backgroundColor: MaterialStateProperty.all<Color>(Theme.of(context).primaryColor),
-                                          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                                              RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(20.0)
-                                              )
-                                          )
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Center(
-                                          child: Text("Зарегистрироваться",
-                                              style: TextStyle(
-                                                  fontStyle: Theme.of(context).textTheme.headline2!.fontStyle,
-                                                  color: Theme.of(context).textTheme.headline2!.color,
-                                                  fontSize: 12
-                                              )
-                                          ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Center(
+                                        child: Text("Зарегистрироваться",
+                                            style: TextStyle(
+                                                fontStyle: Theme.of(context).textTheme.headline2!.fontStyle,
+                                                color: Theme.of(context).textTheme.headline2!.color,
+                                                fontSize: 12
+                                            )
                                         ),
                                       ),
-                                      onPressed: () {
-                                        if (_formRegisterKey.currentState!.validate()) {
-                                          registration();
-                                        }
-                                      }
                                     ),
+                                    onPressed: () {
+                                      if (_formRegisterKey.currentState!.validate()) {
+                                        registration();
+                                      }
+                                    }
                                   ),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                        )
+                        ),
                       )
+                    ),
                   ),
                 ),
               )
@@ -280,122 +280,125 @@ class _AuthView extends State<AuthView> {
   Widget build(BuildContext context) {
     final AuthBloc authBloc = BlocProvider.of<AuthBloc>(context);
     return BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
-      return Scaffold(
-          resizeToAvoidBottomInset: false,
-          body: SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height),
-              child: Stack(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 5, top: 5),
-                    child: SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.5,
-                        height: MediaQuery.of(context).size.height / 16,
-                        child: Container(
-                            decoration: BoxDecoration(
-                                color: Theme.of(context).primaryColor,
-                                borderRadius: const BorderRadius.all(
-                                  Radius.circular(20.0),
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                      color: Theme.of(context).primaryColor.withOpacity(0.2),
-                                      spreadRadius: 2,
-                                      offset: const Offset(5, 5),
-                                      blurRadius: 10
-                                  )
-                                ]
-                            ),
-                            child: Center(
-                              child: Text("Ролевые игры", style: Theme.of(context).textTheme.headline1),
-                            ))),
-                  ),
-                  ///Auth form
-                  Center(
-                      child: Form(
-                        key: _formLoginKey,
-                        child: Padding(
-                          padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 2.4),
-                          child: Column(
-                            children: [
-                              ///Login field
-                              EmailFormField(icon: const Icon(Icons.login), hintText: "Введите email", controller: _emailLoginController),
-                              Padding(
-                                  padding: const EdgeInsets.only(top: 30),
-                                  ///Password field
-                                    child: PasswordFormField(icon: const Icon(Icons.password), hintText: "Введите пароль", controller: _passwordLoginController, registerFlag: false)
+      return KeyboardDismissOnTap(
+        child: Scaffold(
+            resizeToAvoidBottomInset: false,
+            body: SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height),
+                child: Stack(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 5, top: 5),
+                      child: SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.5,
+                          height: MediaQuery.of(context).size.height / 16,
+                          child: Container(
+                              decoration: BoxDecoration(
+                                  color: Theme.of(context).primaryColor,
+                                  borderRadius: const BorderRadius.all(
+                                    Radius.circular(20.0),
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                        color: Theme.of(context).primaryColor.withOpacity(0.2),
+                                        spreadRadius: 2,
+                                        offset: const Offset(5, 5),
+                                        blurRadius: 10
+                                    )
+                                  ]
                               ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 20),
-                                ///Login button
-                                child: SizedBox(
-                                  width: MediaQuery.of(context).size.width * 0.5,
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(20.0),
-                                        boxShadow: [
-                                          BoxShadow(
-                                              color: Theme.of(context).primaryColor.withOpacity(0.2),
-                                              spreadRadius: 5,
-                                              offset: const Offset(0, 3),
-                                              blurRadius: 10
-                                          )
-                                        ]
-                                    ),
-                                    child: ElevatedButton(
-                                      style: ButtonStyle(
-                                          backgroundColor: MaterialStateProperty.all<Color>(Theme.of(context).primaryColor),
-                                          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                                              RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(20.0)
-                                              )
-                                          )
+                              child: Center(
+                                child: Text("Ролевые игры", style: Theme.of(context).textTheme.headline1),
+                              ))),
+                    ),
+                    ///Auth form
+                    Center(
+                        child: Form(
+                          key: _formLoginKey,
+                          child: Padding(
+                            padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 2.4),
+                            child: Column(
+                              children: [
+                                ///Login field
+                                EmailFormField(icon: const Icon(Icons.login), hintText: "Введите email", controller: _emailLoginController),
+                                Padding(
+                                    padding: const EdgeInsets.only(top: 30),
+                                    ///Password field
+                                      child: PasswordFormField(icon: const Icon(Icons.password), hintText: "Введите пароль", controller: _passwordLoginController, registerFlag: false)
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 20),
+                                  ///Login button
+                                  child: SizedBox(
+                                    width: MediaQuery.of(context).size.width * 0.5,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(20.0),
+                                          boxShadow: [
+                                            BoxShadow(
+                                                color: Theme.of(context).primaryColor.withOpacity(0.2),
+                                                spreadRadius: 5,
+                                                offset: const Offset(0, 3),
+                                                blurRadius: 10
+                                            )
+                                          ]
                                       ),
-                                      onPressed: isLoading ? null : () {
-                                        setState(() {
-                                          isLoading = true;
-                                          auth(authBloc);
-                                        });
-                                      },
-                                      child: isLoading ? const CircularProgressIndicator() : Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Center(
-                                          child: Text("Войти", style: Theme.of(context).textTheme.headline2),
+                                      child: ElevatedButton(
+                                        style: ButtonStyle(
+                                            backgroundColor: MaterialStateProperty.all<Color>(Theme.of(context).primaryColor),
+                                            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                                RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(20.0)
+                                                )
+                                            )
+                                        ),
+                                        onPressed: isLoading ? null : () {
+                                          FocusManager.instance.primaryFocus?.unfocus();
+                                          setState(() {
+                                            isLoading = true;
+                                            auth(authBloc);
+                                          });
+                                        },
+                                        child: isLoading ? const CircularProgressIndicator() : Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Center(
+                                            child: Text("Войти", style: Theme.of(context).textTheme.headline2),
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 10),
-                                child: TextButton(
-                                    onPressed: () {
-                                      openRegisterForm();
-                                    },
-                                    child: Text("Ещё не зарегистрированы? Создать аккаунт",
-                                        style: Theme.of(context).textTheme.subtitle2
-                                    )
-                                ),
-                              )
-                            ],
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 10),
+                                  child: TextButton(
+                                      onPressed: () {
+                                        openRegisterForm();
+                                      },
+                                      child: Text("Ещё не зарегистрированы? Создать аккаунт",
+                                          style: Theme.of(context).textTheme.subtitle2
+                                      )
+                                  ),
+                                )
+                              ],
+                            ),
                           ),
-                        ),
-                      )
-                  ),
-                  BlocListener<AuthBloc, AuthState>(
-                    listener: (context, state) {
-                      if (state is AuthStateAuthenticated) {
-                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MenuScreen()));
-                      }
-                    },
-                    child: Container(),
-                  )
-                ],
-              )
-            ),
-          )
+                        )
+                    ),
+                    BlocListener<AuthBloc, AuthState>(
+                      listener: (context, state) {
+                        if (state is AuthStateAuthenticated) {
+                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MenuScreen()));
+                        }
+                      },
+                      child: Container(),
+                    )
+                  ],
+                )
+              ),
+            )
+        ),
       );
     });
   }

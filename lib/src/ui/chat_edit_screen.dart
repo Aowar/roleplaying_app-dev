@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
@@ -50,6 +51,7 @@ class _ChatEditView extends State<ChatEditView> {
   late String title;
   late String description;
   bool isOpen = false;
+  bool isLoading = false;
   late OverlayEntry _overlayEntry;
   late double x;
   late double y;
@@ -137,159 +139,200 @@ class _ChatEditView extends State<ChatEditView> {
     return BlocBuilder <AuthBloc, AuthState> (
         builder: (context, state) {
           if (state is AuthStateAuthenticated) {
-            return Scaffold(
-              body: Stack(
-                children: [
-                  ///Back button
-                  const Positioned(
-                      top: 15,
-                      left: 15,
-                      child: utils.BackButton()
-                  ),
-                  ///Apply button
-                  Positioned(
-                      top: 15,
-                      right: 15,
-                      child: Container(
-                        decoration: BoxDecoration(
-                            color: Theme.of(context).primaryColor,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                  color: Theme.of(context).primaryColor.withOpacity(0.2),
-                                  spreadRadius: 5,
-                                  offset: const Offset(5, 5),
-                                  blurRadius: 10,
-                              )
-                            ]
-                        ),
-                        child: IconButton(
-                          icon: const Icon(Icons.check),
-                          color: Colors.white,
-                          iconSize: sqrt(MediaQuery.of(context).size.height + MediaQuery.of(context).size.width),
-                          onPressed: () async {
-                            title = _titleController.text;
-                            description = _descriptionController.text;
-                            List usersList = [];
-                            if (_chatCreateFlag) {
-                              usersList = [user];
-                               if (imageInMemory == null)
-                                 {
-                                   Fluttertoast.showToast(
-                                       msg: "Добавьте картинку",
-                                       toastLength: Toast.LENGTH_SHORT,
-                                       gravity: ToastGravity.CENTER,
-                                       timeInSecForIosWeb: 3,
-                                       backgroundColor: Colors.red,
-                                       textColor: Colors.white,
-                                       fontSize: 16.0
-                                   );
-                                   return;
-                                 }
-                            } else {
-                              _chat.image = imageInMemory!.path;
-                              _chat.title = title;
-                              _chat.description = description;
-                            }
-                            Chat chat = Chat(usersList, state.getUser()!.id, title, description, "chat_picture");
-                            !_chatCreateFlag ? _chatService.updateChat(_chat) : _chatService.addChat(chat, imageInMemory!.path);
-                            Navigator.pop(context);
-                          },
-                        ),
-                      )
-                  ),
-                  Center(
-                    child: Padding(
-                      padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 10),
-                      child: SizedBox(
-                        width: MediaQuery.of(context).size.width / 1.1,
-                        height: MediaQuery.of(context).size.height / 1.15,
+            return KeyboardDismissOnTap(
+              child: Scaffold(
+                body: Stack(
+                  children: [
+                    ///Back button
+                    const Positioned(
+                        top: 15,
+                        left: 16,
+                        child: utils.BackButton()
+                    ),
+                    ///Apply button
+                    Positioned(
+                        top: 15,
+                        right: 16,
                         child: Container(
                           decoration: BoxDecoration(
-                              color: Theme.of(context).cardColor,
-                              borderRadius: const BorderRadius.all(
-                                Radius.circular(5.0),
-                              ),
+                              color: Theme.of(context).primaryColor,
+                              shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                    color: Theme.of(context).cardColor.withOpacity(0.2),
-                                    spreadRadius: 2,
+                                    color: Theme.of(context).primaryColor.withOpacity(0.2),
+                                    spreadRadius: 5,
                                     offset: const Offset(5, 5),
-                                    blurRadius: 10
+                                    blurRadius: 10,
                                 )
                               ]
                           ),
-                          child: Center(
-                            child: ListView(
-                              children: [
-                                Column(
-                                    children: [
-                                      ///Title block
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 30),
-                                        child: SizedBox(
-                                            width: MediaQuery.of(context).size.width * 0.5,
-                                            height: MediaQuery.of(context).size.height / 22,
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                  color: Theme.of(context).colorScheme.secondary,
-                                                  borderRadius: const BorderRadius.all(
-                                                    Radius.circular(10.0),
-                                                  ),
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                        color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
-                                                        spreadRadius: 5,
-                                                        offset: const Offset(5, 5),
-                                                        blurRadius: 10
-                                                    )
-                                                  ]
-                                              ),
-                                              child: TextField(
-                                                textAlignVertical: TextAlignVertical.center,
-                                                textAlign: TextAlign.center,
-                                                decoration: const InputDecoration(
-                                                  border: InputBorder.none,
-                                                  hintText: "Название чата",
-                                                ),
-                                                controller: !_chatCreateFlag ? (_titleController..text = _chat.title) : _titleController,
-                                                onChanged: (String value) async {
-                                                  if (!_chatCreateFlag) {
-                                                    _chat.title = value;
-                                                  }
-                                                  return;
-                                                },
-                                              ),
-                                            )
-                                        ),
-                                      ),
-                                      ///image container
-                                      Padding(
-                                        padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 80),
-                                        child: SizedBox(
-                                            child: Listener(
-                                              onPointerMove: getCoordinates,
-                                              onPointerDown: getCoordinates,
-                                              onPointerUp: getCoordinates,
-                                              child: IconButton(
-                                                iconSize: sqrt(MediaQuery.of(context).size.height+MediaQuery.of(context).size.width)*8,
-                                                icon: imageInMemory == null && _chatCreateFlag ?
-                                                Container(
-                                                  child: const Icon(Icons.image_outlined),
-                                                  decoration: BoxDecoration(
+                          child: isLoading ? const CircularProgressIndicator() :
+                          IconButton(
+                            icon: const Icon(Icons.check),
+                            color: Colors.white,
+                            iconSize: sqrt(MediaQuery.of(context).size.height + MediaQuery.of(context).size.width),
+                            onPressed: () async {
+                              setState(() {
+                                isLoading = true;
+                              });
+                              title = _titleController.text;
+                              description = _descriptionController.text;
+                              List usersList = [];
+                              if (_chatCreateFlag) {
+                                usersList = [user];
+                                 if (imageInMemory == null)
+                                   {
+                                     Fluttertoast.showToast(
+                                         msg: "Добавьте картинку",
+                                         toastLength: Toast.LENGTH_SHORT,
+                                         gravity: ToastGravity.CENTER,
+                                         timeInSecForIosWeb: 3,
+                                         backgroundColor: Colors.red,
+                                         textColor: Colors.white,
+                                         fontSize: 16.0
+                                     );
+                                     return;
+                                   }
+                              } else {
+                                _chat.image = "chat_pic";
+                                _chat.title = title;
+                                _chat.description = description;
+                              }
+                              Chat chat = Chat(usersList, state.getUser()!.id, title, description, "chat_pic");
+                              if (!_chatCreateFlag) {
+                                _chatService.updateChat(_chat);
+                                await FileService().uploadImage("chats/" + _chat.id, imageInMemory!.path, "chat_pic");
+                              } else {
+                                _chatService.addChat(chat, imageInMemory!.path);
+                              }
+                              Navigator.pop(context);
+                            },
+                          ),
+                        )
+                    ),
+                    Center(
+                      child: Padding(
+                        padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 10),
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width / 1.1,
+                          height: MediaQuery.of(context).size.height / 1.15,
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Theme.of(context).cardColor,
+                                borderRadius: const BorderRadius.all(
+                                  Radius.circular(5.0),
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                      color: Theme.of(context).cardColor.withOpacity(0.2),
+                                      spreadRadius: 2,
+                                      offset: const Offset(5, 5),
+                                      blurRadius: 10
+                                  )
+                                ]
+                            ),
+                            child: Center(
+                              child: ListView(
+                                children: [
+                                  Column(
+                                      children: [
+                                        ///Title block
+                                        Padding(
+                                          padding: const EdgeInsets.only(top: 10),
+                                          child: SizedBox(
+                                              width: MediaQuery.of(context).size.width * 0.5,
+                                              child: Container(
+                                                decoration: BoxDecoration(
                                                     color: Theme.of(context).colorScheme.secondary,
                                                     borderRadius: const BorderRadius.all(
-                                                      Radius.circular(5.0),
+                                                      Radius.circular(10.0),
                                                     ),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                          color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
+                                                          spreadRadius: 5,
+                                                          offset: const Offset(5, 5),
+                                                          blurRadius: 10
+                                                      )
+                                                    ]
+                                                ),
+                                                child: TextField(
+                                                  textAlignVertical: TextAlignVertical.center,
+                                                  textAlign: TextAlign.center,
+                                                  decoration: const InputDecoration(
+                                                    border: InputBorder.none,
+                                                    hintText: "Название чата",
                                                   ),
-                                                ) :
-                                                !_chatCreateFlag ?
-                                                FutureBuilder<String>(
-                                                    future: FileService().getChatImage(_chat.id, _chat.image),
+                                                  controller: !_chatCreateFlag ? (_titleController..text = _chat.title) : _titleController,
+                                                  onChanged: (String value) async {
+                                                    if (!_chatCreateFlag) {
+                                                      _chat.title = value;
+                                                    }
+                                                    return;
+                                                  },
+                                                ),
+                                              )
+                                          ),
+                                        ),
+                                        ///image container
+                                        Padding(
+                                          padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 80),
+                                          child: SizedBox(
+                                              child: Listener(
+                                                onPointerMove: getCoordinates,
+                                                onPointerDown: getCoordinates,
+                                                onPointerUp: getCoordinates,
+                                                child: IconButton(
+                                                  iconSize: sqrt(MediaQuery.of(context).size.height+MediaQuery.of(context).size.width)*8,
+                                                  icon: imageInMemory == null && _chatCreateFlag ?
+                                                  Container(
+                                                    child: const Icon(Icons.image_outlined),
+                                                    decoration: BoxDecoration(
+                                                      color: Theme.of(context).colorScheme.secondary,
+                                                      borderRadius: const BorderRadius.all(
+                                                        Radius.circular(5.0),
+                                                      ),
+                                                    ),
+                                                  ) :
+                                                  !_chatCreateFlag && imageInMemory == null ?
+                                                  FutureBuilder<String>(
+                                                      future: FileService().getChatImage(_chat.id, _chat.image),
+                                                      builder: (context, snapshot) {
+                                                        if (!snapshot.hasData) {
+                                                          return const CircularProgressIndicator();
+                                                        } else if (snapshot.hasError) {
+                                                          Fluttertoast.showToast(
+                                                              msg: "Ошибка загрузки изображения" + snapshot.error.toString(),
+                                                              toastLength: Toast.LENGTH_SHORT,
+                                                              gravity: ToastGravity.CENTER,
+                                                              timeInSecForIosWeb: 3,
+                                                              backgroundColor: Colors.black26,
+                                                              textColor: Colors.black,
+                                                              fontSize: 16.0
+                                                          );
+                                                          return const Icon(Icons.image_outlined);
+                                                        } else {
+                                                          return Container(
+                                                            decoration: BoxDecoration(
+                                                                color: Theme.of(context).colorScheme.secondary,
+                                                                borderRadius: const BorderRadius.all(
+                                                                  Radius.circular(5.0),
+                                                                ),
+                                                                image: DecorationImage(
+                                                                  fit: BoxFit.fitHeight,
+                                                                  alignment: FractionalOffset.topCenter,
+                                                                  image: NetworkImage(snapshot.data!),
+                                                                )
+                                                            ),
+                                                          );
+                                                        }
+                                                      }
+                                                  ) : FutureBuilder<Uint8List>(
+                                                    future: imageInMemory!.readAsBytes(),
                                                     builder: (context, snapshot) {
                                                       if (!snapshot.hasData) {
-                                                        return const CircularProgressIndicator();
-                                                      } else if (snapshot.hasError) {
+                                                        return const LinearProgressIndicator();
+                                                      } if (snapshot.hasError) {
                                                         Fluttertoast.showToast(
                                                             msg: "Ошибка загрузки изображения" + snapshot.error.toString(),
                                                             toastLength: Toast.LENGTH_SHORT,
@@ -303,112 +346,84 @@ class _ChatEditView extends State<ChatEditView> {
                                                       } else {
                                                         return Container(
                                                           decoration: BoxDecoration(
-                                                              color: Theme.of(context).colorScheme.secondary,
-                                                              borderRadius: const BorderRadius.all(
-                                                                Radius.circular(5.0),
-                                                              ),
                                                               image: DecorationImage(
-                                                                fit: BoxFit.fitHeight,
-                                                                alignment: FractionalOffset.topCenter,
-                                                                image: NetworkImage(snapshot.data!),
+                                                                  image: Image.memory(snapshot.data!).image
                                                               )
                                                           ),
                                                         );
                                                       }
                                                     }
-                                                ) : FutureBuilder<Uint8List>(
-                                                  future: imageInMemory!.readAsBytes(),
-                                                  builder: (context, snapshot) {
-                                                    if (!snapshot.hasData) {
-                                                      return const LinearProgressIndicator();
-                                                    } if (snapshot.hasError) {
-                                                      Fluttertoast.showToast(
-                                                          msg: "Ошибка загрузки изображения" + snapshot.error.toString(),
-                                                          toastLength: Toast.LENGTH_SHORT,
-                                                          gravity: ToastGravity.CENTER,
-                                                          timeInSecForIosWeb: 3,
-                                                          backgroundColor: Colors.black26,
-                                                          textColor: Colors.black,
-                                                          fontSize: 16.0
-                                                      );
-                                                      return const Icon(Icons.image_outlined);
-                                                    } else {
-                                                      return Container(
-                                                        decoration: BoxDecoration(
-                                                            image: DecorationImage(
-                                                                image: Image.memory(snapshot.data!).image
-                                                            )
-                                                        ),
-                                                      );
-                                                    }
-                                                  }
-                                                ),
-                                                onPressed: ()
-                                                {
-                                                  openContextMenu();
-                                                },
-                                              ),
-                                            ),
-                                        ),
-                                      )
-                                    ]
-                                ),
-                                Column(
-                                  children: [
-                                    ///Text body container
-                                    Padding(
-                                      padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 60),
-                                      child: Container(
-                                        constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height / 4),
-                                        child: SizedBox(
-                                          width: MediaQuery.of(context).size.width / 1.3,
-                                          child: Container(
-                                              decoration: BoxDecoration(
-                                                  color: Theme.of(context).colorScheme.secondary,
-                                                  borderRadius: const BorderRadius.all(
-                                                    Radius.circular(5.0),
                                                   ),
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                        color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
-                                                        spreadRadius: 2,
-                                                        offset: const Offset(5, 5),
-                                                        blurRadius: 10
-                                                    )
-                                                  ]
-                                              ),
-                                              child: TextField(
-                                                keyboardType: TextInputType.multiline,
-                                                maxLines: null,
-                                                decoration: InputDecoration(
-                                                    border: InputBorder.none,
-                                                    hintText: "Текст",
-                                                    hintStyle: TextStyle(
-                                                      color: Theme.of(context).textTheme.bodyText1?.color,
-                                                    )
+                                                  onPressed: ()
+                                                  {
+                                                    openContextMenu();
+                                                  },
                                                 ),
-                                                controller: !_chatCreateFlag ? (_descriptionController..text = _chat.description) : _descriptionController,
-                                                onChanged: (String value) async {
-                                                  if (!_chatCreateFlag) {
-                                                    _chat.description = value;
-                                                  }
-                                                  return;
-                                                },
-                                              )
+                                              ),
+                                          ),
+                                        )
+                                      ]
+                                  ),
+                                  Column(
+                                    children: [
+                                      ///Text body container
+                                      Padding(
+                                        padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 60),
+                                        child: Container(
+                                          constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height / 4),
+                                          child: SizedBox(
+                                            width: MediaQuery.of(context).size.width / 1.3,
+                                            child: Container(
+                                                decoration: BoxDecoration(
+                                                    color: Theme.of(context).colorScheme.secondary,
+                                                    borderRadius: const BorderRadius.all(
+                                                      Radius.circular(5.0),
+                                                    ),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                          color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
+                                                          spreadRadius: 2,
+                                                          offset: const Offset(5, 5),
+                                                          blurRadius: 10
+                                                      )
+                                                    ]
+                                                ),
+                                                child: Padding(
+                                                  padding: const EdgeInsets.only(left: 5, bottom:5, right: 5),
+                                                  child: TextField(
+                                                    keyboardType: TextInputType.multiline,
+                                                    maxLines: null,
+                                                    decoration: InputDecoration(
+                                                        border: InputBorder.none,
+                                                        hintText: "Текст",
+                                                        hintStyle: TextStyle(
+                                                          color: Theme.of(context).textTheme.bodyText1?.color,
+                                                        )
+                                                    ),
+                                                    controller: !_chatCreateFlag ? (_descriptionController..text = _chat.description) : _descriptionController,
+                                                    onChanged: (String value) async {
+                                                      if (!_chatCreateFlag) {
+                                                        _chat.description = value;
+                                                      }
+                                                      return;
+                                                    },
+                                                  ),
+                                                )
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                )
-                              ],
+                                    ],
+                                  )
+                                ],
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           }

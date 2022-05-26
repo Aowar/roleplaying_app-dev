@@ -1,6 +1,8 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:roleplaying_app/src/services/file_service.dart';
+import 'package:roleplaying_app/src/ui/utils/Utils.dart';
 import '../../../models/chat.dart';
 import '../../../models/profile.dart';
 import '../../chat_screen.dart';
@@ -52,22 +54,10 @@ class ChatBlock extends StatelessWidget {
         child: Column(
           children: [
             SizedBox(
-              child: ElevatedButton(
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all<Color>(Theme.of(context).colorScheme.secondary),
-                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(5.0),
-                        ),
-                      )
-                  ),
-                ),
-                onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(chat: chat))),
-                child:
-                Icon(Icons.image_outlined,
-                  size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width)*3),
-                ),
+              child: CustomSquareIconButton(
+                  future: FileService().getChatImage(chat.id, chat.image),
+                  onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(chat: chat))),
+                  scale: 2
               ),
             ),
             Text(chat.title,

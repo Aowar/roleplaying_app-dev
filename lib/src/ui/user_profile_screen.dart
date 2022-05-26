@@ -56,7 +56,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     } else {
       _user.image = "loading";
       CustomUserService().updateCustomUser(_user);
-      TaskState state = await FileService().uploadImage(_user.idUser, image.path, "user_pic");
+      TaskState state = await FileService().uploadImage("users/" + _user.idUser, image.path, "user_pic");
       _user.image = "user_pic";
       CustomUserService().updateCustomUser(_user);
       if (state == TaskState.success) {
