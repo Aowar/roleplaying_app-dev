@@ -13,7 +13,7 @@ import 'package:roleplaying_app/src/services/profile_service.dart';
 import 'package:roleplaying_app/src/ui/utils/Utils.dart' as utils;
 import 'package:roleplaying_app/src/ui/auth_screen.dart';
 
-import '../services/auth_service.dart';
+import '../../services/auth_service.dart';
 
 late Profile _profile;
 late bool _profileCreateFlag;
@@ -146,14 +146,14 @@ class _ProfileEditView extends State<ProfileEditView> {
                 children: [
                   ///Building back button
                   const Positioned(
-                      top: 15,
-                      left: 15,
+                      top: 16,
+                      left: 16,
                       child: utils.BackButton()
                   ),
                   ///Building apply button
                   Positioned(
-                      top: 15,
-                      right: 15,
+                      top: 16,
+                      right: 16,
                       child: Container(
                         decoration: BoxDecoration(
                             color: Theme.of(context).primaryColor,

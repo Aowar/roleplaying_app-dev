@@ -8,6 +8,8 @@ import 'package:roleplaying_app/src/models/custom_user_model.dart';
 import 'package:roleplaying_app/src/services/auth_service.dart';
 import 'package:roleplaying_app/src/services/custom_user_service.dart';
 import 'package:roleplaying_app/src/ui/menu_screen.dart';
+import 'package:roleplaying_app/src/ui/utils/Utils.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'dart:developer' as developer;
 
@@ -41,13 +43,14 @@ class _AuthView extends State<AuthView> {
   final TextEditingController _emailRegisterController = TextEditingController();
   final TextEditingController _userNicknameController = TextEditingController();
   final TextEditingController _passwordRegisterController = TextEditingController();
+  late SharedPreferences _prefs;
   bool isOpen = false;
   late OverlayEntry _overlayEntry;
   bool isLoading = false;
   final AuthService _authService = AuthService();
-  late String _email;
-  late String _nickName;
-  late String _password;
+  String _email = "";
+  String _nickName = "";
+  String _password = "";
   Map<AuthProblems, String> registerErrorsMessages = {
     AuthProblems.userExists: "Данный email уже используется",
     AuthProblems.networkError: "Произошла ошибка, повторите попытку позже",
@@ -69,14 +72,52 @@ class _AuthView extends State<AuthView> {
     _overlayEntry.remove();
   }
 
+  getPrefs() async {
+    _prefs = await SharedPreferences.getInstance();
+  }
+
+  getDataFromPrefs() async {
+    await getPrefs();
+    if (_prefs.getString("email") != null) {
+      _email = _prefs.getString("email")!;
+    }
+    if (_prefs.getString("password") != null) {
+      _password = _prefs.getString("password")!;
+    }
+  }
+
+  setDataToPrefs() {
+    _prefs.setString("email", _email);
+    _prefs.setString("password", _password);
+  }
+
+  deleteDataFromPrefs() async {
+    await getPrefs();
+    _email = "";
+    _password = "";
+    _prefs.remove("email");
+    _prefs.remove("password");
+  }
+
+  checkingPrefs(AuthBloc authBloc) async {
+    await getDataFromPrefs();
+    if (_prefs.containsKey("email") && _prefs.containsKey("password")) {
+      isLoading = true;
+      _emailLoginController.text = _email;
+      _passwordLoginController.text = _password;
+      auth(authBloc);
+    }
+  }
+
   auth(authBloc) async {
     AuthProblems? errorType;
-    _email = _emailLoginController.text;
-    _password = _passwordLoginController.text;
+    _email = _emailLoginController.text.trim();
+    _password = _passwordLoginController.text.trim();
     dynamic signInResult;
     signInResult = await _authService.signIn(_email.trim(), _password.trim());
     if (signInResult.runtimeType == UserModel) {
       if (!FirebaseAuth.instance.currentUser!.emailVerified) {
+        deleteDataFromPrefs();
         return Fluttertoast.showToast(
             msg: "Подтвердите адрес электронной почты",
             toastLength: Toast.LENGTH_SHORT,
@@ -92,9 +133,11 @@ class _AuthView extends State<AuthView> {
         CustomUserService().addCustomUser(_customUserModel);
       }
       authBloc.add(UserLoggedIn(user: signInResult));
+      setDataToPrefs();
     } else if (signInResult.runtimeType == FirebaseAuthException) {
       setState(() {
         isLoading = false;
+        deleteDataFromPrefs();
       });
       switch (signInResult.code) {
         case "internal-error":
@@ -119,6 +162,7 @@ class _AuthView extends State<AuthView> {
           errorType = AuthProblems.unknownProblem;
           break;
       }
+      await deleteDataFromPrefs();
       return Fluttertoast.showToast(
           msg: registerErrorsMessages[errorType]!,
           toastLength: Toast.LENGTH_SHORT,
@@ -195,7 +239,7 @@ class _AuthView extends State<AuthView> {
                       constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 2),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
-                        color: Theme.of(context).colorScheme.secondary,
+                        color: Theme.of(context).cardColor.withOpacity(0.6),
                       ),
                         ///Register form
                       child: Center(
@@ -226,7 +270,7 @@ class _AuthView extends State<AuthView> {
                                       borderRadius: BorderRadius.circular(20.0),
                                       boxShadow: [
                                         BoxShadow(
-                                            color: Theme.of(context).primaryColor.withOpacity(0.2),
+                                            color: Theme.of(context).cardColor.withOpacity(0.2),
                                             spreadRadius: 5,
                                             offset: const Offset(0, 3),
                                             blurRadius: 10
@@ -279,6 +323,7 @@ class _AuthView extends State<AuthView> {
   @override
   Widget build(BuildContext context) {
     final AuthBloc authBloc = BlocProvider.of<AuthBloc>(context);
+    checkingPrefs(authBloc);
     return BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
       return KeyboardDismissOnTap(
         child: Scaffold(

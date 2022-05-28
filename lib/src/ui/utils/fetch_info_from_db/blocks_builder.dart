@@ -5,8 +5,8 @@ import 'package:roleplaying_app/src/services/file_service.dart';
 import 'package:roleplaying_app/src/ui/utils/Utils.dart';
 import '../../../models/chat.dart';
 import '../../../models/profile.dart';
-import '../../chat_screen.dart';
-import '../../profile_screen.dart';
+import '../../chat/chat_screen.dart';
+import '../../profile/profile_screen.dart';
 
 ///Building profile block
 class ProfileBlock extends StatelessWidget {
@@ -36,7 +36,7 @@ class ProfileBlock extends StatelessWidget {
                   maxLines: 1,
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.subtitle2,
-                overflow: TextOverflow.ellipsis,
+                  overflow: TextOverflow.ellipsis,
               ),
             ),
           ],

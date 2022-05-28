@@ -10,10 +10,10 @@ import 'package:roleplaying_app/src/models/profile.dart';
 import 'package:roleplaying_app/src/services/file_service.dart';
 import 'package:roleplaying_app/src/services/profile_service.dart';
 import 'package:roleplaying_app/src/ui/utils/Utils.dart' as utils;
-import 'package:roleplaying_app/src/ui/profile_edit_screen.dart';
+import 'package:roleplaying_app/src/ui/profile/profile_edit_screen.dart';
 
-import '../services/auth_service.dart';
-import 'auth_screen.dart';
+import '../../services/auth_service.dart';
+import '../auth_screen.dart';
 
 late Profile _profile;
 
@@ -55,15 +55,15 @@ class _ProfileView extends State<ProfileView> {
               children: [
                 ///Building back button
                 const Positioned(
-                    top: 15,
-                    left: 15,
+                    top: 16,
+                    left: 16,
                     child: utils.BackButton()
                 ),
                 ///Building edit button
                 if (state.getUser()!.id == _profile.userId) ...[
                   Positioned(
-                    top: 15,
-                    right: 15,
+                    top: 16,
+                    right: 16,
                     child: utils.PushButton(icon: Icons.edit, onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileEditScreen.edit(profile: _profile)))),
                   ),
                 ],

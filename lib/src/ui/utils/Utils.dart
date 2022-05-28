@@ -1,6 +1,8 @@
 import 'dart:math';
 
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class PushButton extends StatelessWidget {
   final IconData icon;
@@ -35,7 +37,7 @@ class PushButton extends StatelessWidget {
 }
 
 class CustomCircleIconButton extends StatelessWidget {
-  final void Function() onPressed;
+  final void Function()? onPressed;
   final Future<String> future;
   final double borderWidth;
   final double scale;
@@ -52,7 +54,8 @@ class CustomCircleIconButton extends StatelessWidget {
                 if (!snapshot.hasData) {
                   return const CircularProgressIndicator();
                 } else if (snapshot.hasError) {
-                  return const Icon(Icons.account_circle_sharp);
+                  ErrorCatcher(snapshot: snapshot);
+                  return const Icon(Icons.error_outline_sharp);
                 } else {
                   return Container(
                     decoration: BoxDecoration(
@@ -71,6 +74,45 @@ class CustomCircleIconButton extends StatelessWidget {
           ),
           color: Colors.white,
           onPressed: onPressed
+    );
+  }
+}
+
+class CustomCircleIcon extends StatelessWidget {
+  final Future<String> future;
+  final double borderWidth;
+  final double scale;
+
+  const CustomCircleIcon({Key? key, required this.scale, required this.borderWidth, required this.future}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox.square(
+        dimension: sqrt(MediaQuery.of(context).size.height+MediaQuery.of(context).size.width) * scale,
+        child: FutureBuilder<String>(
+            future: future,
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return const CircularProgressIndicator();
+              } else if (snapshot.hasError) {
+                ErrorCatcher(snapshot: snapshot);
+                return const Icon(Icons.error_outline_sharp);
+              } else {
+                return Container(
+                  decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primaryContainer,
+                      shape: BoxShape.circle,
+                      border: Border.all(width: borderWidth, color: Theme.of(context).colorScheme.primaryContainer),
+                      image: DecorationImage(
+                        fit: BoxFit.fitHeight,
+                        alignment: FractionalOffset.topCenter,
+                        image: NetworkImage(snapshot.data!)
+                      )
+                  ),
+                );
+              }
+            }
+        ),
     );
   }
 }
@@ -172,5 +214,50 @@ class ImageContainer extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class ErrorCatcher extends StatelessWidget {
+  final AsyncSnapshot snapshot;
+  bool? showErrorTextWidget = false;
+
+  ErrorCatcher({Key? key, required this.snapshot, this.showErrorTextWidget}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    Fluttertoast.showToast(
+        msg: "Ошибка получения данных " + snapshot.error.toString(),
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 5,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0);
+    return showErrorTextWidget! ? Text("Ошибка загрузки данных " + snapshot.error.toString(), style: Theme.of(context).textTheme.subtitle2) :
+        Container();
+  }
+}
+
+class Toasts {
+  static showErrorMessage({required String errorMessage, int duration = 5}) {
+    Fluttertoast.showToast(
+        msg: errorMessage,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: duration,
+        backgroundColor: Colors.red.withOpacity(0.8),
+        textColor: Colors.white,
+        fontSize: 16.0);
+  }
+
+  static showInfo({required BuildContext context, required String infoMessage, int duration = 3, bool isSuccess = false}) {
+    Fluttertoast.showToast(
+        msg: infoMessage,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: duration,
+        backgroundColor: isSuccess ? Colors.green.withOpacity(0.7) : Theme.of(context).colorScheme.secondary.withOpacity(0.7),
+        textColor: Colors.white,
+        fontSize: 16.0);
   }
 }

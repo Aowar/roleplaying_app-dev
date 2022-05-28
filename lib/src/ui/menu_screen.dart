@@ -8,10 +8,11 @@ import 'package:roleplaying_app/src/models/custom_user_model.dart';
 import 'package:roleplaying_app/src/services/auth_service.dart';
 import 'package:roleplaying_app/src/services/custom_user_service.dart';
 import 'package:roleplaying_app/src/ui/auth_screen.dart';
-import 'package:roleplaying_app/src/ui/chat_edit_screen.dart';
-import 'package:roleplaying_app/src/ui/profile_edit_screen.dart';
+import 'package:roleplaying_app/src/ui/chat/chat_edit_screen.dart';
+import 'package:roleplaying_app/src/ui/profile/profile_edit_screen.dart';
 import 'package:roleplaying_app/src/ui/user_profile_screen.dart';
 import 'package:roleplaying_app/src/ui/utils/fetch_info_from_db/fetch_info.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'utils/Utils.dart';
 
@@ -26,6 +27,17 @@ class MenuScreen extends StatefulWidget{
 class _MenuScreenState extends State<MenuScreen> {
 
   final AuthService _authService = AuthService();
+  late SharedPreferences _prefs;
+
+  getPrefs() async {
+    _prefs = await SharedPreferences.getInstance();
+  }
+
+  clearAccountInPrefs() async {
+    await getPrefs();
+    _prefs.remove("email");
+    _prefs.remove("password");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,8 +49,8 @@ class _MenuScreenState extends State<MenuScreen> {
               body: Stack(
                 children: [
                   Positioned(
-                    left: 15,
-                    top: 15,
+                    left: 16,
+                    top: 16,
                     child: FutureBuilder<CustomUserModel>(
                         future: CustomUserService().getUser(state.getUser()!.id),
                         builder: (context, snapshot) {
@@ -73,6 +85,7 @@ class _MenuScreenState extends State<MenuScreen> {
                           color: Colors.white,
                           iconSize: sqrt(MediaQuery.of(context).size.height + MediaQuery.of(context).size.width),
                           onPressed: () {
+                            clearAccountInPrefs();
                             _authService.logOut();
                             authBloc.add(const UserLoggedOut());
                             Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => AuthScreen()), (route) => false);

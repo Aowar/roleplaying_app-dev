@@ -13,10 +13,10 @@ import 'package:roleplaying_app/src/services/file_service.dart';
 import 'package:roleplaying_app/src/ui/user_profile_screen.dart';
 import 'package:roleplaying_app/src/ui/utils/Utils.dart' as utils;
 import 'package:roleplaying_app/src/ui/auth_screen.dart';
-import 'package:roleplaying_app/src/ui/chat_edit_screen.dart';
+import 'package:roleplaying_app/src/ui/chat/chat_edit_screen.dart';
 import 'package:roleplaying_app/src/ui/menu_screen.dart';
 
-import '../services/auth_service.dart';
+import '../../services/auth_service.dart';
 
 late Chat _chat;
 
@@ -56,13 +56,13 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
               body: Stack(
                 children: [
                   const Positioned(
-                      top: 15,
-                      left: 15,
+                      top: 16,
+                      left: 16,
                       child: utils.BackButton(),
                   ),
                   Positioned(
-                    top: 15,
-                    right: 15,
+                    top: 16,
+                    right: 16,
                     child: utils.PushButton(icon: Icons.edit, onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => ChatEditScreen.update(chat: _chat)))),
                   ),
                   Center(

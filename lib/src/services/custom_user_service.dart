@@ -27,7 +27,8 @@ class CustomUserService {
   Future<CustomUserModel> getUser(String userId) async {
     DocumentReference docRef = _usersCollection.doc(userId);
     return await docRef.get().then((value) {
-      return CustomUserModel(value.get("userId"), value.get("nickName"), value.get("image"));
+      CustomUserModel user = CustomUserModel(value.get("userId"), value.get("nickName"), value.get("image"));
+      return user;
     });
   }
 }

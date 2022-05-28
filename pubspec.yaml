@@ -49,6 +49,9 @@ dependencies:
   image_picker: ^0.8.5+3
   path_provider: ^2.0.10
   flutter_keyboard_visibility: ^5.2.0
+  rect_getter: ^1.1.0
+  shared_preferences: ^2.0.15
+  dotted_border: ^2.0.0+2
 
 
 
