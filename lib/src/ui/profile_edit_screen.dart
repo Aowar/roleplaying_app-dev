@@ -50,11 +50,10 @@ class _ProfileEditView extends State<ProfileEditView> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _textController = TextEditingController();
 
-  final ProfileService _profileService = ProfileService();
-
   late String title;
   late String text;
   bool isOpen = false;
+  bool imageChanged = false;
   late OverlayEntry _overlayEntry;
   late double x;
   late double y;
@@ -78,6 +77,7 @@ class _ProfileEditView extends State<ProfileEditView> {
     if (image == null) {
       return setState(() { });
     } else {
+      imageChanged = true;
       return imageInMemory = image;
     }
   }
@@ -172,7 +172,7 @@ class _ProfileEditView extends State<ProfileEditView> {
                             color: Colors.white,
                             iconSize: sqrt(MediaQuery.of(context).size.height + MediaQuery.of(context).size.width),
                             onPressed: () {
-                              title = _titleController.text;
+                              title = _titleController.text.trim();
                               text = _textController.text;
                               if (imageInMemory == null && _profileCreateFlag)
                               {
@@ -194,7 +194,9 @@ class _ProfileEditView extends State<ProfileEditView> {
                                 _profile.title = title;
                                 _profile.text = text;
                                 ProfileService().updateProfile(_profile);
-                                FileService().uploadImage("profiles/" + _profile.id, imageInMemory!.path, _profile.image);
+                                if(imageChanged) {
+                                  FileService().uploadImage("profiles/" + _profile.id, imageInMemory!.path, _profile.image);
+                                }
                               }
                               Navigator.pop(context);
                             }
@@ -229,10 +231,10 @@ class _ProfileEditView extends State<ProfileEditView> {
                                 Column(
                                   children: [
                                     Padding(
-                                      padding: const EdgeInsets.only(top: 20),
+                                      padding: const EdgeInsets.only(top: 10),
                                       child: SizedBox(
-                                        width: MediaQuery.of(context).size.width * 0.8,
                                         child: Container(
+                                            constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.8),
                                             decoration: BoxDecoration(
                                                 color: Theme.of(context).colorScheme.secondary,
                                                 borderRadius: const BorderRadius.all(
@@ -247,25 +249,29 @@ class _ProfileEditView extends State<ProfileEditView> {
                                                   )
                                                 ]
                                             ),
-                                            child: TextField(
-                                              textAlignVertical: TextAlignVertical.center,
-                                              textAlign: TextAlign.center,
-                                              style: Theme.of(context).textTheme.headline1,
-                                              decoration: const InputDecoration(
-                                                border: InputBorder.none,
-                                                hintText: "Название",
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(left: 5, top: 2, bottom: 2, right: 5),
+                                              child: TextField(
+                                                maxLines: 1,
+                                                textAlignVertical: TextAlignVertical.center,
+                                                textAlign: TextAlign.center,
+                                                style: Theme.of(context).textTheme.headline1,
+                                                decoration: const InputDecoration(
+                                                  border: InputBorder.none,
+                                                  hintText: "Название",
+                                                ),
+                                                controller: !_profileCreateFlag ? (_titleController..text = _profile.title) : _titleController,
+                                                onChanged: (String value) async {
+                                                  _profile.title = value.trim();
+                                                },
                                               ),
-                                              controller: !_profileCreateFlag ? (_titleController..text = _profile.title) : _titleController,
-                                              onChanged: (String value) async {
-                                                _profile.title = value;
-                                              },
                                             )
                                         ),
                                       ),
                                     ),
                                     ///Image container
                                     Padding(
-                                      padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 80),
+                                      padding: const EdgeInsets.only(top: 15),
                                       child: SizedBox(
                                         child: Listener(
                                           onPointerMove: getCoordinates,
@@ -303,7 +309,7 @@ class _ProfileEditView extends State<ProfileEditView> {
                                                   } else {
                                                     return Container(
                                                       decoration: BoxDecoration(
-                                                          color: Theme.of(context).colorScheme.secondary,
+                                                          color: Theme.of(context).colorScheme.secondary.withOpacity(0),
                                                           borderRadius: const BorderRadius.all(
                                                             Radius.circular(5.0),
                                                           ),

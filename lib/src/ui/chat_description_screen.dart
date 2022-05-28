@@ -3,7 +3,6 @@ import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
 import 'package:roleplaying_app/src/models/chat.dart';
@@ -43,6 +42,7 @@ class ChatDescriptionView extends StatefulWidget {
 }
 
 class _ChatDescriptionView extends State<ChatDescriptionView> {
+  final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
 
   late String text;
@@ -95,29 +95,34 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
                                       Padding(
                                         padding: const EdgeInsets.only(top: 10),
                                         child: SizedBox(
-                                            width: MediaQuery.of(context).size.width * 0.5,
                                             child: Container(
-                                              decoration: BoxDecoration(
-                                                  color: Theme.of(context).colorScheme.secondary,
-                                                  borderRadius: const BorderRadius.all(
-                                                    Radius.circular(10.0),
-                                                  ),
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                        color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
-                                                        spreadRadius: 5,
-                                                        offset: const Offset(5, 5),
-                                                        blurRadius: 10
-                                                    )
-                                                  ]
-                                              ),
+                                                constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.8),
+                                                decoration: BoxDecoration(
+                                                    color: Theme.of(context).colorScheme.secondary,
+                                                    borderRadius: const BorderRadius.all(
+                                                      Radius.circular(10.0),
+                                                    ),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                          color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
+                                                          spreadRadius: 5,
+                                                          offset: const Offset(5, 5),
+                                                          blurRadius: 10
+                                                      )
+                                                    ]
+                                                ),
                                                 child: Padding(
-                                                  padding: const EdgeInsets.all(2),
-                                                  child: Text(
-                                                    _chat.title,
+                                                  padding: const EdgeInsets.only(left: 5, top: 2, bottom: 2, right: 5),
+                                                  child: TextField(
+                                                    maxLines: 1,
+                                                    textAlignVertical: TextAlignVertical.center,
                                                     textAlign: TextAlign.center,
-                                                    style: Theme.of(context).textTheme.subtitle1,
-                                                    overflow: TextOverflow.fade,
+                                                    decoration: const InputDecoration(
+                                                      border: InputBorder.none,
+                                                      hintText: "Название чата",
+                                                    ),
+                                                    controller: _titleController..text = _chat.title,
+                                                    readOnly: true,
                                                   ),
                                                 )
                                             )

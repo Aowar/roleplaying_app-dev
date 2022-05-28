@@ -95,10 +95,10 @@ class _ProfileView extends State<ProfileView> {
                                 children: [
                                   ///Title block
                                   Padding(
-                                    padding: const EdgeInsets.only(top: 30),
+                                    padding: const EdgeInsets.only(top: 10),
                                     child: SizedBox(
-                                      width: MediaQuery.of(context).size.width * 0.8,
                                       child: Container(
+                                          constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.8),
                                           decoration: BoxDecoration(
                                               color: Theme.of(context).colorScheme.secondary,
                                               borderRadius: const BorderRadius.all(
@@ -113,27 +113,31 @@ class _ProfileView extends State<ProfileView> {
                                                 )
                                               ]
                                           ),
-                                          child: TextField(
-                                            textAlignVertical: TextAlignVertical.center,
-                                            textAlign: TextAlign.center,
-                                            readOnly: true,
-                                            style: Theme.of(context).textTheme.headline1,
-                                            decoration: const InputDecoration(
-                                              border: InputBorder.none,
-                                              hintText: "Название",
-                                            ),
-                                            controller: _titleController..text = title,
-                                          )
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(left: 5, top: 2, bottom: 2, right: 5),
+                                            child: TextField(
+                                              maxLines: 1,
+                                              textAlignVertical: TextAlignVertical.center,
+                                              textAlign: TextAlign.center,
+                                              style: Theme.of(context).textTheme.headline1,
+                                              decoration: const InputDecoration(
+                                                border: InputBorder.none,
+                                                hintText: "Название",
+                                              ),
+                                              controller: _titleController..text = _profile.title,
+                                              readOnly: true,
+                                            )
+                                          ),
                                       ),
                                     ),
                                   ),
                                   ///Image container
                                   Padding(
-                                      padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 80),
+                                      padding: const EdgeInsets.only(top: 15),
                                       child: SizedBox.square(
                                         dimension: sqrt(MediaQuery.of(context).size.width + MediaQuery.of(context).size.height) * 8,
                                         child: FutureBuilder<String>(
-                                          future: FileService().getChatImage(_profile.id, _profile.image),
+                                          future: FileService().getProfileImage(_profile.id, _profile.image),
                                           builder: (context, snapshot) {
                                             if (!snapshot.hasData) {
                                               return const LinearProgressIndicator();
@@ -151,7 +155,7 @@ class _ProfileView extends State<ProfileView> {
                                             } else {
                                               return Container(
                                                 decoration: BoxDecoration(
-                                                    color: Theme.of(context).colorScheme.secondary,
+                                                    color: Theme.of(context).colorScheme.secondary.withOpacity(0),
                                                     borderRadius: const BorderRadius.all(
                                                       Radius.circular(5.0),
                                                     ),

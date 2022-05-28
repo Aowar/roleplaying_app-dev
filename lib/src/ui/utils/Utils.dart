@@ -96,7 +96,7 @@ class CustomSquareIconButton extends StatelessWidget {
               } else {
                 return Container(
                   decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primaryContainer,
+                      color: Theme.of(context).colorScheme.secondary.withOpacity(0),
                       borderRadius: const BorderRadius.all(Radius.circular(5)),
                       image: DecorationImage(
                         fit: BoxFit.fitHeight,

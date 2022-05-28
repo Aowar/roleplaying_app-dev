@@ -10,8 +10,11 @@ class ProfileService {
   Future addProfile(Profile profile, String imagePath) async {
     DocumentReference docRef = _profileCollection.doc();
     await docRef.set({
-      profile.id = docRef.id,
-      profile.toMap()
+      "id": docRef.id,
+      "userId": profile.userId,
+      "title": profile.title,
+      "text": profile.text,
+      "image": profile.image
     });
     return await FileService().uploadImage("profiles/" + docRef.id, imagePath, "profile_pic");
   }

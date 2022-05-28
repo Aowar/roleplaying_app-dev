@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
 import 'package:roleplaying_app/src/models/chat.dart';
 import 'package:roleplaying_app/src/models/custom_user_model.dart';
@@ -120,7 +121,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                                               constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 4.5),
                                                               child: Container(
                                                                   decoration: BoxDecoration(
-                                                                      color: Theme.of(context).colorScheme.secondary,
+                                                                      color: Theme.of(context).colorScheme.secondary.withOpacity(0.8),
                                                                       borderRadius: const BorderRadius.all(
                                                                         Radius.circular(20.0),
                                                                       ),
@@ -136,8 +137,10 @@ class _ChatScreenState extends State<ChatScreen> {
                                                                   child: Padding(
                                                                     padding: const EdgeInsets.only(left: 10),
                                                                     child: TextField(
+                                                                      style: TextStyle(
+                                                                        color: Theme.of(context).textTheme.bodyText1!.color!
+                                                                      ),
                                                                         textAlign: TextAlign.left,
-                                                                        keyboardType: TextInputType.multiline,
                                                                         maxLines: null,
                                                                         controller: _textController,
                                                                         decoration: InputDecoration(
@@ -173,6 +176,18 @@ class _ChatScreenState extends State<ChatScreen> {
                                                             color: Colors.white,
                                                             iconSize: sqrt(MediaQuery.of(context).size.height + MediaQuery.of(context).size.width),
                                                             onPressed: () async {
+                                                              if (_textController.text.trim().isEmpty) {
+                                                                Fluttertoast.showToast(
+                                                                    msg: "Введите сообщение",
+                                                                    toastLength: Toast.LENGTH_SHORT,
+                                                                    gravity: ToastGravity.CENTER,
+                                                                    timeInSecForIosWeb: 3,
+                                                                    backgroundColor: Colors.red,
+                                                                    textColor: Colors.white,
+                                                                    fontSize: 16.0
+                                                                );
+                                                                return;
+                                                              }
                                                               String _text = _textController.text;
                                                               Message _message = Message(state.getUser()!.id, _text);
                                                               messageService.addMessage(_message);
@@ -353,7 +368,7 @@ class CurUserMessageBox extends StatelessWidget {
             constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 6, maxWidth: MediaQuery.of(context).size.width / 1.2),
             child: Container(
               decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer,
+                  color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.7),
                   borderRadius: const BorderRadius.all(
                     Radius.circular(5.0),
                   ),
@@ -395,7 +410,7 @@ class CurUserMessageBox extends StatelessWidget {
                             return utils.CustomCircleIconButton(
                                 future: FileService().getUserImage(snapshot.data!.idUser, snapshot.data!.image),
                                 onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => UserProfileScreen(user: snapshot.data!))),
-                                scale: 15,
+                                scale: 1.5,
                                 borderWidth: 2,
                             );
                           }
@@ -430,7 +445,7 @@ class MessageBox extends StatelessWidget {
               constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 6, minHeight: MediaQuery.of(context).size.height / 8, maxWidth: MediaQuery.of(context).size.width / 1.2),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(5),
-                color: Theme.of(context).colorScheme.secondary,
+                color: Theme.of(context).colorScheme.secondary.withOpacity(0.7),
               ),
               child: Stack(
                 children: [
@@ -443,10 +458,10 @@ class MessageBox extends StatelessWidget {
                           return Text(snapshot.error.toString());
                         } else {
                           return utils.CustomCircleIconButton(
-                              future: FileService().getUserImage(snapshot.data!.idUser, snapshot.data!.image),
-                              onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => UserProfileScreen(user: snapshot.data!))),
-                              borderWidth: 2,
-                              scale: 15,
+                            future: FileService().getUserImage(snapshot.data!.idUser, snapshot.data!.image),
+                            onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => UserProfileScreen(user: snapshot.data!))),
+                            borderWidth: 2,
+                            scale: 1.5,
                           );
                         }
                       }

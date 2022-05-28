@@ -8,38 +8,44 @@ import '../../../models/profile.dart';
 import '../../chat_screen.dart';
 import '../../profile_screen.dart';
 
-class BlocksBuilder {
-  ///Building profile block
-  static Widget buildProfile(BuildContext context, Profile profile) => SizedBox(
-      height: 100,
-      child: Column(
-        children: [
-          SizedBox(
-            child: ElevatedButton(
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all<Color>(Theme.of(context).colorScheme.secondary),
-                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                    const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(5.0),
-                      ),
-                    )
-                ),
-              ),
-              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ProfileScreen(profile: profile))),
-              child:
-              Icon(Icons.image_outlined,
-                size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width)*3),
+///Building profile block
+class ProfileBlock extends StatelessWidget {
+  final Profile profile;
+
+  const ProfileBlock({Key? key, required this.profile}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 5),
+      child: Container(
+        constraints: BoxConstraints(maxWidth: sqrt(MediaQuery.of(context).size.width + MediaQuery.of(context).size.height)*2.5),
+        decoration: BoxDecoration(
+          border: Border.all(width: 0.5, color: Theme.of(context).primaryColor),
+          borderRadius: const BorderRadius.all(Radius.circular(5))
+        ),
+        child: Column(
+          children: [
+            CustomSquareIconButton(
+                future: FileService().getProfileImage(profile.id, profile.image),
+                onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen(profile: profile))),
+                scale: 2
+            ),
+            Flexible(
+              child: Text(profile.title,
+                  maxLines: 1,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.subtitle2,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
-          ),
-          Text(profile.title,
-              style: Theme.of(context).textTheme.subtitle2
-          ),
-        ],
-      )
-  );
+          ],
+        ),
+      ),
+    );
+  }
 }
+
 
 ///Building chat block
 class ChatBlock extends StatelessWidget {
@@ -49,22 +55,30 @@ class ChatBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-        height: 100,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 5),
+      child: Container(
+        constraints: BoxConstraints(maxWidth: sqrt(MediaQuery.of(context).size.width + MediaQuery.of(context).size.height)*2.5),
+        decoration: BoxDecoration(
+            border: Border.all(width: 0.5, color: Theme.of(context).primaryColor),
+            borderRadius: const BorderRadius.all(Radius.circular(5))
+        ),
         child: Column(
           children: [
-            SizedBox(
-              child: CustomSquareIconButton(
-                  future: FileService().getChatImage(chat.id, chat.image),
-                  onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(chat: chat))),
-                  scale: 2
-              ),
+            CustomSquareIconButton(
+                future: FileService().getChatImage(chat.id, chat.image),
+                onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(chat: chat))),
+                scale: 2
             ),
             Text(chat.title,
-                style: Theme.of(context).textTheme.subtitle2
+                style: Theme.of(context).textTheme.subtitle2,
+              maxLines: 1,
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
-        )
+        ),
+      ),
     );
   }
 }

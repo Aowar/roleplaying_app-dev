@@ -13,8 +13,10 @@ class MessageService {
   Future addMessage(Message message) async {
     DocumentReference docRef = messageCollection.doc(chat.id).collection("messages").doc();
     return await docRef.set({
-      message.id = docRef.id,
-      message.toMap()
+      "id": docRef.id,
+      "authorId": message.authorId,
+      "text": message.text,
+      "creationDate": message.creationDate
     });
   }
 

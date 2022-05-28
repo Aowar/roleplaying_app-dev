@@ -28,7 +28,7 @@ class FileService {
   }
 
   Future<String> getProfileImage(String folder, String imageName) async {
-    final _storageRef = storageRef.child("profile");
+    final _storageRef = storageRef.child("profiles");
     return _storageRef.child(folder).child(imageName).getDownloadURL();
   }
 }

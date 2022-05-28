@@ -52,6 +52,7 @@ class _ChatEditView extends State<ChatEditView> {
   late String description;
   bool isOpen = false;
   bool isLoading = false;
+  bool imageChanged = false;
   late OverlayEntry _overlayEntry;
   late double x;
   late double y;
@@ -75,6 +76,7 @@ class _ChatEditView extends State<ChatEditView> {
     if (image == null) {
       return setState(() { });
     } else {
+      imageChanged = true;
       return imageInMemory = image;
     }
   }
@@ -175,7 +177,7 @@ class _ChatEditView extends State<ChatEditView> {
                               setState(() {
                                 isLoading = true;
                               });
-                              title = _titleController.text;
+                              title = _titleController.text.trim();
                               description = _descriptionController.text;
                               List usersList = [];
                               if (_chatCreateFlag) {
@@ -240,8 +242,8 @@ class _ChatEditView extends State<ChatEditView> {
                                         Padding(
                                           padding: const EdgeInsets.only(top: 10),
                                           child: SizedBox(
-                                              width: MediaQuery.of(context).size.width * 0.5,
                                               child: Container(
+                                                constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.8),
                                                 decoration: BoxDecoration(
                                                     color: Theme.of(context).colorScheme.secondary,
                                                     borderRadius: const BorderRadius.all(
@@ -257,6 +259,7 @@ class _ChatEditView extends State<ChatEditView> {
                                                     ]
                                                 ),
                                                 child: TextField(
+                                                  maxLines: 1,
                                                   textAlignVertical: TextAlignVertical.center,
                                                   textAlign: TextAlign.center,
                                                   decoration: const InputDecoration(
@@ -266,7 +269,7 @@ class _ChatEditView extends State<ChatEditView> {
                                                   controller: !_chatCreateFlag ? (_titleController..text = _chat.title) : _titleController,
                                                   onChanged: (String value) async {
                                                     if (!_chatCreateFlag) {
-                                                      _chat.title = value;
+                                                      _chat.title = value.trim();
                                                     }
                                                     return;
                                                   },

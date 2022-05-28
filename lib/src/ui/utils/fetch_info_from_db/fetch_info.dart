@@ -29,7 +29,7 @@ class FetchInfoFromDb {
                       scrollDirection: Axis.horizontal,
                       itemCount: profiles.length,
                       itemBuilder: (BuildContext context, int index) {
-                        return BlocksBuilder.buildProfile(context, profiles[index]);
+                        return ProfileBlock(profile: profiles[index]);
                       },
                       separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 10),
                     ),
