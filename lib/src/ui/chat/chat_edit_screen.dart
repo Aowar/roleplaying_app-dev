@@ -97,11 +97,11 @@ class _ChatEditView extends State<ChatEditView> {
                     top: y,
                     child: Container(
                         decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.secondary,
+                            color: Theme.of(context).colorScheme.secondaryContainer,
                             borderRadius: BorderRadius.circular(5.0),
                             boxShadow: [
                               BoxShadow(
-                                  color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
+                                  color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.2),
                                   spreadRadius: 5,
                                   offset: const Offset(5, 5),
                                   blurRadius: 10
@@ -245,13 +245,13 @@ class _ChatEditView extends State<ChatEditView> {
                                               child: Container(
                                                 constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.8),
                                                 decoration: BoxDecoration(
-                                                    color: Theme.of(context).colorScheme.secondary,
+                                                    color: Theme.of(context).colorScheme.secondaryContainer,
                                                     borderRadius: const BorderRadius.all(
                                                       Radius.circular(10.0),
                                                     ),
                                                     boxShadow: [
                                                       BoxShadow(
-                                                          color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
+                                                          color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.2),
                                                           spreadRadius: 5,
                                                           offset: const Offset(5, 5),
                                                           blurRadius: 10
@@ -291,7 +291,7 @@ class _ChatEditView extends State<ChatEditView> {
                                                   Container(
                                                     child: const Icon(Icons.image_outlined),
                                                     decoration: BoxDecoration(
-                                                      color: Theme.of(context).colorScheme.secondary,
+                                                      color: Theme.of(context).colorScheme.secondaryContainer,
                                                       borderRadius: const BorderRadius.all(
                                                         Radius.circular(5.0),
                                                       ),
@@ -317,7 +317,7 @@ class _ChatEditView extends State<ChatEditView> {
                                                         } else {
                                                           return Container(
                                                             decoration: BoxDecoration(
-                                                                color: Theme.of(context).colorScheme.secondary,
+                                                                color: Theme.of(context).colorScheme.secondaryContainer,
                                                                 borderRadius: const BorderRadius.all(
                                                                   Radius.circular(5.0),
                                                                 ),
@@ -378,13 +378,13 @@ class _ChatEditView extends State<ChatEditView> {
                                             width: MediaQuery.of(context).size.width / 1.3,
                                             child: Container(
                                                 decoration: BoxDecoration(
-                                                    color: Theme.of(context).colorScheme.secondary,
+                                                    color: Theme.of(context).colorScheme.secondaryContainer,
                                                     borderRadius: const BorderRadius.all(
                                                       Radius.circular(5.0),
                                                     ),
                                                     boxShadow: [
                                                       BoxShadow(
-                                                          color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
+                                                          color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.2),
                                                           spreadRadius: 2,
                                                           offset: const Offset(5, 5),
                                                           blurRadius: 10

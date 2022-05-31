@@ -251,17 +251,17 @@ class _AuthView extends State<AuthView> {
                               ///Login field
                               Material(
                                   child: EmailFormField(icon: const Icon(Icons.login), hintText: "Введите email", controller: _emailRegisterController),
-                                  color: Theme.of(context).colorScheme.secondary
+                                  color: Theme.of(context).colorScheme.secondaryContainer
                               ),
                               ///User nickname field
                               Material(
                                 child: NicknameFormField(icon: const Icon(Icons.text_fields_outlined), hintText: "Введите никнейм", controller: _userNicknameController),
-                                color: Theme.of(context).colorScheme.secondary,
+                                color: Theme.of(context).colorScheme.secondaryContainer,
                               ),
                               ///Password field
                               Material(
                                 child: PasswordFormField(icon: const Icon(Icons.password), hintText: "Введите пароль", controller: _passwordRegisterController, registerFlag: true),
-                                color: Theme.of(context).colorScheme.secondary,
+                                color: Theme.of(context).colorScheme.secondaryContainer,
                               ),
                               SizedBox(
                                 width: MediaQuery.of(context).size.width * 0.5,

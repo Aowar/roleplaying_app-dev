@@ -82,11 +82,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   top: y,
                   child: Container(
                       decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.secondary,
+                          color: Theme.of(context).colorScheme.secondaryContainer,
                           borderRadius: BorderRadius.circular(5.0),
                           boxShadow: [
                             BoxShadow(
-                                color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
+                                color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.2),
                                 spreadRadius: 5,
                                 offset: const Offset(5, 5),
                                 blurRadius: 10

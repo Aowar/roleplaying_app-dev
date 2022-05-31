@@ -48,6 +48,22 @@ class _MenuScreenState extends State<MenuScreen> {
             return Scaffold(
               body: Stack(
                 children: [
+                  // SizedBox(
+                  //   width: MediaQuery.of(context).size.width,
+                  //   height: MediaQuery.of(context).size.height,
+                  //   child: Container(
+                  //     decoration: BoxDecoration(
+                  //       gradient: LinearGradient(
+                  //           colors: [
+                  //             Theme.of(context).backgroundColor,
+                  //             Theme.of(context).colorScheme.secondary
+                  //           ],
+                  //         begin: Alignment.bottomLeft,
+                  //         end: Alignment.topRight
+                  //       )
+                  //     ),
+                  //   ),
+                  // ),
                   Positioned(
                     left: 16,
                     top: 16,

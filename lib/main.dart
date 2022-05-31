@@ -1,5 +1,10 @@
 import 'dart:developer';
+import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
@@ -78,7 +83,7 @@ class _RpAppState extends State<RpApp> {
           themeMode: _themeMode,
           debugShowCheckedModeBanner: false,
           title: 'Roleplaying app',
-          home: GestureDetector(child: AuthScreen(), onTap: () => FocusScope.of(context).unfocus()),
+          home: AuthScreen(),
           darkTheme: ThemeData(
               scaffoldBackgroundColor: darkPrimary,
               backgroundColor: darkPrimary,
@@ -97,16 +102,18 @@ class _RpAppState extends State<RpApp> {
                 subtitle2: TextStyle(color: Color(0xffffffff), fontSize: 14, overflow: TextOverflow.fade),
               ),
               colorScheme: ColorScheme.fromSwatch().copyWith(
-                  secondary: const Color(0xff9e9e9e),
+                  secondary: const Color(0xFF2F69FF),
                   brightness: Brightness.dark,
-                  primaryContainer: const Color(0xffdbdbdb),
-                  errorContainer: const Color(0xff6d0000)
+                  primaryContainer: const Color(0xffe5e5e5),
+                  secondaryContainer: const Color(0xff9e9e9e),
+                  errorContainer: const Color(0xff9a0000)
               )
           ),
           theme: ThemeData(
               scaffoldBackgroundColor: lightPrimary,
               backgroundColor: lightPrimary,
               primaryColor: const Color(0xFF2F69FF),
+              canvasColor: const Color(0xffe8e8e8),
               cardColor: Colors.white,
               textTheme: const TextTheme(
                 headline1: TextStyle(color: Colors.white, fontSize: 24, overflow: TextOverflow.fade),
@@ -117,7 +124,8 @@ class _RpAppState extends State<RpApp> {
                 subtitle2: TextStyle(color: Color(0xff000000), fontSize: 14, overflow: TextOverflow.fade),
               ),
               colorScheme: ColorScheme.fromSwatch().copyWith(
-                  secondary: const Color(0xffc2c2c2),
+                  secondary: const Color(0xFF2140A7),
+                  secondaryContainer: const Color(0xffc2c2c2),
                   brightness: Brightness.light,
                   primaryContainer: const Color(0xFF2F69FF),
                   errorContainer: const Color(0xffff0000)
@@ -127,3 +135,74 @@ class _RpAppState extends State<RpApp> {
     );
   }
 }
+
+
+///Code of notifications (currently not working(needed upgrade of Firebase))
+// class MessageHandler extends StatefulWidget {
+//   const MessageHandler({Key? key}) : super(key: key);
+//
+//   @override
+//   State<StatefulWidget> createState() => _MessageHandlerState();
+// }
+//
+// class _MessageHandlerState extends State<MessageHandler> {
+//   final FirebaseFirestore _db = FirebaseFirestore.instance;
+//   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+//
+//   @override
+//   void initState() {
+//     super.initState();
+//
+//     _firebaseMessaging.requestPermission();
+//
+//     _saveDeviceToken() async {
+//       String uid = 'yIN6nhaoPsMlLI3YQbnuaQeZhSl2';
+//       String? fcmToken = await FirebaseMessaging.instance.getToken();
+//       User user = await FirebaseAuth.instance.currentUser!;
+//
+//       if (fcmToken != null) {
+//         var tokenRef = _db.collection('users').doc(uid).collection('tokens').doc(fcmToken);
+//         await tokenRef.set({
+//           'token': fcmToken,
+//           'createdAt': FieldValue.serverTimestamp(),
+//           'platform': Platform.operatingSystem
+//         });
+//       }
+//     }
+//
+//     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+//       print("on message: " + message.data.toString());
+//       showDialog(
+//           context: context,
+//           builder: (context) => AlertDialog(
+//             content: ListTile(
+//               title: Text(message.data['notification']['title']),
+//               subtitle: Text(message.data['notification']['body']),
+//             ),
+//             actions: <Widget>[
+//               TextButton(
+//                   onPressed: () => Navigator.pop(context),
+//                   child: Text("Ок")
+//               )
+//             ],
+//           )
+//       );
+//       final snackbar = SnackBar(
+//         content: Text(message.data['notification']['title']),
+//         action: SnackBarAction(
+//             label: 'Go',
+//             onPressed: () => null
+//         ),
+//       );
+//       ScaffoldMessenger.of(context).showSnackBar(snackbar);
+//     });
+//     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+//       print("on message: " + message.toString());
+//     });
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return AuthScreen();
+//   }
+// }

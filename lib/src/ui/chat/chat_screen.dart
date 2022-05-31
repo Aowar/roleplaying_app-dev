@@ -17,7 +17,7 @@ import 'package:roleplaying_app/src/services/chat_service.dart';
 import 'package:roleplaying_app/src/services/custom_user_service.dart';
 import 'package:roleplaying_app/src/services/file_service.dart';
 import 'package:roleplaying_app/src/services/message_service.dart';
-import 'package:roleplaying_app/src/services/rolePlayQueueService.dart';
+import 'package:roleplaying_app/src/services/role_play_queue_service.dart';
 import 'package:roleplaying_app/src/ui/utils/Utils.dart' as utils;
 import 'package:roleplaying_app/src/ui/auth_screen.dart';
 import 'package:roleplaying_app/src/ui/chat/chat_description_screen.dart';
@@ -491,7 +491,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       top: rect.top - rect.height,
                       child: Container(
                           decoration: BoxDecoration(
-                              color: Theme.of(context).cardColor.withOpacity(0.6),
+                              color: Theme.of(context).canvasColor.withOpacity(0.6),
                               borderRadius: BorderRadius.circular(5.0),
                               border: Border.all(width: 0.5),
                               boxShadow: [
@@ -649,13 +649,13 @@ class _ChatScreenState extends State<ChatScreen> {
                                                               constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 4.5),
                                                               child: Container(
                                                                   decoration: BoxDecoration(
-                                                                      color: Theme.of(context).colorScheme.secondary.withOpacity(0.8),
+                                                                      color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.8),
                                                                       borderRadius: const BorderRadius.all(
                                                                         Radius.circular(20.0),
                                                                       ),
                                                                       boxShadow: [
                                                                         BoxShadow(
-                                                                            color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
+                                                                            color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.2),
                                                                             spreadRadius: 5,
                                                                             offset: const Offset(5, 5),
                                                                             blurRadius: 10
@@ -933,10 +933,11 @@ class CurUserMessageBox extends StatelessWidget {
                             return Text(snapshot.error.toString());
                           } else {
                             return utils.CustomCircleIconButton(
-                                future: FileService().getUserImage(snapshot.data!.idUser, snapshot.data!.image),
-                                onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => UserProfileScreen(user: snapshot.data!))),
-                                scale: 1.5,
-                                borderWidth: 2,
+                              future: FileService().getUserImage(snapshot.data!.idUser, snapshot.data!.image),
+                              onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => UserProfileScreen(user: snapshot.data!))),
+                              scale: 1.5,
+                              borderWidth: 2,
+                              borderColor: Theme.of(context).colorScheme.secondaryContainer,
                             );
                           }
                         }
@@ -970,7 +971,7 @@ class MessageBox extends StatelessWidget {
               constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 6, minHeight: MediaQuery.of(context).size.height / 8, maxWidth: MediaQuery.of(context).size.width / 1.2),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(5),
-                color: Theme.of(context).colorScheme.secondary.withOpacity(0.7),
+                color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.7),
               ),
               child: Stack(
                 children: [

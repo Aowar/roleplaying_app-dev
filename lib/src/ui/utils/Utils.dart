@@ -41,11 +41,14 @@ class CustomCircleIconButton extends StatelessWidget {
   final Future<String> future;
   final double borderWidth;
   final double scale;
+  late Color? borderColor;
 
-  const CustomCircleIconButton({Key? key, required this.onPressed, required this.scale, required this.borderWidth, required this.future}) : super(key: key);
+
+  CustomCircleIconButton({Key? key, required this.onPressed, required this.scale, required this.borderWidth, required this.future, this.borderColor}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    borderColor ??= Theme.of(context).colorScheme.primaryContainer;
     return IconButton(
           iconSize: sqrt(MediaQuery.of(context).size.height+MediaQuery.of(context).size.width) * scale,
           icon: FutureBuilder<String>(
@@ -61,7 +64,7 @@ class CustomCircleIconButton extends StatelessWidget {
                     decoration: BoxDecoration(
                         color: Theme.of(context).colorScheme.primaryContainer,
                         shape: BoxShape.circle,
-                        border: Border.all(width: borderWidth, color: Theme.of(context).colorScheme.primaryContainer),
+                        border: Border.all(width: borderWidth, color: borderColor!),
                         image: DecorationImage(
                           fit: BoxFit.fitHeight,
                           alignment: FractionalOffset.topCenter,
@@ -138,7 +141,7 @@ class CustomSquareIconButton extends StatelessWidget {
               } else {
                 return Container(
                   decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.secondary.withOpacity(0),
+                      color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0),
                       borderRadius: const BorderRadius.all(Radius.circular(5)),
                       image: DecorationImage(
                         fit: BoxFit.fitHeight,
@@ -196,13 +199,13 @@ class ImageContainer extends StatelessWidget {
     return SizedBox(
       child: Container(
         decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.secondary,
+            color: Theme.of(context).colorScheme.secondaryContainer,
             borderRadius: const BorderRadius.all(
               Radius.circular(5.0),
             ),
             boxShadow: [
               BoxShadow(
-                  color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
+                  color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.2),
                   spreadRadius: 5,
                   offset: const Offset(5, 5),
                   blurRadius: 10
@@ -256,7 +259,7 @@ class Toasts {
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.CENTER,
         timeInSecForIosWeb: duration,
-        backgroundColor: isSuccess ? Colors.green.withOpacity(0.7) : Theme.of(context).colorScheme.secondary.withOpacity(0.7),
+        backgroundColor: isSuccess ? Colors.green.withOpacity(0.7) : Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.7),
         textColor: Colors.white,
         fontSize: 16.0);
   }
