@@ -1,22 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:roleplaying_app/src/models/profile.dart';
+import 'package:roleplaying_app/src/services/profile_service.dart';
+import 'package:roleplaying_app/src/ui/utils/Utils.dart';
 import 'package:roleplaying_app/src/ui/utils/fetch_info_from_db/blocks_builder.dart';
 
-import '../../../models/chat.dart';
-import '../../../models/profile.dart';
-import '../../../services/chat_service.dart';
-import '../../../services/profile_service.dart';
+class ProfilesList extends StatelessWidget {
+  final String userId;
+  Stream<List<Profile>>? stream;
+  ProfilesList ({Key? key, required this.userId, this.stream}) : super(key: key);
 
-class FetchInfoFromDb {
-
-  ///Getting profiles from DB
-  static itemOfProfilesList(String userId) {
+  @override
+  Widget build(BuildContext context) {
+    stream ??= ProfileService().readProfiles(userId);
     return StreamBuilder<List<Profile>>(
-      stream: ProfileService().readProfiles(userId),
+      stream: stream,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return Text("Ошибка получения данных" + snapshot.error.toString(), style: Theme.of(context).textTheme.subtitle2);
+          Toasts.showErrorMessage(errorMessage: "Ошибка получения данных\n" + snapshot.error.toString());
+          return Text("Ошибка получения данных", style: Theme.of(context).textTheme.subtitle2);
         }
         if (snapshot.hasData) {
+          if(snapshot.data!.isEmpty) {
+            return Text("Пусто", style: Theme.of(context).textTheme.subtitle2);
+          }
           final profiles = snapshot.data!;
           return Padding(
               padding: const EdgeInsets.only(right: 25),
@@ -30,76 +36,6 @@ class FetchInfoFromDb {
                       itemCount: profiles.length,
                       itemBuilder: (BuildContext context, int index) {
                         return ProfileBlock(profile: profiles[index]);
-                      },
-                      separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 10),
-                    ),
-                  )
-                ],
-              )
-          );
-        }
-        return const CircularProgressIndicator();
-      },
-    );
-  }
-
-  ///Getting chats from DB
-  static itemOfChatsList() {
-    return StreamBuilder<List<Chat>>(
-      stream: ChatService().readChats(),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return Text("Ошибка получения данных", style: Theme.of(context).textTheme.subtitle2);
-        }
-        if (snapshot.hasData) {
-          final chats = snapshot.data!;
-          return Padding(
-              padding: const EdgeInsets.only(right: 25),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Flexible(
-                    fit: FlexFit.loose,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: chats.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return ChatBlock(chat: chats[index]);
-                      },
-                      separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 10),
-                    ),
-                  )
-                ],
-              )
-          );
-        }
-        return const CircularProgressIndicator();
-      },
-    );
-  }
-
-  ///Getting user chats from DB
-  static itemOfUserChatsList(String userId) {
-    return StreamBuilder<List<Chat>>(
-      stream: ChatService().readUserChats(userId),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return Text("Ошибка получения данных", style: Theme.of(context).textTheme.subtitle2);
-        }
-        if (snapshot.hasData) {
-          final chats = snapshot.data!;
-          return Padding(
-              padding: const EdgeInsets.only(right: 25),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Flexible(
-                    fit: FlexFit.loose,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: chats.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return ChatBlock(chat: chats[index]);
                       },
                       separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 10),
                     ),

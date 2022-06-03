@@ -7,8 +7,10 @@ class Chat extends Equatable {
   late String title;
   late String description;
   late String image;
+  late bool isPrivate;
+  late List? profilesPatterns = [];
 
-  Chat(this.usersId, this.organizerId, this.title, this.description, this.image);
+  Chat({required this.usersId, required this.organizerId, required this.title, required this.description, required this.image, this.isPrivate = false, this.profilesPatterns});
 
   Chat.fromJson(Map<String, dynamic> data) {
     id = data['id'];
@@ -17,10 +19,12 @@ class Chat extends Equatable {
     title = data['title'];
     description = data['description'];
     image = data['image'];
+    isPrivate = data['isPrivate'];
+
   }
 
   @override
-  List<Object?> get props => [id, usersId, organizerId, title, description, image];
+  List<Object?> get props => [id, usersId, organizerId, title, description, image, isPrivate, profilesPatterns];
 
   Map<String, dynamic> toMap() {
     return {
@@ -28,7 +32,9 @@ class Chat extends Equatable {
       "organizerId": organizerId,
       "title": title,
       "description": description,
-      "image": image
+      "image": image,
+      "isPrivate": isPrivate,
+      "profilesPatterns": profilesPatterns
     };
   }
 }

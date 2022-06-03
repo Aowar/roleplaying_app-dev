@@ -1,5 +1,5 @@
+import 'dart:developer';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:firebase_storage/firebase_storage.dart';
 
@@ -22,13 +22,30 @@ class FileService {
     return imageName == "default_user_icon.png" ? _storageRef.child(imageName).getDownloadURL() : _storageRef.child(folder + "/" + imageName).getDownloadURL();
   }
 
-  Future<String> getChatImage(String folder, String imageName) async {
-    final _storageRef = storageRef.child("chats");
-    return _storageRef.child(folder).child(imageName).getDownloadURL();
+  Future<String> getChatImage(String folder, String imageName, bool isPrivate) async {
+    Reference _storageRef;
+    if (isPrivate && imageName == "default_image.png") {
+      _storageRef = storageRef;
+      return _storageRef.child("chats").child(imageName).getDownloadURL();
+    } else {
+      _storageRef = storageRef.child("chats");
+      return _storageRef.child(folder).child(imageName).getDownloadURL();
+    }
   }
 
   Future<String> getProfileImage(String folder, String imageName) async {
     final _storageRef = storageRef.child("profiles");
-    return _storageRef.child(folder).child(imageName).getDownloadURL();
+    String downloadResult;
+    try {
+      downloadResult = await _storageRef.child(folder).child(imageName).getDownloadURL();
+    } catch(error) {
+      log(error.toString(), name: "Error while download");
+      downloadResult = "error";
+    }
+    return downloadResult;
+  }
+
+  deleteImage(String folder, String imageName) async {
+    await storageRef.child(folder + "/" + imageName).delete();
   }
 }

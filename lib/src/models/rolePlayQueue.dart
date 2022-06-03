@@ -4,7 +4,7 @@ class RolePlayQueue extends Equatable {
   late String id;
   late List users;
 
-  RolePlayQueue(this.users);
+  RolePlayQueue({required this.users});
 
   RolePlayQueue.fromJson(Map<String, dynamic> data) {
     id = data['id'];

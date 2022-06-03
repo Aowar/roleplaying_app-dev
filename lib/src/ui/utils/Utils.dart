@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -13,25 +12,17 @@ class PushButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-          color: Theme.of(context).primaryColor,
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-                color: Theme.of(context).primaryColor.withOpacity(0.2),
-                spreadRadius: 5,
-                offset: const Offset(5, 5),
-                blurRadius: 10
-            )
-          ]
-      ),
-      child: IconButton(
-        icon: Icon(icon),
-        color: Colors.white,
-        iconSize: sqrt(MediaQuery.of(context).size.height + MediaQuery.of(context).size.width),
-        onPressed: onPressed
-      ),
+    return ElevatedButton(
+        style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.all(Theme.of(context).primaryColor),
+          shape: MaterialStateProperty.all(const CircleBorder()),
+          padding: MaterialStateProperty.all(const EdgeInsets.all(8)),
+        ),
+        onPressed: onPressed,
+        child: Icon(icon,
+          color: Colors.white,
+          size: sqrt(MediaQuery.of(context).size.height + MediaQuery.of(context).size.width),
+        )
     );
   }
 }
@@ -42,7 +33,6 @@ class CustomCircleIconButton extends StatelessWidget {
   final double borderWidth;
   final double scale;
   late Color? borderColor;
-
 
   CustomCircleIconButton({Key? key, required this.onPressed, required this.scale, required this.borderWidth, required this.future, this.borderColor}) : super(key: key);
 
@@ -138,6 +128,8 @@ class CustomSquareIconButton extends StatelessWidget {
                 return const CircularProgressIndicator();
               } else if (snapshot.hasError) {
                 return const Icon(Icons.account_circle_sharp);
+              } else if (snapshot.data == "error") {
+                return Icon(Icons.account_circle_sharp, color: Theme.of(context).colorScheme.secondaryContainer);
               } else {
                 return Container(
                   decoration: BoxDecoration(
@@ -164,27 +156,19 @@ class BackButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-          color: Theme.of(context).primaryColor,
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-                color: Theme.of(context).primaryColor.withOpacity(0.2),
-                spreadRadius: 5,
-                offset: const Offset(5, 5),
-                blurRadius: 10
-            )
-          ]
+    return ElevatedButton(
+      style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.all(Theme.of(context).primaryColor),
+        shape: MaterialStateProperty.all(const CircleBorder()),
+        padding: MaterialStateProperty.all(const EdgeInsets.all(8)),
       ),
-      child: IconButton(
-        icon: const Icon(Icons.arrow_back_ios_rounded),
-        color: Colors.white,
-        iconSize: sqrt(MediaQuery.of(context).size.height + MediaQuery.of(context).size.width),
         onPressed: () {
           Navigator.pop(context);
         },
-      ),
+        child: Icon(Icons.arrow_back_ios_rounded,
+          color: Colors.white,
+          size: sqrt(MediaQuery.of(context).size.height + MediaQuery.of(context).size.width),
+        ),
     );
   }
 }
@@ -242,13 +226,13 @@ class ErrorCatcher extends StatelessWidget {
 }
 
 class Toasts {
-  static showErrorMessage({required String errorMessage, int duration = 5}) {
+  static showErrorMessage({required String errorMessage, int duration = 5, Color color = Colors.red}) {
     Fluttertoast.showToast(
         msg: errorMessage,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.CENTER,
         timeInSecForIosWeb: duration,
-        backgroundColor: Colors.red.withOpacity(0.8),
+        backgroundColor: color.withOpacity(0.8),
         textColor: Colors.white,
         fontSize: 16.0);
   }

@@ -129,7 +129,11 @@ class _AuthView extends State<AuthView> {
         );
       }
       if (!await CustomUserService().collectionContainsUser(signInResult.id)) {
-        CustomUserModel _customUserModel = CustomUserModel(signInResult.id, signInResult.nickName, "default_user_icon.png");
+        CustomUserModel _customUserModel = CustomUserModel(
+            idUser: signInResult.id,
+            nickName: signInResult.nickName,
+            image: "default_user_icon.png"
+        );
         CustomUserService().addCustomUser(_customUserModel);
       }
       authBloc.add(UserLoggedIn(user: signInResult));
@@ -333,6 +337,22 @@ class _AuthView extends State<AuthView> {
                 constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height),
                 child: Stack(
                   children: [
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height,
+                      child: Container(
+                        decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                                colors: [
+                                  Theme.of(context).backgroundColor,
+                                  Theme.of(context).colorScheme.secondary
+                                ],
+                                begin: Alignment.bottomLeft,
+                                end: Alignment.topRight
+                            )
+                        ),
+                      ),
+                    ),
                     Padding(
                       padding: const EdgeInsets.only(left: 5, top: 5),
                       child: SizedBox(

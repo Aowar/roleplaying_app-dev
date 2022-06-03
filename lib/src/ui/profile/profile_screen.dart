@@ -53,6 +53,22 @@ class _ProfileView extends State<ProfileView> {
           return Scaffold(
             body: Stack(
               children: [
+                SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                  child: Container(
+                    decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                            colors: [
+                              Theme.of(context).backgroundColor,
+                              Theme.of(context).colorScheme.secondary
+                            ],
+                            begin: Alignment.bottomLeft,
+                            end: Alignment.topRight
+                        )
+                    ),
+                  ),
+                ),
                 ///Building back button
                 const Positioned(
                     top: 16,
@@ -64,7 +80,13 @@ class _ProfileView extends State<ProfileView> {
                   Positioned(
                     top: 16,
                     right: 16,
-                    child: utils.PushButton(icon: Icons.edit, onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileEditScreen.edit(profile: _profile)))),
+                    child: utils.PushButton(icon: Icons.edit, onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileEditScreen.edit(profile: _profile, currentUserId: state.getUser()!.id)))),
+                  ),
+                ] else if (_profile.isPattern) ...[
+                  Positioned(
+                    top: 16,
+                    right: 16,
+                    child: utils.PushButton(icon: Icons.copy, onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileEditScreen.edit(profile: _profile, currentUserId: state.getUser()!.id)))),
                   ),
                 ],
                 Center(

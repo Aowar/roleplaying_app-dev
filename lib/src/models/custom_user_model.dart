@@ -6,7 +6,7 @@ class CustomUserModel extends Equatable {
   late String nickName;
   late String image;
 
-  CustomUserModel(this.idUser, this.nickName, this.image);
+  CustomUserModel({required this.idUser, required this.nickName, required this.image});
 
   CustomUserModel.fromJson(Map<String, dynamic> data) {
     idUser = data['userId'];

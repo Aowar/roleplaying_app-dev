@@ -12,17 +12,21 @@ import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
 import 'package:roleplaying_app/src/models/chat.dart';
 import 'package:roleplaying_app/src/models/custom_user_model.dart';
 import 'package:roleplaying_app/src/models/message.dart';
+import 'package:roleplaying_app/src/models/profile.dart';
 import 'package:roleplaying_app/src/models/rolePlayQueue.dart';
 import 'package:roleplaying_app/src/services/chat_service.dart';
+import 'package:roleplaying_app/src/services/chat_text_formatter.dart';
 import 'package:roleplaying_app/src/services/custom_user_service.dart';
 import 'package:roleplaying_app/src/services/file_service.dart';
 import 'package:roleplaying_app/src/services/message_service.dart';
+import 'package:roleplaying_app/src/services/profile_service.dart';
 import 'package:roleplaying_app/src/services/role_play_queue_service.dart';
 import 'package:roleplaying_app/src/ui/utils/Utils.dart' as utils;
 import 'package:roleplaying_app/src/ui/auth_screen.dart';
 import 'package:roleplaying_app/src/ui/chat/chat_description_screen.dart';
 import 'package:roleplaying_app/src/ui/user_profile_screen.dart';
 import 'package:roleplaying_app/src/ui/utils/Utils.dart';
+import 'package:roleplaying_app/src/ui/utils/fetch_info_from_db/blocks_builder.dart';
 
 late Chat? _chat;
 
@@ -37,9 +41,12 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  ScrollController scrollController = ScrollController();
+  bool firstAutoscrollExecuted = false;
+  bool shouldAutoscroll = false;
   var menuPozKey = RectGetter.createGlobalKey();
   final TextEditingController _textController = TextEditingController();
-  final MessageService messageService = MessageService(_chat!);
+  final MessageService messageService = MessageService(_chat!.id);
   bool isQueueCreate = true;
   String? queueId;
   bool isContextMenuOpen = false;
@@ -48,6 +55,7 @@ class _ChatScreenState extends State<ChatScreen> {
   late OverlayEntry contextMenuOverlayEntry;
   late OverlayEntry queueMenuOverlayEntry;
   late OverlayEntry queueCreateOverlayEntry;
+  late OverlayEntry profileChoseMenu;
   List _chosenUsersId = [];
 
   openContextMenu() {
@@ -81,6 +89,20 @@ class _ChatScreenState extends State<ChatScreen> {
   closeQueueCreateMenu() {
     isQueueCreateMenuOpen = false;
     queueCreateOverlayEntry.remove();
+  }
+
+  void scrollToBottom() {
+    scrollController.jumpTo(scrollController.position.maxScrollExtent);
+  }
+
+  void scrollListener() {
+    firstAutoscrollExecuted = true;
+
+    if (scrollController.hasClients && scrollController.position.pixels == scrollController.position.maxScrollExtent) {
+      shouldAutoscroll = true;
+    } else {
+      shouldAutoscroll = false;
+    }
   }
 
   OverlayEntry createQueueCreateMenuOverlay() {
@@ -269,8 +291,9 @@ class _ChatScreenState extends State<ChatScreen> {
                                           )
                                       ),
                                       onPressed: () {
-                                        RolePlayQueue queue = RolePlayQueue(List.of(_chosenUsersId));
-                                        _chosenUsersId.clear();
+                                        RolePlayQueue queue = RolePlayQueue(
+                                            users: List.of(_chosenUsersId)
+                                        );
                                         if (isQueueCreate) {
                                           if (queue.users.isEmpty) {
                                             utils.Toasts.showInfo(context: context, infoMessage: 'Добавьте участников');
@@ -530,6 +553,19 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
+
+  @override
+  void initState() {
+    super.initState();
+    scrollController.addListener(scrollListener);
+  }
+
+  @override
+  void dispose() {
+    scrollController.removeListener(scrollListener);
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc, AuthState> (
@@ -540,16 +576,35 @@ class _ChatScreenState extends State<ChatScreen> {
                 onWillPop: () async {
                   if (isContextMenuOpen) {
                     closeContextMenu();
+                    return false;
                   } if (isQueueMenuOpen) {
                     closeQueueMenu();
+                    return false;
                   } if (isQueueCreateMenuOpen) {
                     closeQueueCreateMenu();
+                    return false;
                   }
-                  return false;
+                  return true;
                 },
                 child: Scaffold(
                   body: Stack(
                     children: [
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height,
+                        child: Container(
+                          decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                  colors: [
+                                    Theme.of(context).backgroundColor,
+                                    Theme.of(context).colorScheme.secondary
+                                  ],
+                                  begin: Alignment.bottomLeft,
+                                  end: Alignment.topRight
+                              )
+                          ),
+                        ),
+                      ),
                       const Positioned(
                         left: 16,
                         top: 15,
@@ -562,7 +617,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             future: ChatService().getChat(_chat!.id),
                             builder: (context, snapshot) {
                               if(!snapshot.hasData) {
-                                return utils.PushButton(icon: Icons.menu, onPressed: () { });
+                                return const CircularProgressIndicator();
                               } else {
                                 Chat chat = snapshot.data!;
                                 chat.id = _chat!.id;
@@ -608,7 +663,54 @@ class _ChatScreenState extends State<ChatScreen> {
                                                     height: MediaQuery.of(context).size.height / 1.6,
                                                     child: Stack(
                                                       children: [
-                                                        ItemOfMessageList(loggedUserId: state.getUser()!.id, messageService: messageService)
+                                                        StreamBuilder<List<Message>>(
+                                                          stream: messageService.readMessages(),
+                                                          builder: (context, snapshot) {
+                                                            if (snapshot.hasError) {
+                                                              return Text("Ошибка получения данных", style: Theme.of(context).textTheme.subtitle2);
+                                                            }
+                                                            if (snapshot.hasData) {
+                                                              final messages = snapshot.data!;
+                                                              if (scrollController.hasClients && shouldAutoscroll) {
+                                                                scrollToBottom();
+                                                              }
+
+                                                              if (!firstAutoscrollExecuted && scrollController.hasClients) {
+                                                                scrollToBottom();
+                                                              }
+                                                              return Row(
+                                                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                                children: [
+                                                                  Flexible(
+                                                                    fit: FlexFit.loose,
+                                                                    child: ListView.separated(
+                                                                      controller: scrollController,
+                                                                      scrollDirection: Axis.vertical,
+                                                                      itemCount: messages.length,
+                                                                      itemBuilder: (BuildContext context, int index) {
+                                                                        if (state.getUser()!.id == messages[index].authorId) {
+                                                                          return Column(
+                                                                            crossAxisAlignment: CrossAxisAlignment.end,
+                                                                            children: [
+                                                                              CurUserMessageBox(text: messages[index].text, userId: messages[index].authorId, currentUserId: state.getUser()!.id),
+                                                                            ],
+                                                                          );
+                                                                        } else {
+                                                                          return Padding(
+                                                                            padding: const EdgeInsets.only(right: 15),
+                                                                            child: MessageBox(text: messages[index].text, userId: messages[index].authorId, currentUserId: state.getUser()!.id),
+                                                                          );
+                                                                        }
+                                                                      },
+                                                                      separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 10),
+                                                                    ),
+                                                                  )
+                                                                ],
+                                                              );
+                                                            }
+                                                            return const CircularProgressIndicator();
+                                                          },
+                                                        )
                                                       ],
                                                     )
                                                   )
@@ -621,24 +723,15 @@ class _ChatScreenState extends State<ChatScreen> {
                                                       children: [
                                                         RectGetter(
                                                           key: menuPozKey,
-                                                          child: IconButton(
-                                                            icon: Container(
-                                                              decoration: BoxDecoration(
-                                                                  color: Theme.of(context).primaryColor,
-                                                                  shape: BoxShape.circle,
-                                                                  boxShadow: [
-                                                                    BoxShadow(
-                                                                        color: Theme.of(context).primaryColor.withOpacity(0.2),
-                                                                        spreadRadius: 5,
-                                                                        offset: const Offset(5, 5),
-                                                                        blurRadius: 10
-                                                                    )
-                                                                  ]
-                                                              ),
-                                                              child: const Icon(Icons.menu_rounded),
+                                                          child: ElevatedButton(
+                                                            style: ButtonStyle(
+                                                              backgroundColor: MaterialStateProperty.all(Theme.of(context).primaryColor),
+                                                              shape: MaterialStateProperty.all(const CircleBorder()),
+                                                              padding: MaterialStateProperty.all(const EdgeInsets.all(8)),
                                                             ),
-                                                            color: Colors.white,
-                                                            iconSize: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width)*2),
+                                                            child: Icon(Icons.menu_rounded,
+                                                                color: Colors.white,
+                                                                size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width))),
                                                             onPressed: () {
                                                               openContextMenu();
                                                             },
@@ -683,24 +776,15 @@ class _ChatScreenState extends State<ChatScreen> {
                                                               ),
                                                             )
                                                         ),
-                                                        IconButton(
-                                                          icon: Container(
-                                                            decoration: BoxDecoration(
-                                                                color: Theme.of(context).primaryColor,
-                                                                shape: BoxShape.circle,
-                                                                boxShadow: [
-                                                                  BoxShadow(
-                                                                      color: Theme.of(context).primaryColor.withOpacity(0.2),
-                                                                      spreadRadius: 5,
-                                                                      offset: const Offset(5, 5),
-                                                                      blurRadius: 10
-                                                                  )
-                                                                ]
-                                                            ),
-                                                            child: const Icon(Icons.arrow_forward_ios_rounded),
+                                                        ElevatedButton(
+                                                          style: ButtonStyle(
+                                                            backgroundColor: MaterialStateProperty.all(Theme.of(context).primaryColor),
+                                                            shape: MaterialStateProperty.all(const CircleBorder()),
+                                                            padding: MaterialStateProperty.all(const EdgeInsets.all(8)),
                                                           ),
-                                                          color: Colors.white,
-                                                          iconSize: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width)*2),
+                                                          child: Icon(Icons.arrow_forward_ios_rounded,
+                                                              color: Colors.white,
+                                                              size: sqrt((MediaQuery.of(context).size.height + MediaQuery.of(context).size.width))),
                                                           onPressed: () async {
                                                             if (_textController.text.trim().isEmpty) {
                                                               Fluttertoast.showToast(
@@ -714,10 +798,125 @@ class _ChatScreenState extends State<ChatScreen> {
                                                               );
                                                               return;
                                                             }
-                                                            String _text = _textController.text;
-                                                            Message _message = Message(state.getUser()!.id, _text);
-                                                            messageService.addMessage(_message);
-                                                            _textController.clear();
+                                                            final nextPlayerWord = RegExp(r' !next', caseSensitive: false);
+                                                            if (_textController.text.trim().contains(nextPlayerWord)) {
+                                                              showDialog(
+                                                                  context: context,
+                                                                  builder: (context) => SimpleDialog(
+                                                                    title: Text("Выберите очередь вашего текущего персонажа"),
+                                                                    children: [
+                                                                      FutureBuilder<List<RolePlayQueue>>(
+                                                                          future: RolePlayQueueService(_chat!).getQueueByUserId(state.getUser()!.id),
+                                                                          builder: (context, snapshot) {
+                                                                            if(!snapshot.hasData) {
+                                                                              return const CircularProgressIndicator();
+                                                                            } else if(snapshot.hasError) {
+                                                                              return utils.Toasts.showErrorMessage(errorMessage: "Ошибка получения очередей");
+                                                                            } else {
+                                                                              final queues = snapshot.data!;
+                                                                              return ListView.separated(
+                                                                                shrinkWrap: true,
+                                                                                scrollDirection: Axis.vertical,
+                                                                                itemCount: queues.length,
+                                                                                separatorBuilder: (BuildContext context, int index) => const Divider(),
+                                                                                itemBuilder: (BuildContext context, int index) {
+                                                                                  final queue = queues[index];
+                                                                                  final _height = MediaQuery.of(context).size.height / 2.5;
+                                                                                  final _width = MediaQuery.of(context).size.width / 2;
+                                                                                  return Row(
+                                                                                    children: [
+                                                                                      Flexible(
+                                                                                        child: GestureDetector(
+                                                                                          onTap: () {
+                                                                                            List list = List.of(queue.users);
+                                                                                            if(list.first == state.getUser()!.id) {
+                                                                                              list.remove(state.getUser()!.id);
+                                                                                              list.add(state.getUser()!.id);
+                                                                                              queue.users = list;
+                                                                                              RolePlayQueueService(_chat!).updateQueue(queue);
+                                                                                              ChatTextFormatter(
+                                                                                                  nextPlayerId: list.first,
+                                                                                                  chatId: _chat!.id,
+                                                                                                  chatName: _chat!.title,
+                                                                                                  text: _textController.text.trim()
+                                                                                              ).nextPlayerNotifier();
+                                                                                            }
+                                                                                            String _text = _textController.text;
+                                                                                            Message _message = Message(
+                                                                                                authorId: state.getUser()!.id,
+                                                                                                text: _text
+                                                                                            );
+                                                                                            messageService.addMessage(_message);
+                                                                                            _textController.clear();
+                                                                                            _textController.clear();
+                                                                                            Navigator.pop(context);
+                                                                                          },
+                                                                                          child: Container(
+                                                                                            constraints: BoxConstraints(maxHeight: _height / 3, maxWidth: _width - 10),
+                                                                                            decoration: BoxDecoration(
+                                                                                                borderRadius: BorderRadius.circular(15),
+                                                                                                border: Border.all(color: Theme.of(context).primaryColor, width: 1)
+                                                                                            ),
+                                                                                            child: ListView.separated(
+                                                                                              scrollDirection: Axis.horizontal,
+                                                                                              itemCount: queue.users.length,
+                                                                                              itemBuilder: (BuildContext context, int index) {
+                                                                                                return FutureBuilder<CustomUserModel>(
+                                                                                                    future: CustomUserService().getUser(queue.users[index]),
+                                                                                                    builder: (context, snapshot2) {
+                                                                                                      if (!snapshot2.hasData){
+                                                                                                        return const CircularProgressIndicator();
+                                                                                                      } else if (snapshot2.hasError) {
+                                                                                                        return utils.ErrorCatcher(snapshot: snapshot2, showErrorTextWidget: true);
+                                                                                                      }
+                                                                                                      return Container(
+                                                                                                        constraints: BoxConstraints(maxHeight: sqrt(MediaQuery.of(context).size.height) * 3, maxWidth: sqrt(MediaQuery.of(context).size.width) * 4),
+                                                                                                        child: Column(
+                                                                                                          children: [
+                                                                                                            utils.CustomCircleIconButton(
+                                                                                                                onPressed: null,
+                                                                                                                scale: 1.2,
+                                                                                                                borderWidth: 2,
+                                                                                                                future: FileService().getUserImage(snapshot2.data!.idUser, snapshot2.data!.image)
+                                                                                                            ),
+                                                                                                            Text(
+                                                                                                              snapshot2.data!.nickName,
+                                                                                                              maxLines: 1,
+                                                                                                              textAlign: TextAlign.center,
+                                                                                                              style: Theme.of(context).textTheme.subtitle2,
+                                                                                                              overflow: TextOverflow.ellipsis,
+                                                                                                              textScaleFactor: 0.6,
+                                                                                                            )
+                                                                                                          ],
+                                                                                                        ),
+                                                                                                      );
+                                                                                                    }
+                                                                                                );
+                                                                                              },
+                                                                                              separatorBuilder: (BuildContext context, int index) { return const Divider(); },
+                                                                                            ),
+                                                                                          ),
+                                                                                        ),
+                                                                                      ),
+                                                                                    ],
+                                                                                  );
+                                                                                },
+                                                                              );
+                                                                            }
+                                                                          }
+                                                                      )
+                                                                    ],
+                                                                  )
+                                                              );
+                                                            } else {
+                                                              String _text = _textController.text;
+                                                              Message _message = Message(
+                                                                  authorId: state.getUser()!.id,
+                                                                  text: _text
+                                                              );
+                                                              messageService.addMessage(_message);
+                                                              _textController.clear();
+                                                            }
                                                           },
                                                         )
                                                       ],
@@ -821,59 +1020,6 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 }
-
-///Getting messages from DB
-class ItemOfMessageList extends StatelessWidget {
-  final String loggedUserId;
-  final MessageService messageService;
-
-  const ItemOfMessageList({Key? key, required this.loggedUserId, required this.messageService}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<List<Message>>(
-      stream: messageService.readMessages(),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return Text("Ошибка получения данных", style: Theme.of(context).textTheme.subtitle2);
-        }
-        if (snapshot.hasData) {
-          final messages = snapshot.data!;
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Flexible(
-                fit: FlexFit.loose,
-                child: ListView.separated(
-                  scrollDirection: Axis.vertical,
-                  itemCount: messages.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    if (loggedUserId == messages[index].authorId) {
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          CurUserMessageBox(text: messages[index].text, userId: messages[index].authorId, currentUserId: loggedUserId),
-                        ],
-                      );
-                    } else {
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 15),
-                        child: MessageBox(text: messages[index].text, userId: messages[index].authorId, currentUserId: loggedUserId),
-                      );
-                    }
-                  },
-                  separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 10),
-                ),
-              )
-            ],
-          );
-        }
-        return const CircularProgressIndicator();
-      },
-    );
-  }
-}
-
 
 ///Message box of logged user
 class CurUserMessageBox extends StatelessWidget {

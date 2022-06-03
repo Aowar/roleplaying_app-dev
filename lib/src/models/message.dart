@@ -7,7 +7,7 @@ class Message extends Equatable {
   late String text;
   late Timestamp creationDate;
 
-  Message(this.authorId, this.text){
+  Message({required this.authorId, required this.text}){
     creationDate = Timestamp.now();
   }
 

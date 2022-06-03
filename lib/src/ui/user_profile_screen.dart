@@ -7,10 +7,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
+import 'package:roleplaying_app/src/models/chat.dart';
 import 'package:roleplaying_app/src/models/custom_user_model.dart';
+import 'package:roleplaying_app/src/services/chat_service.dart';
 import 'package:roleplaying_app/src/services/custom_user_service.dart';
 import 'package:roleplaying_app/src/services/file_service.dart';
 import 'package:roleplaying_app/src/ui/auth_screen.dart';
+import 'package:roleplaying_app/src/ui/chat/chat_screen.dart';
 import 'package:roleplaying_app/src/ui/profile/profile_edit_screen.dart';
 import 'package:roleplaying_app/src/ui/settings_screen.dart';
 import 'package:roleplaying_app/src/ui/utils/Utils.dart' as utils;
@@ -134,6 +137,22 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                child: Scaffold(
                  body: Stack(
                    children: [
+                     SizedBox(
+                       width: MediaQuery.of(context).size.width,
+                       height: MediaQuery.of(context).size.height,
+                       child: Container(
+                         decoration: BoxDecoration(
+                             gradient: LinearGradient(
+                                 colors: [
+                                   Theme.of(context).backgroundColor,
+                                   Theme.of(context).colorScheme.secondary
+                                 ],
+                                 begin: Alignment.bottomLeft,
+                                 end: Alignment.topRight
+                             )
+                         ),
+                       ),
+                     ),
                      const Positioned(
                          left: 16,
                          top: 16,
@@ -202,7 +221,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                    padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 60),
                                    child: Center(
                                      child: SizedBox(
-                                         height: MediaQuery.of(context).size.height / 10,
                                          width: MediaQuery.of(context).size.width / 2,
                                          child: Text(
                                              _user.nickName,
@@ -212,47 +230,94 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                      ),
                                    )
                                ),
-                               Container (
-                                 constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height / 7, maxHeight: MediaQuery.of(context).size.height / 4.7),
+                               state.getUser()!.id != _user.idUser ? Padding(
+                                 padding: const EdgeInsets.only(top: 0),
                                  child: SizedBox(
-                                   width: MediaQuery.of(context).size.width / 1.1,
-                                   child: Container(
-                                     decoration: BoxDecoration(
-                                         color: Theme.of(context).cardColor,
-                                         borderRadius: const BorderRadius.all(
-                                           Radius.circular(20.0),
-                                         ),
-                                         boxShadow: [
-                                           BoxShadow(
-                                               color: Theme.of(context).cardColor.withOpacity(0.2),
-                                               spreadRadius: 2,
-                                               offset: const Offset(5, 5),
-                                               blurRadius: 10
-                                           )
-                                         ]
+                                   width: MediaQuery.of(context).size.width / 2.5,
+                                   child: ElevatedButton(
+                                     style: ButtonStyle(
+                                       backgroundColor: MaterialStateProperty.all(Theme.of(context).primaryColor),
+                                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                         RoundedRectangleBorder(
+                                           borderRadius: BorderRadius.circular(15)
+                                         )
+                                       )
                                      ),
-                                     child: Stack(
-                                       children: [
-                                         Padding(
-                                           padding: const EdgeInsets.only(left: 10, top: 2),
-                                           child: Text(state.getUser()!.id == _user.idUser ? "Мои анкеты" : "Анкеты пользователя",
-                                             style: Theme.of(context).textTheme.headline2,
+                                     onPressed: () async {
+                                       List<String> usersList = [state.getUser()!.id, _user.idUser];
+                                       if(!await ChatService().isPrivateChatExists(usersList)) {
+                                         Chat chat = Chat(
+                                             usersId: usersList,
+                                             organizerId: state.getUser()!.id,
+                                             title:  "Чат " + state.getUser()!.nickName!,
+                                             description: "Личный чат между пользователями " + state.getUser()!.nickName! + " и " + _user.nickName,
+                                             image: "default_image.png",
+                                             isPrivate: true
+                                         );
+                                         chat = await ChatService().addChat(chat);
+                                         Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(chat: chat)));
+                                       } else {
+                                         utils.Toasts.showInfo(context: context, infoMessage: "Вы уже начали чат с этим пользователем");
+                                       }
+                                     },
+                                     child: Center(
+                                       child: Row(
+                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                         children: const [
+                                           Text(
+                                               "Написать"
                                            ),
-                                         ),
-                                         Padding(
-                                             padding: const EdgeInsets.only(left: 20, top: 35),
-                                             child: FetchInfoFromDb.itemOfProfilesList(_user.idUser)
-                                         ),
-                                         state.getUser()!.id == _user.idUser ? Positioned(
-                                             right: 5,
-                                             top: 5,
-                                             child: utils.PushButton(icon: Icons.add, onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileEditScreen.create())))
-                                         ) : Container()
-                                       ],
+                                           Icon(Icons.edit)
+                                         ],
+                                       ),
+                                     )
+                                   ),
+                                 )
+                               ) : Container(),
+                               Padding(
+                                 padding: const EdgeInsets.only(top: 25),
+                                 child: Container(
+                                   constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height / 7, maxHeight: MediaQuery.of(context).size.height / 4.7),
+                                   child: SizedBox(
+                                     width: MediaQuery.of(context).size.width / 1.1,
+                                     child: Container(
+                                       decoration: BoxDecoration(
+                                           color: Theme.of(context).cardColor,
+                                           borderRadius: const BorderRadius.all(
+                                             Radius.circular(20.0),
+                                           ),
+                                           boxShadow: [
+                                             BoxShadow(
+                                                 color: Theme.of(context).cardColor.withOpacity(0.2),
+                                                 spreadRadius: 2,
+                                                 offset: const Offset(5, 5),
+                                                 blurRadius: 10
+                                             )
+                                           ]
+                                       ),
+                                       child: Stack(
+                                         children: [
+                                           Padding(
+                                             padding: const EdgeInsets.only(left: 10, top: 2),
+                                             child: Text(state.getUser()!.id == _user.idUser ? "Мои анкеты" : "Анкеты пользователя",
+                                               style: Theme.of(context).textTheme.headline2,
+                                             ),
+                                           ),
+                                           Padding(
+                                               padding: const EdgeInsets.only(left: 20, top: 35),
+                                               child: ProfilesList(userId: _user.idUser)
+                                           ),
+                                           state.getUser()!.id == _user.idUser ? Positioned(
+                                               right: 5,
+                                               top: 5,
+                                               child: utils.PushButton(icon: Icons.add, onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileEditScreen.create(currentUserId: state.getUser()!.id))))
+                                           ) : Container()
+                                         ],
+                                       ),
                                      ),
                                    ),
                                  ),
-                               ),
+                               )
                                // Padding(
                                //   padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 40),
                                //   child: SizedBox(

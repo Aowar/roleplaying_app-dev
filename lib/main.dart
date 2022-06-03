@@ -69,7 +69,7 @@ class _RpAppState extends State<RpApp> {
   Widget build(BuildContext context) {
     getDataFromPrefs();
     const lightPrimary = Color(0xffa2cbea);
-    const darkPrimary = Color(0xff313030);
+    const darkPrimary = Colors.black;
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [
       SystemUiOverlay.bottom
     ]);
@@ -91,23 +91,23 @@ class _RpAppState extends State<RpApp> {
               ),
               textTheme: const TextTheme(
                 headline1: TextStyle(color: Colors.white, fontSize: 24, overflow: TextOverflow.fade),
-                headline2: TextStyle(color: Colors.white, fontSize: 24, overflow: TextOverflow.fade),
+                headline2: TextStyle(color: Colors.black, fontSize: 24, overflow: TextOverflow.fade),
                 bodyText1: TextStyle(color: Colors.black, fontSize: 20, overflow: TextOverflow.fade),
-                bodyText2: TextStyle(color: Color(0xD2FFFFFF), fontSize: 20, overflow: TextOverflow.fade),
+                bodyText2: TextStyle(color: Color(0xFFFFFFFF), fontSize: 20, overflow: TextOverflow.fade),
                 subtitle1: TextStyle(color: Color(0xff000000), fontSize: 14, overflow: TextOverflow.fade),
                 subtitle2: TextStyle(color: Color(0xffffffff), fontSize: 14, overflow: TextOverflow.fade),
               ),
               colorScheme: ColorScheme.fromSwatch().copyWith(
-                  secondary: const Color(0xFF2F69FF),
+                  secondary: const Color(0xff3d3b3b),
                   brightness: Brightness.dark,
                   primaryContainer: const Color(0xffe5e5e5),
-                  secondaryContainer: const Color(0xff9e9e9e),
+                  secondaryContainer: const Color(0xff767676),
                   errorContainer: const Color(0xff9a0000)
               )
           ),
           theme: ThemeData(
               scaffoldBackgroundColor: lightPrimary,
-              backgroundColor: lightPrimary,
+              backgroundColor: const Color(0xFF2140A7),
               primaryColor: const Color(0xFF2F69FF),
               canvasColor: const Color(0xffe8e8e8),
               cardColor: Colors.white,
@@ -120,7 +120,7 @@ class _RpAppState extends State<RpApp> {
                 subtitle2: TextStyle(color: Color(0xff000000), fontSize: 14, overflow: TextOverflow.fade),
               ),
               colorScheme: ColorScheme.fromSwatch().copyWith(
-                  secondary: const Color(0xFF2140A7),
+                  secondary: const Color(0xffa2cbea),
                   secondaryContainer: const Color(0xffc2c2c2),
                   brightness: Brightness.light,
                   primaryContainer: const Color(0xFF2F69FF),

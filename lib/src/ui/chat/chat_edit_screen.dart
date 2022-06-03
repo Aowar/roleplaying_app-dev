@@ -145,6 +145,22 @@ class _ChatEditView extends State<ChatEditView> {
               child: Scaffold(
                 body: Stack(
                   children: [
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height,
+                      child: Container(
+                        decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                                colors: [
+                                  Theme.of(context).backgroundColor,
+                                  Theme.of(context).colorScheme.secondary
+                                ],
+                                begin: Alignment.bottomLeft,
+                                end: Alignment.topRight
+                            )
+                        ),
+                      ),
+                    ),
                     ///Back button
                     const Positioned(
                         top: 15,
@@ -200,13 +216,20 @@ class _ChatEditView extends State<ChatEditView> {
                                 _chat.title = title;
                                 _chat.description = description;
                               }
-                              Chat chat = Chat(usersList, state.getUser()!.id, title, description, "chat_pic");
+                              Chat chat = Chat(
+                                  usersId: usersList,
+                                  organizerId: state.getUser()!.id,
+                                  title: title,
+                                  description: description,
+                                  image: "chat_pic"
+                              );
                               if (!_chatCreateFlag) {
                                 _chatService.updateChat(_chat);
                                 await FileService().uploadImage("chats/" + _chat.id, imageInMemory!.path, "chat_pic");
                               } else {
-                                _chatService.addChat(chat, imageInMemory!.path);
+                                await _chatService.addChat(chat, imageInMemory!.path);
                               }
+                              FocusManager.instance.primaryFocus?.unfocus();
                               Navigator.pop(context);
                             },
                           ),
@@ -299,7 +322,7 @@ class _ChatEditView extends State<ChatEditView> {
                                                   ) :
                                                   !_chatCreateFlag && imageInMemory == null ?
                                                   FutureBuilder<String>(
-                                                      future: FileService().getChatImage(_chat.id, _chat.image),
+                                                      future: FileService().getChatImage(_chat.id, _chat.image, _chat.isPrivate),
                                                       builder: (context, snapshot) {
                                                         if (!snapshot.hasData) {
                                                           return const CircularProgressIndicator();
