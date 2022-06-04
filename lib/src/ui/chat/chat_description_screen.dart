@@ -580,8 +580,8 @@ class _MyDialogState extends State<MyDialog> {
         Center(
             child: ElevatedButton(
                 onPressed: () {
-                  if (deleteProfilesPatterns) {
-                    ProfileService().deleteProfilesPatterns(widget.chat.profilesPatterns!);
+                  if (deleteProfilesPatterns && widget.chat.profilesPatterns != null) {
+                      ProfileService().deleteProfilesPatterns(widget.chat.profilesPatterns!);
                   }
                   ChatService().deleteChat(widget.chat.id);
                   if (widget.chat.isPrivate) {

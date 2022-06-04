@@ -507,7 +507,7 @@ class _ProfileEditView extends State<ProfileEditView> {
                                                             if (_profile.isPattern) {
                                                               ChatService().deleteProfilePattern(_profile.chatId, _profile.id);
                                                             }
-                                                            if (_profile.chatId != "none") {
+                                                            if (_profile.chatId != "none" && _profile.approvementState == ApprovementStates.approved.value) {
                                                               ChatService().deleteApprovedProfile(_profile.chatId, _profile.id);
                                                             }
                                                             ProfileService().deleteProfile(_profile.id);
