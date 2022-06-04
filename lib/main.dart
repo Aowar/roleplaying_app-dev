@@ -1,6 +1,5 @@
 import 'dart:developer';
 import 'package:firebase_core/firebase_core.dart';
-// import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/services.dart';
@@ -11,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 
 void main() async {
+
   WidgetsFlutterBinding.ensureInitialized();
   try {
     await Firebase.initializeApp(
@@ -54,7 +54,6 @@ class _RpAppState extends State<RpApp> {
     if (_prefs.containsKey("isNightTheme")) {
       isNightTheme = _prefs.getBool("isNightTheme")!;
       isNightTheme ? _themeMode = ThemeMode.dark : _themeMode = ThemeMode.light;
-
     }
   }
 
@@ -92,8 +91,8 @@ class _RpAppState extends State<RpApp> {
               textTheme: const TextTheme(
                 headline1: TextStyle(color: Colors.white, fontSize: 24, overflow: TextOverflow.fade),
                 headline2: TextStyle(color: Colors.black, fontSize: 24, overflow: TextOverflow.fade),
-                bodyText1: TextStyle(color: Colors.black, fontSize: 20, overflow: TextOverflow.fade),
-                bodyText2: TextStyle(color: Color(0xFFFFFFFF), fontSize: 20, overflow: TextOverflow.fade),
+                bodyText1: TextStyle(color: Colors.black, fontSize: 18, overflow: TextOverflow.fade),
+                bodyText2: TextStyle(color: Color(0xFFFFFFFF), fontSize: 18, overflow: TextOverflow.fade),
                 subtitle1: TextStyle(color: Color(0xff000000), fontSize: 14, overflow: TextOverflow.fade),
                 subtitle2: TextStyle(color: Color(0xffffffff), fontSize: 14, overflow: TextOverflow.fade),
               ),
@@ -114,8 +113,8 @@ class _RpAppState extends State<RpApp> {
               textTheme: const TextTheme(
                 headline1: TextStyle(color: Colors.white, fontSize: 24, overflow: TextOverflow.fade),
                 headline2: TextStyle(color: Colors.black, fontSize: 24, overflow: TextOverflow.fade),
-                bodyText1: TextStyle(color: Colors.black, fontSize: 20, overflow: TextOverflow.fade),
-                bodyText2: TextStyle(color: Colors.white, fontSize: 20, overflow: TextOverflow.fade),
+                bodyText1: TextStyle(color: Colors.black, fontSize: 18, overflow: TextOverflow.fade),
+                bodyText2: TextStyle(color: Colors.white, fontSize: 18, overflow: TextOverflow.fade),
                 subtitle1: TextStyle(color: Color(0xff000000), fontSize: 14, overflow: TextOverflow.fade),
                 subtitle2: TextStyle(color: Color(0xff000000), fontSize: 14, overflow: TextOverflow.fade),
               ),

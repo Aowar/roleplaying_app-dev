@@ -402,7 +402,11 @@ class _ProfileEditView extends State<ProfileEditView> {
                                                       maxLines: 1,
                                                       textAlignVertical: TextAlignVertical.center,
                                                       textAlign: TextAlign.center,
-                                                      style: Theme.of(context).textTheme.headline1,
+                                                      style: TextStyle(
+                                                          fontStyle: Theme.of(context).textTheme.headline2!.fontStyle,
+                                                          color: Theme.of(context).textTheme.subtitle2!.color,
+                                                          fontSize: 20
+                                                      ),
                                                       decoration: const InputDecoration(
                                                         border: InputBorder.none,
                                                         hintText: "Название",
@@ -448,13 +452,17 @@ class _ProfileEditView extends State<ProfileEditView> {
                                               child: Padding(
                                                 padding: const EdgeInsets.only(left: 10),
                                                 child: TextField(
+                                                  style: TextStyle(
+                                                      color: Theme.of(context).textTheme.subtitle2!.color,
+                                                      fontStyle: Theme.of(context).textTheme.bodyText1!.fontStyle
+                                                  ),
                                                   keyboardType: TextInputType.multiline,
                                                   maxLines: null,
                                                   decoration: InputDecoration(
                                                       border: InputBorder.none,
                                                       hintText: "Текст",
                                                       hintStyle: TextStyle(
-                                                        color: Theme.of(context).textTheme.bodyText1?.color,
+                                                        color: Theme.of(context).textTheme.subtitle2!.color,
                                                       )
                                                   ),
                                                   controller: !_profileCreateFlag ? (_textController..text = _profile.text) : _textController,

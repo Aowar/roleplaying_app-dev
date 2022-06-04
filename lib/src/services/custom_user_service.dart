@@ -35,4 +35,12 @@ class CustomUserService {
       return user;
     });
   }
+
+  Stream<List<CustomUserModel>> readUsersInChat(String chatId) {
+    List<CustomUserModel> list = [];
+    return FirebaseFirestore.instance.collection("chats").doc(chatId).snapshots().map((doc) {
+      list.add(CustomUserModel.fromJson(doc.data()!));
+      return list;
+    });
+  }
 }

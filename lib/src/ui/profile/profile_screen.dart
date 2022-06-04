@@ -1,16 +1,22 @@
 import 'dart:math';
 import 'dart:developer' as developer;
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
+import 'package:roleplaying_app/src/models/chat.dart';
+import 'package:roleplaying_app/src/models/notifications/notifications.dart';
 import 'package:roleplaying_app/src/models/profile.dart';
+import 'package:roleplaying_app/src/services/chat_service.dart';
 import 'package:roleplaying_app/src/services/file_service.dart';
+import 'package:roleplaying_app/src/services/notifications_service.dart';
 import 'package:roleplaying_app/src/services/profile_service.dart';
 import 'package:roleplaying_app/src/ui/utils/Utils.dart' as utils;
 import 'package:roleplaying_app/src/ui/profile/profile_edit_screen.dart';
+import 'package:roleplaying_app/src/ui/utils/fetch_info_from_db/blocks_builder.dart';
 
 import '../../services/auth_service.dart';
 import '../auth_screen.dart';
@@ -141,7 +147,11 @@ class _ProfileView extends State<ProfileView> {
                                               maxLines: 1,
                                               textAlignVertical: TextAlignVertical.center,
                                               textAlign: TextAlign.center,
-                                              style: Theme.of(context).textTheme.headline1,
+                                              style: TextStyle(
+                                                fontStyle: Theme.of(context).textTheme.headline2!.fontStyle,
+                                                color: Theme.of(context).textTheme.subtitle2!.color,
+                                                fontSize: 20
+                                              ),
                                               decoration: const InputDecoration(
                                                 border: InputBorder.none,
                                                 hintText: "Название",
@@ -155,7 +165,7 @@ class _ProfileView extends State<ProfileView> {
                                   ),
                                   ///Image container
                                   Padding(
-                                      padding: const EdgeInsets.only(top: 15),
+                                      padding: const EdgeInsets.only(top: 15, bottom: 10),
                                       child: SizedBox.square(
                                         dimension: sqrt(MediaQuery.of(context).size.width + MediaQuery.of(context).size.height) * 8,
                                         child: FutureBuilder<String>(
@@ -217,6 +227,10 @@ class _ProfileView extends State<ProfileView> {
                                             child: Padding(
                                               padding: const EdgeInsets.only(left: 10),
                                               child: TextField(
+                                                style: TextStyle(
+                                                  color: Theme.of(context).textTheme.subtitle2!.color,
+                                                  fontStyle: Theme.of(context).textTheme.bodyText1!.fontStyle
+                                                ),
                                                 keyboardType: TextInputType.multiline,
                                                 maxLines: null,
                                                 readOnly: true,
@@ -224,7 +238,7 @@ class _ProfileView extends State<ProfileView> {
                                                     border: InputBorder.none,
                                                     hintText: "Текст",
                                                     hintStyle: TextStyle(
-                                                      color: Theme.of(context).textTheme.bodyText1?.color,
+                                                      color: Theme.of(context).textTheme.bodyText1!.color,
                                                     )
                                                 ),
                                                 controller: _textController..text = text,
@@ -233,7 +247,121 @@ class _ProfileView extends State<ProfileView> {
                                         ),
                                       ),
                                     ),
-                                  )
+                                  ),
+                                  ///Chat block
+                                  _profile.chatId != "none" ? FutureBuilder<Chat>(
+                                      future: ChatService().getChat(_profile.chatId),
+                                      builder: (context, snapshot) {
+                                        if(!snapshot.hasData) {
+                                          return Container();
+                                        } else if(snapshot.hasError) {
+                                          utils.Toasts.showInfo(context: context, infoMessage: "Ошибка получения данных");
+                                          return Container();
+                                        } else {
+                                          Chat _chat = snapshot.data!;
+                                          return Container (
+                                            constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height / 7, maxHeight: MediaQuery.of(context).size.height / 4.4),
+                                            child: SizedBox(
+                                              width: MediaQuery.of(context).size.width / 1.25,
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                    color: Theme.of(context).cardColor,
+                                                    borderRadius: const BorderRadius.all(
+                                                      Radius.circular(20.0),
+                                                    ),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                          color: Theme.of(context).cardColor.withOpacity(0.2),
+                                                          spreadRadius: 2,
+                                                          offset: const Offset(5, 5),
+                                                          blurRadius: 10
+                                                      )
+                                                    ]
+                                                ),
+                                                child: Stack(
+                                                  children: [
+                                                    Column(
+                                                      children: [
+                                                        Padding(
+                                                          padding: const EdgeInsets.only(left: 5, top: 5),
+                                                          child: Text("Анкета для чата",
+                                                            style: Theme.of(context).textTheme.headline2,
+                                                          ),
+                                                        ),
+                                                        Padding(
+                                                          padding: const EdgeInsets.only(left: 5, top: 10),
+                                                          child: Row(
+                                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                            children: [
+                                                              ChatBlock(chat: _chat),
+                                                              if(_chat.organizerId == state.getUser()!.id && _profile.approvementState == ApprovementStates.awaiting.value) ...[
+                                                                Padding(
+                                                                  padding: EdgeInsets.only(left: MediaQuery.of(context).size.width / 12),
+                                                                  child: Column(
+                                                                    children: [
+                                                                      ElevatedButton(
+                                                                          style: ButtonStyle(
+                                                                              backgroundColor: MaterialStateProperty.all(Theme.of(context).primaryColor)
+                                                                          ),
+                                                                          onPressed: () async {
+                                                                            Profile profile = await ProfileService().getProfile(_profile.id);
+                                                                            profile.approvementState = ApprovementStates.approved.value;
+                                                                            ProfileService().updateProfile(profile);
+                                                                            List list = List.of(_chat.approvedProfiles!);
+                                                                            list.add(profile.id);
+                                                                            ChatService().addApprovedProfiles(_chat.id, list);
+                                                                            NotificationsService(profile.userId).successApprovementNotification(_chat.title, _chat.id);
+                                                                            setState(() {
+                                                                              _profile = profile;
+                                                                              utils.Toasts.showInfo(context: context, infoMessage: "Анкета пользлвателя одобрена", isSuccess: true);
+                                                                            });
+                                                                          },
+                                                                          child: Text(
+                                                                            "Одобрить анкету",
+                                                                            style: TextStyle(
+                                                                                color: Theme.of(context).textTheme.bodyText2!.color,
+                                                                                fontStyle: Theme.of(context).textTheme.subtitle2!.fontStyle
+                                                                            ),
+                                                                          )
+                                                                      ),
+                                                                      Padding(
+                                                                        padding: const EdgeInsets.only(top: 5),
+                                                                        child: ElevatedButton(
+                                                                            style: ButtonStyle(
+                                                                                backgroundColor: MaterialStateProperty.all(Theme.of(context).colorScheme.errorContainer)
+                                                                            ),
+                                                                            onPressed: () async {
+                                                                              Profile profile = await ProfileService().getProfile(_profile.id);
+                                                                              profile.approvementState == ApprovementStates.notApproved.value;
+                                                                              ProfileService().updateProfile(profile);
+                                                                              NotificationsService(_profile.userId).failureApprovementNotification(_chat.title, _chat.id);
+                                                                            },
+                                                                            child: Text(
+                                                                              "Отклонить анкету",
+                                                                              style: TextStyle(
+                                                                                  color: Theme.of(context).textTheme.bodyText2!.color,
+                                                                                  fontStyle: Theme.of(context).textTheme.subtitle2!.fontStyle
+                                                                              ),
+                                                                            )
+                                                                        ),
+                                                                      )
+                                                                    ],
+                                                                  ),
+                                                                )
+                                                              ]
+                                                            ],
+                                                          ),
+                                                        )
+                                                      ],
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      }
+                                  ) : Container()
                                 ],
                               ),
                             ),

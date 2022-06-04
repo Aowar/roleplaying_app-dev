@@ -14,25 +14,23 @@ import 'package:roleplaying_app/src/services/custom_user_service.dart';
 import 'package:roleplaying_app/src/services/file_service.dart';
 import 'package:roleplaying_app/src/ui/auth_screen.dart';
 import 'package:roleplaying_app/src/ui/chat/chat_screen.dart';
+import 'package:roleplaying_app/src/ui/grid_screen/profile_grid_screen.dart';
 import 'package:roleplaying_app/src/ui/profile/profile_edit_screen.dart';
 import 'package:roleplaying_app/src/ui/settings_screen.dart';
 import 'package:roleplaying_app/src/ui/utils/Utils.dart' as utils;
 import 'package:roleplaying_app/src/ui/utils/fetch_info_from_db/fetch_info.dart';
 
-late CustomUserModel _user;
-
 class UserProfileScreen extends StatefulWidget{
   CustomUserModel user;
 
-  UserProfileScreen({Key? key, required this.user}) : super(key: key) {
-    _user = user;
-  }
+  UserProfileScreen({Key? key, required this.user}) : super(key: key);
 
   @override
   State<UserProfileScreen> createState() => _UserProfileScreenState();
 }
 
 class _UserProfileScreenState extends State<UserProfileScreen> {
+  late CustomUserModel _user;
   bool isMenuOpen = false;
   late OverlayEntry _overlayEntry;
   late double x;
@@ -124,6 +122,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    _user = widget.user;
     return BlocBuilder<AuthBloc, AuthState> (
          builder: (context, state) {
            if (state is AuthStateAuthenticated) {
@@ -225,7 +224,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                          child: Text(
                                              _user.nickName,
                                              textAlign: TextAlign.center,
-                                             style: Theme.of(context).textTheme.headline2
+                                             style: Theme.of(context).textTheme.headline1
                                          )
                                      ),
                                    )
@@ -276,44 +275,81 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                ) : Container(),
                                Padding(
                                  padding: const EdgeInsets.only(top: 25),
-                                 child: Container(
-                                   constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height / 7, maxHeight: MediaQuery.of(context).size.height / 4.7),
-                                   child: SizedBox(
-                                     width: MediaQuery.of(context).size.width / 1.1,
-                                     child: Container(
-                                       decoration: BoxDecoration(
-                                           color: Theme.of(context).cardColor,
-                                           borderRadius: const BorderRadius.all(
-                                             Radius.circular(20.0),
-                                           ),
-                                           boxShadow: [
-                                             BoxShadow(
-                                                 color: Theme.of(context).cardColor.withOpacity(0.2),
-                                                 spreadRadius: 2,
-                                                 offset: const Offset(5, 5),
-                                                 blurRadius: 10
-                                             )
-                                           ]
-                                       ),
-                                       child: Stack(
-                                         children: [
-                                           Padding(
-                                             padding: const EdgeInsets.only(left: 10, top: 2),
-                                             child: Text(state.getUser()!.id == _user.idUser ? "Мои анкеты" : "Анкеты пользователя",
-                                               style: Theme.of(context).textTheme.headline2,
+                                 child: GestureDetector(
+                                   onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ProfilesGridScreen(userId: _user.idUser))),
+                                   child: Container(
+                                     decoration: BoxDecoration(
+                                         color: Theme.of(context).cardColor,
+                                         borderRadius: const BorderRadius.all(
+                                           Radius.circular(20.0),
+                                         ),
+                                         boxShadow: [
+                                           BoxShadow(
+                                               color: Theme.of(context).cardColor.withOpacity(0.2),
+                                               spreadRadius: 2,
+                                               offset: const Offset(5, 5),
+                                               blurRadius: 10
+                                           )
+                                         ]
+                                     ),
+                                     constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height / 4.1),
+                                     child: Stack(
+                                       children: [
+                                         Container(
+                                           constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height / 7, maxHeight: MediaQuery.of(context).size.height / 4.45),
+                                           child: SizedBox(
+                                             width: MediaQuery.of(context).size.width / 1.1,
+                                             child: Container(
+                                               decoration: BoxDecoration(
+                                                   color: Theme.of(context).cardColor,
+                                                   borderRadius: const BorderRadius.all(
+                                                     Radius.circular(20.0),
+                                                   ),
+                                                   boxShadow: [
+                                                     BoxShadow(
+                                                         color: Theme.of(context).cardColor.withOpacity(0.2),
+                                                         spreadRadius: 2,
+                                                         offset: const Offset(5, 5),
+                                                         blurRadius: 10
+                                                     )
+                                                   ]
+                                               ),
+                                               child: Stack(
+                                                 children: [
+                                                   Padding(
+                                                     padding: const EdgeInsets.only(left: 10, top: 2),
+                                                     child: Text(state.getUser()!.id == _user.idUser ? "Мои анкеты" : "Анкеты пользователя",
+                                                       style: Theme.of(context).textTheme.headline2,
+                                                     ),
+                                                   ),
+                                                   Padding(
+                                                       padding: const EdgeInsets.only(left: 20, top: 35),
+                                                       child: ProfilesList(userId: _user.idUser)
+                                                   ),
+                                                   state.getUser()!.id == _user.idUser ? Positioned(
+                                                       right: 5,
+                                                       top: 5,
+                                                       child: utils.PushButton(icon: Icons.add, onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileEditScreen.create(currentUserId: state.getUser()!.id))))
+                                                   ) : Container()
+                                                 ],
+                                               ),
                                              ),
                                            ),
-                                           Padding(
-                                               padding: const EdgeInsets.only(left: 20, top: 35),
-                                               child: ProfilesList(userId: _user.idUser)
-                                           ),
-                                           state.getUser()!.id == _user.idUser ? Positioned(
-                                               right: 5,
-                                               top: 5,
-                                               child: utils.PushButton(icon: Icons.add, onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileEditScreen.create(currentUserId: state.getUser()!.id))))
-                                           ) : Container()
-                                         ],
-                                       ),
+                                         ),
+                                         const Positioned(
+                                             bottom: 8,
+                                             right: 10,
+                                             child: Text(
+                                                 "Открыть блок",
+                                                 maxLines: 1,
+                                                 style: TextStyle(
+                                                   color: Colors.blue,
+                                                   fontSize: 12,
+                                                   decoration: TextDecoration.underline,
+                                                 )
+                                             )
+                                         )
+                                       ],
                                      ),
                                    ),
                                  ),

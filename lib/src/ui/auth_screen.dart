@@ -7,6 +7,7 @@ import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
 import 'package:roleplaying_app/src/models/custom_user_model.dart';
 import 'package:roleplaying_app/src/services/auth_service.dart';
 import 'package:roleplaying_app/src/services/custom_user_service.dart';
+import 'package:roleplaying_app/src/services/notifications_service.dart';
 import 'package:roleplaying_app/src/ui/menu_screen.dart';
 import 'package:roleplaying_app/src/ui/utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -60,6 +61,150 @@ class _AuthView extends State<AuthView> {
     AuthProblems.userNotFound: "Пользователя с таким email не существует",
     AuthProblems.unknownProblem: "Произошла неизвестная ошибка"
   };
+
+  @override
+  Widget build(BuildContext context) {
+    final AuthBloc authBloc = BlocProvider.of<AuthBloc>(context);
+    checkingPrefs(authBloc);
+    return BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
+      return KeyboardDismissOnTap(
+        child: Scaffold(
+            resizeToAvoidBottomInset: false,
+            body: SingleChildScrollView(
+              child: ConstrainedBox(
+                  constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height),
+                  child: Stack(
+                    children: [
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height,
+                        child: Container(
+                          decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                  colors: [
+                                    Theme.of(context).backgroundColor,
+                                    Theme.of(context).colorScheme.secondary
+                                  ],
+                                  begin: Alignment.bottomLeft,
+                                  end: Alignment.topRight
+                              )
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 5, top: 5),
+                        child: SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.5,
+                            height: MediaQuery.of(context).size.height / 16,
+                            child: Container(
+                                decoration: BoxDecoration(
+                                    color: Theme.of(context).primaryColor,
+                                    borderRadius: const BorderRadius.all(
+                                      Radius.circular(20.0),
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                          color: Theme.of(context).primaryColor.withOpacity(0.2),
+                                          spreadRadius: 2,
+                                          offset: const Offset(5, 5),
+                                          blurRadius: 10
+                                      )
+                                    ]
+                                ),
+                                child: Center(
+                                  child: Text("Ролевые игры", style: Theme.of(context).textTheme.headline1),
+                                ))),
+                      ),
+                      ///Auth form
+                      Center(
+                          child: Form(
+                            key: _formLoginKey,
+                            child: Padding(
+                              padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 2.4),
+                              child: Column(
+                                children: [
+                                  ///Login field
+                                  EmailFormField(icon: const Icon(Icons.login), hintText: "Введите email", controller: _emailLoginController),
+                                  Padding(
+                                      padding: const EdgeInsets.only(top: 30),
+                                      ///Password field
+                                      child: PasswordFormField(icon: const Icon(Icons.password), hintText: "Введите пароль", controller: _passwordLoginController, registerFlag: false)
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 20),
+                                    ///Login button
+                                    child: SizedBox(
+                                      width: MediaQuery.of(context).size.width * 0.5,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(20.0),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                  color: Theme.of(context).primaryColor.withOpacity(0.2),
+                                                  spreadRadius: 5,
+                                                  offset: const Offset(0, 3),
+                                                  blurRadius: 10
+                                              )
+                                            ]
+                                        ),
+                                        child: ElevatedButton(
+                                          style: ButtonStyle(
+                                              backgroundColor: MaterialStateProperty.all<Color>(Theme.of(context).colorScheme.primaryContainer),
+                                              shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                                  RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.circular(20.0)
+                                                  )
+                                              )
+                                          ),
+                                          onPressed: isLoading ? null : () {
+                                            FocusManager.instance.primaryFocus?.unfocus();
+                                            setState(() {
+                                              isLoading = true;
+                                              auth(authBloc);
+                                            });
+                                          },
+                                          child: isLoading ? const CircularProgressIndicator() : Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Center(
+                                              child: Text("Войти", style: Theme.of(context).textTheme.headline1),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 10),
+                                    child: TextButton(
+                                        onPressed: () {
+                                          openRegisterForm();
+                                        },
+                                        child: Text("Ещё не зарегистрированы? Создать аккаунт",
+                                            style: Theme.of(context).textTheme.subtitle2
+                                        )
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                          )
+                      ),
+                      BlocListener<AuthBloc, AuthState>(
+                        listener: (context, state) {
+                          if (state is AuthStateAuthenticated) {
+                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MenuScreen()));
+                          }
+                        },
+                        child: Container(),
+                      )
+                    ],
+                  )
+              ),
+            )
+        ),
+      );
+    });
+  }
 
   void openRegisterForm() {
     isOpen = true;
@@ -319,150 +464,6 @@ class _AuthView extends State<AuthView> {
                 ),
               )
           ),
-        ),
-      );
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final AuthBloc authBloc = BlocProvider.of<AuthBloc>(context);
-    checkingPrefs(authBloc);
-    return BlocBuilder<AuthBloc, AuthState>(builder: (context, state) {
-      return KeyboardDismissOnTap(
-        child: Scaffold(
-            resizeToAvoidBottomInset: false,
-            body: SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height),
-                child: Stack(
-                  children: [
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.height,
-                      child: Container(
-                        decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                                colors: [
-                                  Theme.of(context).backgroundColor,
-                                  Theme.of(context).colorScheme.secondary
-                                ],
-                                begin: Alignment.bottomLeft,
-                                end: Alignment.topRight
-                            )
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 5, top: 5),
-                      child: SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.5,
-                          height: MediaQuery.of(context).size.height / 16,
-                          child: Container(
-                              decoration: BoxDecoration(
-                                  color: Theme.of(context).primaryColor,
-                                  borderRadius: const BorderRadius.all(
-                                    Radius.circular(20.0),
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                        color: Theme.of(context).primaryColor.withOpacity(0.2),
-                                        spreadRadius: 2,
-                                        offset: const Offset(5, 5),
-                                        blurRadius: 10
-                                    )
-                                  ]
-                              ),
-                              child: Center(
-                                child: Text("Ролевые игры", style: Theme.of(context).textTheme.headline1),
-                              ))),
-                    ),
-                    ///Auth form
-                    Center(
-                        child: Form(
-                          key: _formLoginKey,
-                          child: Padding(
-                            padding: EdgeInsets.only(top: MediaQuery.of(context).size.height / 2.4),
-                            child: Column(
-                              children: [
-                                ///Login field
-                                EmailFormField(icon: const Icon(Icons.login), hintText: "Введите email", controller: _emailLoginController),
-                                Padding(
-                                    padding: const EdgeInsets.only(top: 30),
-                                    ///Password field
-                                      child: PasswordFormField(icon: const Icon(Icons.password), hintText: "Введите пароль", controller: _passwordLoginController, registerFlag: false)
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 20),
-                                  ///Login button
-                                  child: SizedBox(
-                                    width: MediaQuery.of(context).size.width * 0.5,
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(20.0),
-                                          boxShadow: [
-                                            BoxShadow(
-                                                color: Theme.of(context).primaryColor.withOpacity(0.2),
-                                                spreadRadius: 5,
-                                                offset: const Offset(0, 3),
-                                                blurRadius: 10
-                                            )
-                                          ]
-                                      ),
-                                      child: ElevatedButton(
-                                        style: ButtonStyle(
-                                            backgroundColor: MaterialStateProperty.all<Color>(Theme.of(context).primaryColor),
-                                            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                                                RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.circular(20.0)
-                                                )
-                                            )
-                                        ),
-                                        onPressed: isLoading ? null : () {
-                                          FocusManager.instance.primaryFocus?.unfocus();
-                                          setState(() {
-                                            isLoading = true;
-                                            auth(authBloc);
-                                          });
-                                        },
-                                        child: isLoading ? const CircularProgressIndicator() : Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Center(
-                                            child: Text("Войти", style: Theme.of(context).textTheme.headline2),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 10),
-                                  child: TextButton(
-                                      onPressed: () {
-                                        openRegisterForm();
-                                      },
-                                      child: Text("Ещё не зарегистрированы? Создать аккаунт",
-                                          style: Theme.of(context).textTheme.subtitle2
-                                      )
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                        )
-                    ),
-                    BlocListener<AuthBloc, AuthState>(
-                      listener: (context, state) {
-                        if (state is AuthStateAuthenticated) {
-                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MenuScreen()));
-                        }
-                      },
-                      child: Container(),
-                    )
-                  ],
-                )
-              ),
-            )
         ),
       );
     });

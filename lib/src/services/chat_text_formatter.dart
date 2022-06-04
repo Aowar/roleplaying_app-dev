@@ -16,7 +16,7 @@ class ChatTextFormatter {
   nextPlayerNotifier() {
     Notifications notification = Notifications(
         title: "Ваша очередь",
-        text: "Ваш пост ждут в чате " + chatName,
+        text: "Ваш пост ждут в чате \"" + chatName + "\"",
         creationTime: Timestamp.now(),
         type: NotificationType.chat.value,
         navigationId: chatId

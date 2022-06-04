@@ -33,6 +33,17 @@ class ProfileService {
     FileService().deleteImage("profiles/" + profileId, "profile_pic");
   }
 
+  Future approveListOfProfiles(String chatId, List approvedProfilesIds) async {
+    await _profileCollection.where("chatId", isEqualTo: chatId).where("isApproved",
+        isEqualTo: ApprovementStates.awaiting.value).get().then((QuerySnapshot querySnapshot) {
+          for(var doc in querySnapshot.docs) {
+            doc.reference.update({
+              "isApproved": ApprovementStates.approved.value
+            });
+          }
+    });
+  }
+
   ///Getting list stream of profiles where id of current user = user id in profile
   Stream<List<Profile>> readProfiles(String userId) =>
       FirebaseFirestore.instance.collection("profiles").where("userId", isEqualTo: userId).snapshots().map(
@@ -44,18 +55,19 @@ class ProfileService {
               (snapshot) => snapshot.docs.map((doc) => Profile.fromJson(doc.data())).toList()
       );
 
-  Future<Profile> getProfile(String profileId) async {
-    DocumentReference docRef = _profileCollection.doc(profileId);
-    return await docRef.get().then((value) {
-      return Profile(
-          userId: value.get("userId"),
-          title: value.get("title"),
-          text: value.get("text"),
-          image: value.get("image"),
-          isPattern: value.get("isPattern"),
-          chatId: value.get("chatId"),
-          approvementState: value.get("isApproved")
+  Stream<List<Profile>> readApprovedProfiles(String chatId) =>
+      FirebaseFirestore.instance.collection("profiles").where("chatId", isEqualTo: chatId).where("isPattern", isEqualTo: false).where("isApproved", isEqualTo: ApprovementStates.approved.value).snapshots().map(
+              (snapshot) => snapshot.docs.map((doc) => Profile.fromJson(doc.data())).toList()
       );
+
+  Stream<List<Profile>> readAwaitingApproveProfiles(String chatId) =>
+      FirebaseFirestore.instance.collection("profiles").where("chatId", isEqualTo: chatId).where("isPattern", isEqualTo: false).where("isApproved", isEqualTo: ApprovementStates.awaiting.value).snapshots().map(
+              (snapshot) => snapshot.docs.map((doc) => Profile.fromJson(doc.data())).toList()
+      );
+
+  Future<Profile> getProfile(String profileId) async {
+    return await FirebaseFirestore.instance.collection("profiles").doc(profileId).get().then((value) {
+      return Profile.fromJson(value.data()!);
     });
   }
 

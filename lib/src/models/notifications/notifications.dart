@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-enum NotificationType { chat, profile }
+enum NotificationType { chat, profile, chatPrivate }
 
 extension NotificationTypeExtension on NotificationType {
   String get value {
@@ -9,6 +9,8 @@ extension NotificationTypeExtension on NotificationType {
         return "chat_notification";
       case NotificationType.profile:
         return "profile_notification";
+      case NotificationType.chatPrivate:
+        return "chat_private_notification";
     }
   }
 }
@@ -20,9 +22,10 @@ class Notifications {
   final Timestamp creationTime;
   final String type;
   final String navigationId;
+  final bool isRead;
 
 
-  Notifications({this.id = "", required this.title, required this.text, required this.creationTime, required this.type, required this.navigationId});
+  Notifications({this.id = "", required this.title, required this.text, required this.creationTime, required this.type, required this.navigationId, this.isRead = false});
 
   static Notifications fromJson(Map<String, dynamic> data) {
     return Notifications(
@@ -31,7 +34,8 @@ class Notifications {
         text: data['text'],
         creationTime: data['creationTime'],
         type: data['type'],
-        navigationId: data['navigationId']
+        navigationId: data['navigationId'],
+        isRead: data['isRead']
     );
   }
 
@@ -42,7 +46,8 @@ class Notifications {
       'text': text,
       'creationTime': creationTime,
       'type': type,
-      'navigationId': navigationId
+      'navigationId': navigationId,
+      'isRead': isRead
     };
   }
 }

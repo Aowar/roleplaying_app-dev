@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:roleplaying_app/src/models/notifications/notifications.dart';
 
 /// {@template user}
 /// User model
@@ -20,8 +23,10 @@ class UserModel extends Equatable {
   const UserModel({
     required this.id,
     this.email,
-    this.nickName
+    this.nickName,
   });
+
+  const UserModel.setStream({this.email, this.nickName, required this.id});
 
   /// Empty user which represents an unauthenticated user.
   static const empty = UserModel(id: '');
@@ -33,5 +38,5 @@ class UserModel extends Equatable {
   bool get isNotEmpty => this != UserModel.empty;
 
   @override
-  List<Object?> get props => [email, id];
+  List<Object?> get props => [email, id, nickName];
 }

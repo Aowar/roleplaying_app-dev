@@ -20,6 +20,6 @@ class MessageService {
 
   ///Getting list stream of messages
   Stream<List<Message>> readMessages() =>
-    FirebaseFirestore.instance.collection("chats").doc(chatId).collection("messages").orderBy('creationDate', descending: false).snapshots().map(
+    FirebaseFirestore.instance.collection("chats").doc(chatId).collection("messages").orderBy('creationDate', descending: true).snapshots().map(
             (snapshot) => snapshot.docs.map((doc) => Message.fromJson(doc.data())).toList());
 }

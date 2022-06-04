@@ -21,7 +21,7 @@ class ProfilesList extends StatelessWidget {
         }
         if (snapshot.hasData) {
           if(snapshot.data!.isEmpty) {
-            return Text("Пусто", style: Theme.of(context).textTheme.subtitle2);
+            return Text("Пусто", style: Theme.of(context).textTheme.subtitle1);
           }
           final profiles = snapshot.data!;
           return Padding(

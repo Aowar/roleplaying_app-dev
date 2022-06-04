@@ -172,37 +172,40 @@ class _SettingsViewState extends State<SettingsView> {
                             children: [
                               Text(
                                 "Изменить никнейм:",
-                                style: Theme.of(context).textTheme.headline2,
+                                style: Theme.of(context).textTheme.headline1,
                               ),
-                              Container(
-                                decoration: BoxDecoration(
-                                    color: Theme.of(context).cardColor,
-                                    borderRadius: const BorderRadius.all(
-                                      Radius.circular(10.0),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 5),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      color: Theme.of(context).cardColor,
+                                      borderRadius: const BorderRadius.all(
+                                        Radius.circular(10.0),
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                            color: Theme.of(context).cardColor.withOpacity(0.2),
+                                            spreadRadius: 5,
+                                            offset: const Offset(5, 5),
+                                            blurRadius: 10
+                                        )
+                                      ]
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 8, right: 8),
+                                    child: TextField(
+                                      maxLines: 1,
+                                      textAlignVertical: TextAlignVertical.center,
+                                      textAlign: TextAlign.left,
+                                      decoration: const InputDecoration(
+                                        border: InputBorder.none,
+                                        hintText: "Введите никнейм",
+                                      ),
+                                      controller: nickNameFieldController..text = widget.user.nickName,
+                                      onSubmitted: (String value) {
+                                        changeNickname();
+                                      },
                                     ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                          color: Theme.of(context).cardColor.withOpacity(0.2),
-                                          spreadRadius: 5,
-                                          offset: const Offset(5, 5),
-                                          blurRadius: 10
-                                      )
-                                    ]
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.only(left: 8, right: 8),
-                                  child: TextField(
-                                    maxLines: 1,
-                                    textAlignVertical: TextAlignVertical.center,
-                                    textAlign: TextAlign.left,
-                                    decoration: const InputDecoration(
-                                      border: InputBorder.none,
-                                      hintText: "Введите никнейм",
-                                    ),
-                                    controller: nickNameFieldController..text = widget.user.nickName,
-                                    onSubmitted: (String value) {
-                                      changeNickname();
-                                    },
                                   ),
                                 ),
                               ),

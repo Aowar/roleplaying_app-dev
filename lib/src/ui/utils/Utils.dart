@@ -5,16 +5,17 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 class PushButton extends StatelessWidget {
   final IconData icon;
-  final void Function() onPressed;
-  final bool? isLoading;
+  final void Function()? onPressed;
+  Color? backgroundColor;
 
-  const PushButton({Key? key, required this.icon, required this.onPressed, this.isLoading}) : super(key: key);
+  PushButton({Key? key, required this.icon, required this.onPressed, this.backgroundColor}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    backgroundColor ??= Theme.of(context).primaryColor;
     return ElevatedButton(
         style: ButtonStyle(
-          backgroundColor: MaterialStateProperty.all(Theme.of(context).primaryColor),
+          backgroundColor: MaterialStateProperty.all(backgroundColor),
           shape: MaterialStateProperty.all(const CircleBorder()),
           padding: MaterialStateProperty.all(const EdgeInsets.all(8)),
         ),

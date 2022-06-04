@@ -20,7 +20,9 @@ class ChatService {
       "title": chat.title,
       "description": chat.description,
       "image": chat.image,
-      "isPrivate": chat.isPrivate
+      "isPrivate": chat.isPrivate,
+      "profilesPatterns": chat.profilesPatterns,
+      "approvedProfiles": chat.approvedProfiles
     });
     if (chat.isPrivate) {
       chat.id = docRef.id;
@@ -71,6 +73,12 @@ class ChatService {
     await updateChat(chat);
   }
 
+  Future addApprovedProfiles(String chatId, List approvedProfiles) async {
+    _chatCollection.doc(chatId).update({
+      "approvedProfiles": approvedProfiles
+    });
+  }
+
   Future<bool> isPrivateChatExists(List<String> users) async {
     bool exists = false;
     Function eq = const ListEquality().equals;
@@ -95,7 +103,8 @@ class ChatService {
           description: value.get("description"),
           image: value.get("image"),
           isPrivate: value.get('isPrivate'),
-          profilesPatterns: value.get('profilesPatterns')
+          profilesPatterns: value.get('profilesPatterns'),
+          approvedProfiles: value.get('approvedProfiles')
       );
       chat.id = value.get("id");
       return chat;
@@ -111,4 +120,8 @@ class ChatService {
   Stream<List<Chat>> readUserChats(String userId) => FirebaseFirestore.instance.collection("chats").where("usersId", arrayContains: userId).snapshots().map(
           (snapshot) => snapshot.docs.map((doc) => Chat.fromJson(doc.data())).toList()
   );
+
+  ///Get the stream of current chat
+  Stream<Chat> readChat(String chatId) => FirebaseFirestore.instance.collection("chats").doc(chatId).snapshots().map(
+          (doc) => Chat.fromJson(doc.data()!));
 }

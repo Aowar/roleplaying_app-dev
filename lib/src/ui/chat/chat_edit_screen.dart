@@ -282,6 +282,11 @@ class _ChatEditView extends State<ChatEditView> {
                                                     ]
                                                 ),
                                                 child: TextField(
+                                                  style: TextStyle(
+                                                      fontStyle: Theme.of(context).textTheme.headline2!.fontStyle,
+                                                      color: Theme.of(context).textTheme.bodyText2!.color,
+                                                      fontSize: 24
+                                                  ),
                                                   maxLines: 1,
                                                   textAlignVertical: TextAlignVertical.center,
                                                   textAlign: TextAlign.center,
@@ -417,13 +422,14 @@ class _ChatEditView extends State<ChatEditView> {
                                                 child: Padding(
                                                   padding: const EdgeInsets.only(left: 5, bottom:5, right: 5),
                                                   child: TextField(
+                                                    style: Theme.of(context).textTheme.bodyText2,
                                                     keyboardType: TextInputType.multiline,
                                                     maxLines: null,
                                                     decoration: InputDecoration(
                                                         border: InputBorder.none,
                                                         hintText: "Текст",
                                                         hintStyle: TextStyle(
-                                                          color: Theme.of(context).textTheme.bodyText1?.color,
+                                                          color: Theme.of(context).textTheme.subtitle2!.color,
                                                         )
                                                     ),
                                                     controller: !_chatCreateFlag ? (_descriptionController..text = _chat.description) : _descriptionController,
