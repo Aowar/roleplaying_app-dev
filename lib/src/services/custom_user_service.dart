@@ -41,6 +41,6 @@ class CustomUserService {
     return FirebaseFirestore.instance.collection("chats").doc(chatId).snapshots().map((doc) {
       list.add(CustomUserModel.fromJson(doc.data()!));
       return list;
-    });
+    }).asBroadcastStream();
   }
 }

@@ -12,6 +12,7 @@ import 'package:roleplaying_app/src/services/custom_user_service.dart';
 import 'package:roleplaying_app/src/services/file_service.dart';
 import 'package:roleplaying_app/src/services/profile_service.dart';
 import 'package:roleplaying_app/src/ui/chat/approving_profiles_screen.dart';
+import 'package:roleplaying_app/src/ui/grid_screen/users_in_chat_grid_screen.dart';
 import 'package:roleplaying_app/src/ui/profile/profile_edit_screen.dart';
 import 'package:roleplaying_app/src/ui/user_profile_screen.dart';
 import 'package:roleplaying_app/src/ui/utils/Utils.dart' as utils;
@@ -354,29 +355,29 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
                                           ///Users container
                                           Padding(
                                             padding: const EdgeInsets.only(top: 15, bottom: 10),
-                                            child: Container(
-                                              constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height / 8, maxHeight: MediaQuery.of(context).size.height / 6.5),
-                                              child: SizedBox(
-                                                width: MediaQuery.of(context).size.width / 1.3,
-                                                child: Container(
-                                                    decoration: BoxDecoration(
-                                                        color: Theme.of(context).colorScheme.secondaryContainer,
-                                                        borderRadius: const BorderRadius.all(
-                                                          Radius.circular(5.0),
-                                                        ),
-                                                        boxShadow: [
-                                                          BoxShadow(
-                                                              color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.2),
-                                                              spreadRadius: 2,
-                                                              offset: const Offset(5, 5),
-                                                              blurRadius: 10
-                                                          )
-                                                        ]
-                                                    ),
-                                                    child: Row(
-                                                      children: [
-                                                        SizedBox(
-                                                          width: MediaQuery.of(context).size.width / 1.3,
+                                            child: SizedBox(
+                                              width: MediaQuery.of(context).size.width / 1.3,
+                                              child: Container(
+                                                  decoration: BoxDecoration(
+                                                      color: Theme.of(context).colorScheme.secondaryContainer,
+                                                      borderRadius: const BorderRadius.all(
+                                                        Radius.circular(5.0),
+                                                      ),
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                            color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.2),
+                                                            spreadRadius: 2,
+                                                            offset: const Offset(5, 5),
+                                                            blurRadius: 10
+                                                        )
+                                                      ]
+                                                  ),
+                                                  child: Row(
+                                                    children: [
+                                                      SizedBox(
+                                                        width: MediaQuery.of(context).size.width / 1.3,
+                                                        child: Container(
+                                                          constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height / 10, maxHeight: MediaQuery.of(context).size.height / 2),
                                                           child: GridView.builder(
                                                             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                                                               crossAxisCount: 3,
@@ -433,12 +434,12 @@ class _ChatDescriptionView extends State<ChatDescriptionView> {
                                                               );
                                                             },
                                                           ),
-                                                        )
-                                                      ],
-                                                    )
-                                                ),
+                                                        ),
+                                                      )
+                                                    ],
+                                                  )
                                               ),
-                                            ),
+                                            )
                                           ),
                                           Padding(
                                               padding: const EdgeInsets.only(top: 10, bottom: 10),
@@ -485,34 +486,7 @@ class BuildExitButton extends StatelessWidget {
         onPressed: () {
           showDialog(
               context: context,
-              builder: (context) => AlertDialog(
-                content: ListTile(
-                  title: Text(
-                      "Вы точно хотите удалить чат?",
-                      style: TextStyle(
-                        color: Theme.of(context).textTheme.headline2!.color,
-                        fontSize: 18
-                      )
-                  ),
-                ),
-                  actions: <Widget>[
-                    Center(
-                      child: ElevatedButton(
-                          onPressed: () {
-                            ChatService().deleteChat(chat.id);
-                            if (chat.isPrivate) {
-                              FileService().deleteImage("chats/" + chat.id, chat.image);
-                            }
-                            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const MenuScreen()), (route) => false);
-                          },
-                          style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(Theme.of(context).colorScheme.errorContainer)
-                          ),
-                          child: Text("Да", style: Theme.of(context).textTheme.bodyText2)
-                      )
-                    )
-                  ],
-              )
+              builder: (_) => MyDialog(deleteFlag: deleteFlag, userId: userId, chat: chat)
           );
         },
       );
@@ -530,7 +504,7 @@ class BuildExitButton extends StatelessWidget {
                   title: Text(
                       "Вы точно хотите Выйти из чата",
                       style: TextStyle(
-                          color: Theme.of(context).textTheme.headline2!.color,
+                          color: Theme.of(context).textTheme.subtitle2!.color,
                           fontSize: 18
                       )
                   ),
@@ -554,5 +528,74 @@ class BuildExitButton extends StatelessWidget {
         },
       );
     }
+  }
+}
+
+class MyDialog extends StatefulWidget {
+  final bool deleteFlag;
+  final String userId;
+  final Chat chat;
+  const MyDialog({Key? key, required this.deleteFlag, required this.userId, required this.chat}) : super(key: key);
+
+  @override
+  State<MyDialog> createState() => _MyDialogState();
+}
+
+class _MyDialogState extends State<MyDialog> {
+  bool deleteProfilesPatterns = false;
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      content: ListTile(
+        title: Text(
+            "Вы точно хотите удалить чат?",
+            style: TextStyle(
+                color: Theme.of(context).textTheme.subtitle2!.color,
+                fontSize: 18
+            )
+        ),
+      ),
+      actions: <Widget>[
+        Center(
+          child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Text(
+                  "Удалить шаблоны:",
+                  style: TextStyle(
+                      color: Theme.of(context).textTheme.subtitle2!.color,
+                      fontSize: 14
+                  )
+                ),
+                Checkbox(
+                    value: deleteProfilesPatterns,
+                    onChanged: (bool? value) {
+                      deleteProfilesPatterns = value!;
+                      setState(() {});
+                    }
+                ),
+              ]
+          ),
+        ),
+        Center(
+            child: ElevatedButton(
+                onPressed: () {
+                  if (deleteProfilesPatterns) {
+                    ProfileService().deleteProfilesPatterns(widget.chat.profilesPatterns!);
+                  }
+                  ChatService().deleteChat(widget.chat.id);
+                  if (widget.chat.isPrivate) {
+                    FileService().deleteImage("chats/" + widget.chat.id, widget.chat.image);
+                  }
+                  Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const MenuScreen()), (route) => false);
+                },
+                style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(Theme.of(context).colorScheme.errorContainer)
+                ),
+                child: Text("Да", style: Theme.of(context).textTheme.bodyText2)
+            )
+        )
+      ],
+    );
   }
 }

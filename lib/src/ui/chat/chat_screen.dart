@@ -199,7 +199,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                     children: [
                                       Center(
                                         child: Padding(
-                                          padding: EdgeInsets.only(top: 10),
+                                          padding: const EdgeInsets.only(top: 10),
                                           child: Column(
                                             children: [
                                               Column(
@@ -223,36 +223,49 @@ class _ChatScreenState extends State<ChatScreen> {
                                                               if (!firstAutoscrollExecuted && scrollController.hasClients) {
                                                                 scrollToBottom();
                                                               }
-                                                              return Row(
-                                                                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                                                children: [
-                                                                  Flexible(
-                                                                    fit: FlexFit.loose,
-                                                                    child: ListView.separated(
-                                                                      reverse: true,
-                                                                      controller: scrollController,
-                                                                      scrollDirection: Axis.vertical,
-                                                                      itemCount: messages.length,
-                                                                      itemBuilder: (BuildContext context, int index) {
-                                                                        if (state.getUser()!.id == messages[index].authorId) {
-                                                                          return Column(
-                                                                            crossAxisAlignment: CrossAxisAlignment.end,
-                                                                            children: [
-                                                                              CurUserMessageBox(text: messages[index].text, userId: messages[index].authorId, currentUserId: state.getUser()!.id),
-                                                                            ],
-                                                                          );
-                                                                        } else {
-                                                                          return Padding(
-                                                                            padding: const EdgeInsets.only(right: 15),
-                                                                            child: MessageBox(text: messages[index].text, userId: messages[index].authorId, currentUserId: state.getUser()!.id),
-                                                                          );
-                                                                        }
-                                                                      },
-                                                                      separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 10),
-                                                                    ),
-                                                                  )
-                                                                ],
-                                                              );
+                                                              if(snapshot.data!.isNotEmpty) {
+                                                                return Row(
+                                                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                                  children: [
+                                                                    Flexible(
+                                                                      fit: FlexFit.loose,
+                                                                      child: ListView.separated(
+                                                                        reverse: true,
+                                                                        controller: scrollController,
+                                                                        scrollDirection: Axis.vertical,
+                                                                        itemCount: messages.length,
+                                                                        itemBuilder: (BuildContext context, int index) {
+                                                                          if (state.getUser()!.id == messages[index].authorId) {
+                                                                            return Column(
+                                                                              crossAxisAlignment: CrossAxisAlignment.end,
+                                                                              children: [
+                                                                                CurUserMessageBox(text: messages[index].text, userId: messages[index].authorId, currentUserId: state.getUser()!.id),
+                                                                              ],
+                                                                            );
+                                                                          } else {
+                                                                            return Padding(
+                                                                              padding: const EdgeInsets.only(right: 15),
+                                                                              child: MessageBox(text: messages[index].text, userId: messages[index].authorId, currentUserId: state.getUser()!.id),
+                                                                            );
+                                                                          }
+                                                                        },
+                                                                        separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 10),
+                                                                      ),
+                                                                    )
+                                                                  ],
+                                                                );
+                                                              } else {
+                                                                return Center(
+                                                                  child: Text(
+                                                                      "Здесь пока пусто",
+                                                                      style: TextStyle(
+                                                                        color: Theme.of(context).textTheme.subtitle1!.color!.withOpacity(0.6),
+                                                                        fontStyle: Theme.of(context).textTheme.bodyText1!.fontStyle,
+                                                                        fontSize: 24
+                                                                      )
+                                                                  ),
+                                                                );
+                                                              }
                                                             }
                                                             return const CircularProgressIndicator();
                                                           },

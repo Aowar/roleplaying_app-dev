@@ -479,11 +479,11 @@ class ChatsListStream extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           Toasts.showErrorMessage(errorMessage: snapshot.error.toString());
-          return Text("Ошибка получения данных \n" + snapshot.error.toString(), style: Theme.of(context).textTheme.subtitle2);
+          return Text("Ошибка получения данных \n" + snapshot.error.toString(), style: Theme.of(context).textTheme.subtitle1);
         }
         if (snapshot.hasData) {
           if(snapshot.data!.isEmpty) {
-            return Text("Пусто", style: Theme.of(context).textTheme.subtitle2);
+            return Text("Пусто", style: Theme.of(context).textTheme.subtitle1);
           }
           final chats = snapshot.data!;
           return Padding(

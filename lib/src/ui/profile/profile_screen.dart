@@ -301,7 +301,7 @@ class _ProfileView extends State<ProfileView> {
                                                                     children: [
                                                                       ElevatedButton(
                                                                           style: ButtonStyle(
-                                                                              backgroundColor: MaterialStateProperty.all(Theme.of(context).primaryColor)
+                                                                              backgroundColor: MaterialStateProperty.all(Colors.green)
                                                                           ),
                                                                           onPressed: () async {
                                                                             Profile profile = await ProfileService().getProfile(_profile.id);
@@ -313,13 +313,13 @@ class _ProfileView extends State<ProfileView> {
                                                                             NotificationsService(profile.userId).successApprovementNotification(_chat.title, _chat.id);
                                                                             setState(() {
                                                                               _profile = profile;
-                                                                              utils.Toasts.showInfo(context: context, infoMessage: "Анкета пользлвателя одобрена", isSuccess: true);
+                                                                              utils.Toasts.showInfo(context: context, infoMessage: "Анкета пользователя одобрена", isSuccess: true);
                                                                             });
                                                                           },
                                                                           child: Text(
                                                                             "Одобрить анкету",
                                                                             style: TextStyle(
-                                                                                color: Theme.of(context).textTheme.bodyText2!.color,
+                                                                                color: Colors.white,
                                                                                 fontStyle: Theme.of(context).textTheme.subtitle2!.fontStyle
                                                                             ),
                                                                           )

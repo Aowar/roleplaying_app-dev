@@ -34,13 +34,15 @@ class ProfileService {
   }
 
   Future approveListOfProfiles(String chatId, List approvedProfilesIds) async {
-    await _profileCollection.where("chatId", isEqualTo: chatId).where("isApproved",
-        isEqualTo: ApprovementStates.awaiting.value).get().then((QuerySnapshot querySnapshot) {
-          for(var doc in querySnapshot.docs) {
-            doc.reference.update({
-              "isApproved": ApprovementStates.approved.value
-            });
-          }
+    await _profileCollection.where("chatId", isEqualTo: chatId).where(
+        "isApproved",
+        isEqualTo: ApprovementStates.awaiting.value).get().then((
+        QuerySnapshot querySnapshot) {
+      for (var doc in querySnapshot.docs) {
+        doc.reference.update({
+          "isApproved": ApprovementStates.approved.value
+        });
+      }
     });
   }
 
@@ -68,6 +70,24 @@ class ProfileService {
   Future<Profile> getProfile(String profileId) async {
     return await FirebaseFirestore.instance.collection("profiles").doc(profileId).get().then((value) {
       return Profile.fromJson(value.data()!);
+    });
+  }
+
+  Future deleteProfilesPatterns(List profilesIds) async {
+    return await _profileCollection.where("id", whereIn: profilesIds).get().then((QuerySnapshot querySnapshot) {
+      for(var doc in querySnapshot.docs){
+        doc.reference.delete();
+      }
+    });
+  }
+
+  Future deleteChatIdFromProfiles(String chatId) async {
+    return await _profileCollection.where("chatId", isEqualTo: chatId).get().then((QuerySnapshot querySnapshot) {
+      for(var doc in querySnapshot.docs) {
+        doc.reference.update({
+          "chatId": "none"
+        });
+      }
     });
   }
 

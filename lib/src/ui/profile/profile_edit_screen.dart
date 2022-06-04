@@ -199,7 +199,7 @@ class _ProfileEditView extends State<ProfileEditView> {
                               )
                             ]
                         ),
-                        child: IconButton(
+                        child: isLoading ? const CircularProgressIndicator() : IconButton(
                             icon: const Icon(Icons.check),
                             color: Colors.white,
                             iconSize: sqrt(MediaQuery.of(context).size.height + MediaQuery.of(context).size.width),
@@ -223,6 +223,10 @@ class _ProfileEditView extends State<ProfileEditView> {
                                 Toasts.showErrorMessage(errorMessage: "Замените картинку");
                                 return;
                               }
+                              isLoading = true;
+                              setState(() {
+
+                              });
                               if (_profileCreateFlag) {
                                 _profile = Profile(
                                     userId: state.getUser()!.id,
@@ -231,15 +235,16 @@ class _ProfileEditView extends State<ProfileEditView> {
                                     image: "profile_pic"
                                 );
                                 if (widget.isPattern) {
-                                  _profile.isPattern = true;
+                                  _profile.isPattern = widget.isPattern;
                                   _profile.approvementState = ApprovementStates.approved.value;
                                   _profile.chatId = widget.chatId!;
                                 }
-                                _profile.id = await ProfileService().addProfile(_profile, imageInMemory!.path);
+                                String patternId = await ProfileService().addProfile(_profile, imageInMemory!.path);
                                 if(widget.isPattern) {
-                                  ChatService().addProfilePattern(widget.chatId!, _profile.id);
+                                  ChatService().addProfilePattern(widget.chatId!, patternId);
                                 }
                               } else {
+                                _profile.approvementState = ApprovementStates.awaiting.value;
                                 _profile.title = title;
                                 _profile.text = text;
                                 if(_profile.isPattern){
@@ -475,7 +480,7 @@ class _ProfileEditView extends State<ProfileEditView> {
                                         ),
                                       ),
                                     ),
-                                    state.getUser()!.id == _profile.userId && !_profileCreateFlag ? Padding(
+                                    !_profileCreateFlag && state.getUser()!.id == _profile.userId ? Padding(
                                       padding: const EdgeInsets.only(top: 15),
                                       child: ElevatedButton(
                                         child: Text("Удалить анкету", style: Theme.of(context).textTheme.bodyText2),
@@ -490,7 +495,7 @@ class _ProfileEditView extends State<ProfileEditView> {
                                                   title: Text(
                                                       "Вы точно хотите удалить анкету?",
                                                       style: TextStyle(
-                                                          color: Theme.of(context).textTheme.headline2!.color,
+                                                          color: Theme.of(context).textTheme.subtitle2!.color,
                                                           fontSize: 18
                                                       )
                                                   ),
@@ -500,7 +505,10 @@ class _ProfileEditView extends State<ProfileEditView> {
                                                       child: ElevatedButton(
                                                           onPressed: () {
                                                             if (_profile.isPattern) {
-                                                              ChatService().deleteProfilePattern(widget.chatId!, _profile.id);
+                                                              ChatService().deleteProfilePattern(_profile.chatId, _profile.id);
+                                                            }
+                                                            if (_profile.chatId != "none") {
+                                                              ChatService().deleteApprovedProfile(_profile.chatId, _profile.id);
                                                             }
                                                             ProfileService().deleteProfile(_profile.id);
                                                             Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const MenuScreen()), (route) => false);

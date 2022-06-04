@@ -56,12 +56,29 @@ class ChatService {
         doc.reference.delete();
       }
     });
+    await docRef.collection("rolePlayQueue").get().then((QuerySnapshot querySnapshot) {
+      for (var doc in querySnapshot.docs) {
+        doc.reference.delete();
+      }
+    });
+
     return await docRef.delete();
+  }
+
+  Future deleteApprovedProfile(String chatId, String profileId) async {
+    Chat chat = await FirebaseFirestore.instance.collection("chats").doc(chatId).get().then((value) => Chat.fromJson(value.data()!));
+    chat.approvedProfiles!.remove(profileId);
+    updateChat(chat);
   }
 
   Future addProfilePattern(String chatId, String profileId) async {
     Chat chat = await getChat(chatId);
-    chat.profilesPatterns!.add(profileId);
+    if(chat.profilesPatterns != null) {
+      chat.profilesPatterns!.add(profileId);
+    } else {
+      List list = [profileId];
+      chat.profilesPatterns = list;
+    }
     updateChat(chat);
   }
 
