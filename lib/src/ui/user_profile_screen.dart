@@ -1,6 +1,7 @@
 import 'dart:developer' as dev;
 import 'dart:math';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,9 +10,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:roleplaying_app/src/bloc/auth/auth_bloc.dart';
 import 'package:roleplaying_app/src/models/chat.dart';
 import 'package:roleplaying_app/src/models/custom_user_model.dart';
+import 'package:roleplaying_app/src/models/notifications/notifications.dart';
 import 'package:roleplaying_app/src/services/chat_service.dart';
 import 'package:roleplaying_app/src/services/custom_user_service.dart';
 import 'package:roleplaying_app/src/services/file_service.dart';
+import 'package:roleplaying_app/src/services/notifications_service.dart';
 import 'package:roleplaying_app/src/ui/auth_screen.dart';
 import 'package:roleplaying_app/src/ui/chat/chat_screen.dart';
 import 'package:roleplaying_app/src/ui/grid_screen/profile_grid_screen.dart';
@@ -254,6 +257,15 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                              isPrivate: true
                                          );
                                          chat = await ChatService().addChat(chat);
+                                         NotificationsService(_user.idUser).addNotification(
+                                           Notifications(
+                                               title: "Приватный чат",
+                                               text: "Пользователь \"" + state.getUser()!.nickName! + "\" приглашает вас в приватный чат",
+                                               creationTime: Timestamp.now(),
+                                               type: NotificationType.chatPrivate.value,
+                                               navigationId: chat.id
+                                           )
+                                         );
                                          Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(chat: chat)));
                                        } else {
                                          utils.Toasts.showInfo(context: context, infoMessage: "Вы уже начали чат с этим пользователем");
