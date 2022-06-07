@@ -307,7 +307,12 @@ class _ProfileView extends State<ProfileView> {
                                                                             Profile profile = await ProfileService().getProfile(_profile.id);
                                                                             profile.approvementState = ApprovementStates.approved.value;
                                                                             ProfileService().updateProfile(profile);
-                                                                            List list = List.of(_chat.approvedProfiles!);
+                                                                            List list;
+                                                                            if(_chat.approvedProfiles != null) {
+                                                                              list = List.of(_chat.approvedProfiles!);
+                                                                            } else {
+                                                                              list = [];
+                                                                            }
                                                                             list.add(profile.id);
                                                                             ChatService().addApprovedProfiles(_chat.id, list);
                                                                             NotificationsService(profile.userId).successApprovementNotification(_chat.title, _chat.id);

@@ -326,9 +326,9 @@ class _AuthView extends State<AuthView> {
 
   registration() async {
     AuthProblems? errorType;
-    _email = _emailRegisterController.text;
-    _nickName = _userNicknameController.text;
-    _password = _passwordRegisterController.text;
+    _email = _emailRegisterController.text.trim();
+    _nickName = _userNicknameController.text.trim();
+    _password = _passwordRegisterController.text.trim();
     dynamic registrationResult;
 
     registrationResult = await _authService.registration(_email, _password, _nickName);

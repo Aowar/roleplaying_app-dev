@@ -1043,7 +1043,7 @@ class CurUserMessageBox extends StatelessWidget {
       child: Stack(
         children: [
           Container(
-            constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 6, maxWidth: MediaQuery.of(context).size.width / 1.2),
+            constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width / 1.2),
             child: Container(
               decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.7),
@@ -1062,14 +1062,17 @@ class CurUserMessageBox extends StatelessWidget {
               child: Stack(
                 children: [
                   Padding(
-                    padding: EdgeInsets.only(left: 10, top: 5, right: MediaQuery.of(context).size.width / 5),
+                    padding: EdgeInsets.only(left: 10, top: 5, right: MediaQuery.of(context).size.width / 5, bottom: 20),
                     child: Column(
                       children: [
                         AuthorOfMessage(userId: userId, currentUserId: currentUserId),
                         Padding(
                           padding: const EdgeInsets.only(top: 10),
                           child: Text(text,
-                            style: Theme.of(context).textTheme.bodyText1,
+                            style: TextStyle(
+                                color: Theme.of(context).textTheme.subtitle2!.color,
+                                fontStyle: Theme.of(context).textTheme.bodyText1!.fontStyle
+                            ),
                           ),
                         ),
                       ],
@@ -1121,50 +1124,53 @@ class MessageBox extends StatelessWidget {
         child: Stack(
           children: [
             Container(
-              constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 6, minHeight: MediaQuery.of(context).size.height / 8, maxWidth: MediaQuery.of(context).size.width / 1.2),
+              constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width / 1.2),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(5),
                 color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.7),
               ),
-              child: Stack(
-                children: [
-                  FutureBuilder<CustomUserModel>(
-                      future: CustomUserService().getUser(userId),
-                      builder: (context, snapshot) {
-                        if (!snapshot.hasData){
-                          return const CircularProgressIndicator();
-                        } else if (snapshot.hasError) {
-                          return Text(snapshot.error.toString());
-                        } else {
-                          return utils.CustomCircleIconButton(
-                            future: FileService().getUserImage(snapshot.data!.idUser, snapshot.data!.image),
-                            onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => UserProfileScreen(user: snapshot.data!))),
-                            borderWidth: 2,
-                            scale: 1.5,
-                          );
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: Stack(
+                  children: [
+                    FutureBuilder<CustomUserModel>(
+                        future: CustomUserService().getUser(userId),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData){
+                            return const CircularProgressIndicator();
+                          } else if (snapshot.hasError) {
+                            return Text(snapshot.error.toString());
+                          } else {
+                            return utils.CustomCircleIconButton(
+                              future: FileService().getUserImage(snapshot.data!.idUser, snapshot.data!.image),
+                              onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => UserProfileScreen(user: snapshot.data!))),
+                              borderWidth: 2,
+                              scale: 1.5,
+                            );
+                          }
                         }
-                      }
-                  ),
-                  Padding(
-                      padding: EdgeInsets.only(left: MediaQuery.of(context).size.width / 5, top: 5, right: 10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          AuthorOfMessage(userId: userId, currentUserId: currentUserId),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 10),
-                            child: Text(text,
-                              textAlign: TextAlign.left,
-                              style: TextStyle(
-                                color: Theme.of(context).textTheme.subtitle2!.color,
-                                fontStyle: Theme.of(context).textTheme.bodyText1!.fontStyle
+                    ),
+                    Padding(
+                        padding: EdgeInsets.only(left: MediaQuery.of(context).size.width / 5, top: 5, right: 10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            AuthorOfMessage(userId: userId, currentUserId: currentUserId),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 10),
+                              child: Text(text,
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                  color: Theme.of(context).textTheme.subtitle2!.color,
+                                  fontStyle: Theme.of(context).textTheme.bodyText1!.fontStyle
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      )
-                  ),
-                ],
+                          ],
+                        )
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

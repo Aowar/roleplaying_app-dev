@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:roleplaying_app/src/models/user.dart';
 
@@ -29,6 +31,7 @@ class AuthService {
       user.updateDisplayName(displayName);
       return UserModel(id: user.uid, email: user.email);
     } on FirebaseAuthException catch (e) {
+      log(e.toString(), name: "ERROR");
       return e;
     }
   }
